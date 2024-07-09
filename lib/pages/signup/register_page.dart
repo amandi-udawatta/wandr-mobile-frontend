@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:wandr/components/bottom_nav_bar.dart';
 import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/components/secondary_button.dart';
 import 'package:wandr/components/cust_textfield.dart';
 import 'package:wandr/components/google_button.dart';
-import 'package:wandr/pages/dashboard_page.dart';
-import 'package:wandr/pages/onboarding/onboarding_page.dart';
-import 'package:wandr/pages/signup/register_page.dart';
-import 'package:wandr/theme/app_colors.dart';
+import 'package:wandr/pages/signup/pref_destinations_page.dart';
 
-// import 'package:get/get.dart';
-
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class RegisterPage extends StatelessWidget {
+  RegisterPage({super.key});
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -34,8 +28,9 @@ class LoginPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: Text(
-                  'Welcome Back!',
+                  'Create Your Account',
                   textAlign: TextAlign.center, // Center the text
+
                   style: TextStyle(
                     color: Color(0xFF437B17),
                     fontSize: 30,
@@ -49,7 +44,7 @@ class LoginPage extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0), // Add horizontal padding
                 child: Text(
-                  'Log in to access your personalized travel itineraries and enjoy seamless journey planning.',
+                  'Join us to enhance your travel experience with personalized recommendations and real-time updates.',
                   textAlign: TextAlign.center, // Center the text
                   style: TextStyle(
                     color: Colors.grey,
@@ -59,6 +54,30 @@ class LoginPage extends StatelessWidget {
               ),
 
               SizedBox(height: 50),
+
+              //   Name label
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                child: const Text(
+                  'Your Name',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Color(0xFF437B17),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+
+              // Your name field
+              CustTextfield(
+                controller: emailController,
+                obsecureText: false,
+                borderRadius: 16.0,
+              ),
+
+              SizedBox(height: 25),
 
               //   Email Address label
               Container(
@@ -99,6 +118,7 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
 
+
               //   Password field
               CustTextfield(
                 controller: passwordController,
@@ -106,25 +126,33 @@ class LoginPage extends StatelessWidget {
                 borderRadius: 16.0,
               ),
 
-              //   Remember Me checkbox
+              SizedBox(height: 25),
 
-              SizedBox(height: 15),
-
-              //   Forgot Password?
+              //   Password label
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: const Text(
-                  'Forgot Password?',
-                  textAlign: TextAlign.right,
+                  'Password Confirmation',
+                  textAlign: TextAlign.left,
                   style: TextStyle(
-                    color: Kcolours.primary,
+                    color: Color(0xFF437B17),
+                    fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
                 ),
               ),
 
-              SizedBox(height: 150),
+              //   Password field
+              CustTextfield(
+                controller: passwordController,
+                obsecureText: true,
+                borderRadius: 16.0,
+              ),
+
+
+              SizedBox(height: 95),
+
 
               //   Login Button
               PrimaryButton(
@@ -133,30 +161,14 @@ class LoginPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context){
-                            return LoginPage();
+                            return PrefDestinationsPage();
                           }
                       )
                   );
                 },
-                text: "Login",
+                text: "Register",
               ),
 
-              SizedBox(height: 15),
-
-              //   Create Account Button
-              SecondaryButton(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context){
-                            return OnboardingPage();
-                          }
-                      )
-                  );
-                },
-                text: "Create Account",
-              ),
 
               SizedBox(height: 20),
 
@@ -200,6 +212,32 @@ class LoginPage extends StatelessWidget {
               //   Continue with Google
               GoogleButton(
                 onTap: logUserIn,
+              ),
+
+              SizedBox(height: 20),
+
+              // Don't have an account?
+              Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0), // Add horizontal padding
+                    child: Text(
+                      'Already have an account?',
+                      textAlign: TextAlign.center, // Center the text
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Login',
+                    style: TextStyle(
+                      color: Color(0xFF437B17),
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

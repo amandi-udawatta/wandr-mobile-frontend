@@ -1,5 +1,5 @@
 name: wandr
-description: "A new Flutter project."
+description: "Third Year Project"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -31,10 +31,12 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
+  smooth_page_indicator: ^1.0.0
+  line_icons: ^2.0.2
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -63,7 +65,11 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - assets/images/logo-image.png
+    - assets/logos/logo-dark.png
+    - assets/brands/google.png
+    - assets/images/Onboarding-1.png
+    - assets/images/Onboarding-2.png
+    - assets/images/Onboarding-3.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -87,6 +93,14 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Bold.otf
+        - asset: assets/fonts/Poppins-ExtraLight.otf
+        - asset: assets/fonts/Poppins-Light.otf
+        - asset: assets/fonts/Poppins-Medium.otf
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
