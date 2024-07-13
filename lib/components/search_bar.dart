@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:google_fonts/google_fonts.dart';
+import 'package:wandr/theme/app_colors.dart';
 
 class SearchBar extends StatelessWidget {
   final TextEditingController controller;
@@ -14,22 +15,30 @@ class SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      padding: EdgeInsets.symmetric(vertical: 1, horizontal: 15), // Reduced padding for the overall box
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        padding: EdgeInsets.symmetric(vertical: 1, horizontal: 10),
         decoration: BoxDecoration(
-          color: Color(0xFFF3F8FE),
-          borderRadius: BorderRadius.circular(24),
+          color: Colors.white, // Set the background color to white
+          borderRadius: BorderRadius.circular(12), // Reduced border radius
+          border: Border.all(color: Kcolours.greyShade2), // Set the border color to grey
         ),
         child: TextField(
           controller: controller,
           onChanged: onChanged,
-          style: TextStyle(color: Colors.black), // Ensure text color is visible
+          style: GoogleFonts.poppins(
+            color: Kcolours.black,
+            fontSize: 18, // Increase the font size
+          ),
           decoration: InputDecoration(
-            hintText: "Find places to visit",
-            hintStyle: TextStyle(color: Colors.grey), // Set hint text color
+            hintText: "Search Destinations",
+            hintStyle: GoogleFonts.poppins(
+              color: Kcolours.greyShade1, // Set hint text color
+              fontSize: 18, // Increase the hint text font size
+            ),
             border: InputBorder.none,
             prefixIcon: Icon(Icons.search, color: Colors.black), // Set icon color
+            contentPadding: EdgeInsets.symmetric(vertical: 10), // Adjust vertical padding for alignment
           ),
         ),
       ),

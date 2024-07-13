@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wandr/theme/app_colors.dart';
+import 'package:wandr/components/categories_button.dart'; // Ensure this import is correct
+import 'package:wandr/components/filter_button.dart'; // Ensure this import is correct
+import 'package:wandr/components/places_card1.dart';
 import 'package:wandr/components/search_bar.dart' as custom;
-import 'package:wandr/components/places_card2.dart';
-import 'package:wandr/components/categories_button.dart';
-import 'package:wandr/components/filter_button.dart';
 import 'package:wandr/components/bottom_nav_bar.dart';
 
 class FilterScreen extends StatefulWidget {
@@ -44,12 +45,12 @@ class _FilterScreenState extends State<FilterScreen> {
         backgroundColor: Colors.white,
         body: Column(
           children: [
-            SizedBox(height: 30),
+            SizedBox(height: 25),
             custom.SearchBar(
               controller: _searchController,
               onChanged: _onSearchChanged,
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 20),
             Expanded(
               child: buildTabContent(),
             ),
@@ -85,7 +86,7 @@ class _FilterScreenState extends State<FilterScreen> {
     ];
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16), // Adjusted padding
+      padding: EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,10 +97,10 @@ class _FilterScreenState extends State<FilterScreen> {
               children: [
                 Text(
                   "Categories",
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
                     fontSize: 18,
-                    color: Color(0xFF232323),
+                    color: Kcolours.brownShade4,
                   ),
                 ),
               ],
@@ -117,7 +118,7 @@ class _FilterScreenState extends State<FilterScreen> {
                     },
                     isSelected: _selectedCategoryIndex == 0,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 12),
                   CategoriesButton(
                     title: "Beach",
                     image: "assets/images/home/Categories - Beach.png",
@@ -126,7 +127,7 @@ class _FilterScreenState extends State<FilterScreen> {
                     },
                     isSelected: _selectedCategoryIndex == 1,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 12),
                   CategoriesButton(
                     title: "Mountains",
                     image: "assets/images/home/Categories - Mountains.png",
@@ -135,7 +136,7 @@ class _FilterScreenState extends State<FilterScreen> {
                     },
                     isSelected: _selectedCategoryIndex == 2,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 12),
                   CategoriesButton(
                     title: "Forest",
                     image: "assets/images/home/Categories - Forest.png",
@@ -148,17 +149,17 @@ class _FilterScreenState extends State<FilterScreen> {
               ),
             ),
 
-            // Filter By (Placeholder)
+            // Filter By
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   "Filter By",
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
                     fontSize: 18,
-                    color: Color(0xFF232323),
+                    color: Kcolours.brownShade4,
                   ),
                 ),
               ],
@@ -173,26 +174,29 @@ class _FilterScreenState extends State<FilterScreen> {
                     onPressed: () {
                       // Handle filter logic for "Most Popular"
                     },
+                    isSelected: _selectedIndex == 0,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 12),
                   FilterButton(
                     text: "Recommended",
                     onPressed: () {
                       // Handle filter logic for "Recommended"
                     },
+                    isSelected: _selectedIndex == 1,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 12),
                   FilterButton(
                     text: "All Destinations",
                     onPressed: () {
                       // Handle filter logic for "All Destinations"
                     },
+                    isSelected: _selectedIndex == 2,
                   ),
                 ],
               ),
             ),
 
-            // Suggested places 
+            // Suggested places
             SizedBox(height: 20),
             GridView.builder(
               physics: NeverScrollableScrollPhysics(),
@@ -203,10 +207,10 @@ class _FilterScreenState extends State<FilterScreen> {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
               ),
-              itemCount: places.length, // Update this count based on your data
+              itemCount: places.length,
               itemBuilder: (context, index) {
                 final place = places[index];
-                return PlacesCard2(
+                return PlacesCard1(
                   title: place["title"]!,
                   location: place["location"]!,
                   image: place["image"]!,

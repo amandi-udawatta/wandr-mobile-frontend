@@ -1,112 +1,110 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wandr/pages/home/home_destination_profile_screen.dart';
 
-class PlacesCard1 extends StatelessWidget {
+class PlacesCard1 extends StatefulWidget {
   final String title;
   final String location;
   final String image;
 
   const PlacesCard1({
-    super.key,
+    Key? key,
     required this.title,
     required this.location,
     required this.image,
-  });
+  }) : super(key: key);
+
+  @override
+  _PlacesCard1State createState() => _PlacesCard1State();
+}
+
+class _PlacesCard1State extends State<PlacesCard1> {
+  bool isFavorite = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DestinationProfileScreen(),
-            ));
+          context,
+          MaterialPageRoute(
+            builder: (context) => DestinationProfileScreen(),
+          ),
+        );
       },
       child: Container(
-        width: 200,
-        height: 240,
+        width: 120,
+        height: 160,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: Colors.black,
           image: DecorationImage(
             fit: BoxFit.cover,
             opacity: 0.9,
-            image: AssetImage(image),
+            image: AssetImage(widget.image),
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF4D5652),
-                        borderRadius: BorderRadius.circular(20),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isFavorite = !isFavorite;
+                  });
+                },
+                child: Icon(
+                  Icons.favorite,
+                  color: isFavorite ? Colors.redAccent : Colors.white,
+                  size: 24,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 10,
+              left: 10,
+              right: 10,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.title,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
+                    maxLines: 1, // Ensure title stays on one line
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 2), // Reduced space between title and location
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 16,
+                        color: Colors.white,
                       ),
-                      child: Text(
-                        title,
-                        style: GoogleFonts.robotoCondensed(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                          color: Colors.white,
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: Text(
+                          widget.location,
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 10,
+                            color: Colors.white,
+                          ),
+                          maxLines: 1, // Ensure location stays on one line
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF4D5652),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/vectors/star.svg',
-                            width: 20,
-                            height: 20,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            location,
-                            style: GoogleFonts.robotoCondensed(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                Container(
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+                    ],
                   ),
-                  child: Icon(
-                    Icons.favorite,
-                    color: Colors.redAccent,
-                  ),
-                )
-              ],
+                ],
+              ),
             ),
-            SizedBox(height: 10),
           ],
         ),
       ),

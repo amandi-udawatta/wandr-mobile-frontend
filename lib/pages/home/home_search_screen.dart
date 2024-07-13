@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wandr/theme/app_colors.dart';
 
 import 'package:wandr/components/places_card1.dart';
 import 'package:wandr/components/search_bar.dart' as custom;
@@ -53,12 +54,12 @@ class _SearchScreenState extends State<SearchScreen> {
         backgroundColor: Colors.white,
         body: Column(
           children: [
-            SizedBox(height: 30),
+            SizedBox(height: 25),
             custom.SearchBar(
               controller: _searchController,
               onChanged: _onSearchChanged,
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 20),
             Expanded(
               child: buildTabContent(),
             ),
@@ -83,10 +84,10 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 Text(
                   "Categories",
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
                     fontSize: 18,
-                    color: Color(0xFF232323),
+                    color: Kcolours.brownShade4,
                   ),
                 ),
               ],
@@ -104,7 +105,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     },
                     isSelected: _selectedCategoryIndex == 0,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 12),
                   CategoriesButton(
                     title: "Beach",
                     image: "assets/images/home/Categories - Beach.png",
@@ -113,7 +114,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     },
                     isSelected: _selectedCategoryIndex == 1,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 12),
                   CategoriesButton(
                     title: "Mountains",
                     image: "assets/images/home/Categories - Mountains.png",
@@ -122,7 +123,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     },
                     isSelected: _selectedCategoryIndex == 1,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 12),
                   CategoriesButton(
                     title: "Forest",
                     image: "assets/images/home/Categories - Forest.png",
@@ -134,6 +135,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ),
+            SizedBox(height: 20),
 
             // Recommended Places
             Row(
@@ -141,18 +143,18 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 Text(
                   "Recommended Places",
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
                     fontSize: 18,
-                    color: Color(0xFF232323),
+                    color: Kcolours.brownShade4,
                   ),
                 ),
                 Text(
                   "See all",
-                  style: GoogleFonts.robotoCondensed(
+                  style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
                     fontSize: 12,
-                    color: Color(0xFF176FF2),
+                    color: Kcolours.blueShade2,
                   ),
                 ),
               ],
@@ -164,25 +166,25 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   PlacesCard1(
                     title: "Sigiriya",
-                    location: "Mathale, Sri Lanka",
+                    location: "Mathale, SL",
                     image: "assets/images/home/Rec - Sigiriya.png",
                   ),
                   SizedBox(width: 16),
                   PlacesCard1(
                     title: "Nilaweli",
-                    location: "Trincomalee, Sri Lanka",
+                    location: "Trincomalee, SL",
                     image: "assets/images/home/Rec - Nilaweli.png",
                   ),
                   SizedBox(width: 16),
                   PlacesCard1(
                     title: "Sinharaja",
-                    location: "Deniyaya, Sri Lanka",
+                    location: "Deniyaya, SL",
                     image: "assets/images/home/Rec - Sinharaja.png",
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 32),
+            SizedBox(height: 20),
 
             // Popular Destinations
             Row(
@@ -190,18 +192,18 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 Text(
                   "Popular Destinations",
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
                     fontSize: 18,
-                    color: Color(0xFF232323),
+                    color: Kcolours.brownShade4,
                   ),
                 ),
                 Text(
                   "See all",
-                  style: GoogleFonts.robotoCondensed(
+                  style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
                     fontSize: 12,
-                    color: Color(0xFF176FF2),
+                    color: Kcolours.blueShade2,
                   ),
                 ),
               ],
@@ -213,25 +215,25 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   PlacesCard1(
                     title: "Ella",
-                    location: "Badulla, Sri Lanka",
+                    location: "Badulla, SL",
                     image: "assets/images/home/Pop - Ella.png",
                   ),
                   SizedBox(width: 16),
                   PlacesCard1(
                     title: "World's End",
-                    location: "Nuwara Eliya, Sri Lanka",
+                    location: "Nuwara Eliya, SL",
                     image: "assets/images/home/Pop - Worlds End.png",
                   ),
                   SizedBox(width: 16),
                   PlacesCard1(
                     title: "Ruwanweli Stupa",
-                    location: "Anuradhapura, Sri Lanka",
+                    location: "Anuradhapura, SL",
                     image: "assets/images/home/Pop - Ruwanweli Stupa.png",
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 32),
+            SizedBox(height: 20),
 
             // Favorites
             Row(
@@ -239,18 +241,18 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 Text(
                   "Favorites",
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
                     fontSize: 18,
-                    color: Color(0xFF232323),
+                    color: Kcolours.brownShade4,
                   ),
                 ),
                 Text(
                   "See all",
-                  style: GoogleFonts.robotoCondensed(
+                  style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
                     fontSize: 12,
-                    color: Color(0xFF176FF2),
+                    color: Kcolours.blueShade2,
                   ),
                 ),
               ],
@@ -262,25 +264,25 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   PlacesCard1(
                     title: "Sigiriya",
-                    location: "Mathale, Sri Lanka",
+                    location: "Mathale, SL",
                     image: "assets/images/home/Fav - Sigiriya.png",
                   ),
                   SizedBox(width: 16),
                   PlacesCard1(
                     title: "Galle Fort",
-                    location: "Galle, Sri Lanka",
+                    location: "Galle, SL",
                     image: "assets/images/home/Fav - Galle Fort.png",
                   ),
                   SizedBox(width: 16),
                   PlacesCard1(
                     title: "Adam's Peak",
-                    location: "Hatton, Sri Lanka",
+                    location: "Hatton, SL",
                     image: "assets/images/home/Fav - Adams Peak.png",
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 32),
+            SizedBox(height: 20),
           ],
         ),
       ),
