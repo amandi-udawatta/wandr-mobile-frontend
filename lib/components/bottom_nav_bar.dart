@@ -3,7 +3,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:wandr/pages/shop/main_shops_page.dart';
 import 'package:wandr/pages/trips_page.dart';
 import 'package:wandr/pages/blogs_page.dart';
-import 'package:wandr/pages/dashboard_page.dart';
+import 'package:wandr/pages/home/home_search_screen.dart';
 import 'package:wandr/pages/challenges_page.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -35,7 +35,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       case 2:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DashboardPage()),
+          MaterialPageRoute(builder: (context) => SearchScreen()),
         );
         break;
       case 3:

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:wandr/components/places_card1.dart';
-import 'package:wandr/components/custom_bottom_navigation_bar.dart';
 import 'package:wandr/components/search_bar.dart' as custom;
 import 'package:wandr/components/categories_button.dart';
 import 'package:wandr/pages/home/home_filter_screen.dart';
+import 'package:wandr/components/bottom_nav_bar.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -64,10 +64,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ],
         ),
-        bottomNavigationBar: CustomBottomNavigationBar(
-          selectedIndex: _selectedIndex,
-          onItemTapped: _onItemTapped,
-        ),
+        bottomNavigationBar: BottomNavBar(),
       ),
     );
   }
@@ -100,8 +97,8 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 children: [
                   CategoriesButton(
-                    title: "Beach",
-                    image: "assets/images/Popular - Ella.png",
+                    title: "Ocean",
+                    image: "assets/images/home/Categories - Ocean.png",
                     onPressed: () {
                       _onCategorySelected(0);
                     },
@@ -109,8 +106,26 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   SizedBox(width: 16),
                   CategoriesButton(
+                    title: "Beach",
+                    image: "assets/images/home/Categories - Beach.png",
+                    onPressed: () {
+                      _onCategorySelected(1);
+                    },
+                    isSelected: _selectedCategoryIndex == 1,
+                  ),
+                  SizedBox(width: 16),
+                  CategoriesButton(
                     title: "Mountains",
-                    image: "assets/images/Popular - Ella.png",
+                    image: "assets/images/home/Categories - Mountains.png",
+                    onPressed: () {
+                      _onCategorySelected(1);
+                    },
+                    isSelected: _selectedCategoryIndex == 1,
+                  ),
+                  SizedBox(width: 16),
+                  CategoriesButton(
+                    title: "Forest",
+                    image: "assets/images/home/Categories - Forest.png",
                     onPressed: () {
                       _onCategorySelected(1);
                     },
@@ -148,15 +163,21 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 children: [
                   PlacesCard1(
-                    title: "Alley Palace",
-                    location: "4.1",
-                    image: "assets/images/Popular - Ella.png",
+                    title: "Sigiriya",
+                    location: "Mathale, Sri Lanka",
+                    image: "assets/images/home/Rec - Sigiriya.png",
                   ),
                   SizedBox(width: 16),
                   PlacesCard1(
-                    title: "Condures Alpes",
-                    location: "4.9",
-                    image: "assets/images/Popular - Ella.png",
+                    title: "Nilaweli",
+                    location: "Trincomalee, Sri Lanka",
+                    image: "assets/images/home/Rec - Nilaweli.png",
+                  ),
+                  SizedBox(width: 16),
+                  PlacesCard1(
+                    title: "Sinharaja",
+                    location: "Deniyaya, Sri Lanka",
+                    image: "assets/images/home/Rec - Sinharaja.png",
                   ),
                 ],
               ),
@@ -191,15 +212,21 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 children: [
                   PlacesCard1(
-                    title: "Alley Palace",
-                    location: "4.1",
-                    image: "assets/images/Popular - Ella.png",
+                    title: "Ella",
+                    location: "Badulla, Sri Lanka",
+                    image: "assets/images/home/Pop - Ella.png",
                   ),
                   SizedBox(width: 16),
                   PlacesCard1(
-                    title: "Condures Alpes",
-                    location: "4.9",
-                    image: "assets/images/Popular - Ella.png",
+                    title: "World's End",
+                    location: "Nuwara Eliya, Sri Lanka",
+                    image: "assets/images/home/Pop - Worlds End.png",
+                  ),
+                  SizedBox(width: 16),
+                  PlacesCard1(
+                    title: "Ruwanweli Stupa",
+                    location: "Anuradhapura, Sri Lanka",
+                    image: "assets/images/home/Pop - Ruwanweli Stupa.png",
                   ),
                 ],
               ),
@@ -234,15 +261,21 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 children: [
                   PlacesCard1(
-                    title: "Alley Palace",
-                    location: "4.1",
-                    image: "assets/images/Popular - Ella.png",
+                    title: "Sigiriya",
+                    location: "Mathale, Sri Lanka",
+                    image: "assets/images/home/Fav - Sigiriya.png",
                   ),
                   SizedBox(width: 16),
                   PlacesCard1(
-                    title: "Condures Alpes",
-                    location: "4.9",
-                    image: "assets/images/Popular - Ella.png",
+                    title: "Galle Fort",
+                    location: "Galle, Sri Lanka",
+                    image: "assets/images/home/Fav - Galle Fort.png",
+                  ),
+                  SizedBox(width: 16),
+                  PlacesCard1(
+                    title: "Adam's Peak",
+                    location: "Hatton, Sri Lanka",
+                    image: "assets/images/home/Fav - Adams Peak.png",
                   ),
                 ],
               ),

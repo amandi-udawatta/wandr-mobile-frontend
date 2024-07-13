@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import 'package:wandr/components/custom_bottom_navigation_bar.dart';
 import 'package:wandr/components/search_bar.dart' as custom;
 import 'package:wandr/components/places_card2.dart';
 import 'package:wandr/components/categories_button.dart';
 import 'package:wandr/components/filter_button.dart';
+import 'package:wandr/components/bottom_nav_bar.dart';
 
 class FilterScreen extends StatefulWidget {
   final String category;
@@ -56,17 +55,37 @@ class _FilterScreenState extends State<FilterScreen> {
             ),
           ],
         ),
-        bottomNavigationBar: CustomBottomNavigationBar(
-          selectedIndex: _selectedIndex,
-          onItemTapped: _onItemTapped,
-        ),
+        bottomNavigationBar: BottomNavBar(),
       ),
     );
   }
 
   Widget buildTabContent() {
+    final places = [
+      {
+        "title": "Mirissa Beach",
+        "location": "Mirissa, Sri Lanka",
+        "image": "assets/images/home/Filter - Mirissa.png",
+      },
+      {
+        "title": "Bentota Beach",
+        "location": "Bentota, Sri Lanka",
+        "image": "assets/images/home/Filter - Bentota.png",
+      },
+      {
+        "title": "Jungle Beach",
+        "location": "Unawatuna, Sri Lanka",
+        "image": "assets/images/home/Filter - Jungle.png",
+      },
+      {
+        "title": "Arugam Bay",
+        "location": "Arugam Bay, Sri Lanka",
+        "image": "assets/images/home/Filter - Arugam Bay.png",
+      },
+    ];
+
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 16), // Adjusted padding
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,8 +110,8 @@ class _FilterScreenState extends State<FilterScreen> {
               child: Row(
                 children: [
                   CategoriesButton(
-                    title: "Beach",
-                    image: "assets/images/Popular - Ella.png",
+                    title: "Ocean",
+                    image: "assets/images/home/Categories - Ocean.png",
                     onPressed: () {
                       _onCategorySelected(0);
                     },
@@ -100,18 +119,37 @@ class _FilterScreenState extends State<FilterScreen> {
                   ),
                   SizedBox(width: 16),
                   CategoriesButton(
-                    title: "Mountains",
-                    image: "assets/images/Popular - Ella.png",
+                    title: "Beach",
+                    image: "assets/images/home/Categories - Beach.png",
                     onPressed: () {
                       _onCategorySelected(1);
                     },
                     isSelected: _selectedCategoryIndex == 1,
+                  ),
+                  SizedBox(width: 16),
+                  CategoriesButton(
+                    title: "Mountains",
+                    image: "assets/images/home/Categories - Mountains.png",
+                    onPressed: () {
+                      _onCategorySelected(2);
+                    },
+                    isSelected: _selectedCategoryIndex == 2,
+                  ),
+                  SizedBox(width: 16),
+                  CategoriesButton(
+                    title: "Forest",
+                    image: "assets/images/home/Categories - Forest.png",
+                    onPressed: () {
+                      _onCategorySelected(3);
+                    },
+                    isSelected: _selectedCategoryIndex == 3,
                   ),
                 ],
               ),
             ),
 
             // Filter By (Placeholder)
+            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -143,10 +181,17 @@ class _FilterScreenState extends State<FilterScreen> {
                       // Handle filter logic for "Recommended"
                     },
                   ),
+                  SizedBox(width: 16),
+                  FilterButton(
+                    text: "All Destinations",
+                    onPressed: () {
+                      // Handle filter logic for "All Destinations"
+                    },
+                  ),
                 ],
               ),
             ),
-            
+
             // Suggested places 
             SizedBox(height: 20),
             GridView.builder(
@@ -158,12 +203,13 @@ class _FilterScreenState extends State<FilterScreen> {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
               ),
-              itemCount: 4, // Update this count based on your data
+              itemCount: places.length, // Update this count based on your data
               itemBuilder: (context, index) {
+                final place = places[index];
                 return PlacesCard2(
-                  title: index == 0 || index == 2 ? "Alley Palace" : "Condures Alpes",
-                  location: index == 0 || index == 2 ? "4.1" : "4.9",
-                  image: "assets/images/Popular - Ella.png",
+                  title: place["title"]!,
+                  location: place["location"]!,
+                  image: place["image"]!,
                 );
               },
             ),
