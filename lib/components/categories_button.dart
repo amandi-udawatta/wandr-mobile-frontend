@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:wandr/theme/app_colors.dart';
 
 class CategoriesButton extends StatelessWidget {
   final String title;
@@ -17,12 +19,11 @@ class CategoriesButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 160, // Adjust width according to your design
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12), // Rounded corners
+        borderRadius: BorderRadius.circular(8), // Matching curvature as the search bar
         border: Border.all(
-          color: isSelected ? Colors.blue : Colors.grey[300]!, // Highlighted color when selected
-          width: 1, // Border width
+          color: isSelected ? Kcolours.primary : Kcolours.greyShade1!, // Highlighted color when selected
+          width: isSelected ? 2 : 1, // Border width
         ),
       ),
       child: TextButton(
@@ -36,23 +37,24 @@ class CategoriesButton extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
+                topLeft: Radius.circular(8),
+                bottomLeft: Radius.circular(8),
               ),
               child: Image.asset(
                 image,
-                width: 80, // Adjust image size as needed
-                height: 80, // Adjust image size as needed
+                width: 40, // Smaller image size
+                height: 40, // Smaller image size
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(width: 8),
-            Expanded(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text(
                 title,
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 14,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500, // Matching font weight as others
+                  color: Colors.black, // Set text color to black
                 ),
               ),
             ),
