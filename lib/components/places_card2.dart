@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:wandr/pages/home/home_filter_screen.dart';
 
 class PlacesCard2 extends StatelessWidget {
   final String title;
@@ -9,108 +6,77 @@ class PlacesCard2 extends StatelessWidget {
   final String image;
 
   const PlacesCard2({
-    super.key,
+    Key? key,
     required this.title,
     required this.location,
     required this.image,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FilterScreen(
-            category: "YourCategory", // Replace with actual category
-            initialIndex: 0, // Replace with actual index
+    return Container(
+      height: 240, // Adjust the height as needed
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3), // changes position of shadow
           ),
-        ),
-      );
-    },
-      child: Container(
-        width: 200,
-        height: 240,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.black,
-          image: DecorationImage(
-            fit: BoxFit.cover,
-            opacity: 0.9,
-            image: AssetImage(image),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF4D5652),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        title,
-                        style: GoogleFonts.robotoCondensed(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                          color: Colors.white,
-                        ),
+            Positioned.fill(
+              child: Image.asset(
+                image,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Positioned(
+              left: 8,
+              top: 8,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF4D5652),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/vectors/star.svg',
-                            width: 20,
-                            height: 20,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            location,
-                            style: GoogleFonts.robotoCondensed(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                Container(
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.favorite,
-                    color: Colors.redAccent,
+                  SizedBox(height: 4),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      location,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
-                )
-              ],
+                ],
+              ),
             ),
-            SizedBox(height: 10),
           ],
         ),
       ),
