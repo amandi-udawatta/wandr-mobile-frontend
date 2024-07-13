@@ -37,6 +37,7 @@ dependencies:
   smooth_page_indicator: ^1.0.0
   line_icons: ^2.0.2
   google_fonts: ^6.2.1
+  carousel_slider: ^4.0.0
   flutter_svg: ^2.0.10+1
 
 dev_dependencies:
@@ -71,6 +72,12 @@ flutter:
     - assets/images/Onboarding-1.png
     - assets/images/Onboarding-2.png
     - assets/images/Onboarding-3.png
+    - assets/advertisements/shops-ad-1.png
+    - assets/shop-categories/category-handicrafts.png
+    - assets/shop-categories/category-souvenirs.png
+    - assets/shop-categories/category-localcuisine.png
+    - assets/shop-categories/category-travelessentials.png
+    - assets/shop-categories/category-clothing.png
     - assets/images/home/
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -95,7 +102,7 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
-  
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
