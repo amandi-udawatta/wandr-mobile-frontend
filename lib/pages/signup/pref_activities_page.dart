@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wandr/components/primary_button.dart';
-import 'package:wandr/pages/dashboard_page.dart';
+import 'package:wandr/pages/home/home_search_screen.dart';
 
 import '../../components/bottom_nav_bar.dart';
 
@@ -89,7 +89,7 @@ class PrefActivitiesPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context){
-                            return DashboardPage();
+                            return SearchScreen();
                           }
                       )
                   );
