@@ -38,6 +38,7 @@ dependencies:
   line_icons: ^2.0.2
   google_fonts: ^6.2.1
   carousel_slider: ^4.0.0
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +78,7 @@ flutter:
     - assets/shop-categories/category-localcuisine.png
     - assets/shop-categories/category-travelessentials.png
     - assets/shop-categories/category-clothing.png
+    - assets/images/home/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
