@@ -5,6 +5,7 @@ import 'package:wandr/pages/trips_page.dart';
 import 'package:wandr/pages/blogs_page.dart';
 import 'package:wandr/pages/home/home_search_screen.dart';
 import 'package:wandr/pages/challenges_page.dart';
+import 'package:wandr/theme/app_colors.dart';
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -94,12 +95,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
         ),
       ],
       currentIndex: _selectedIndex,
-      selectedItemColor: Color(0xFF009CD5), // Selected item color
-      unselectedItemColor: Colors.black, // Unselected items color
+      selectedItemColor: Kcolours.blueShade2,
+      unselectedItemColor: Colors.black,
       onTap: _onItemTapped,
-      type: BottomNavigationBarType.fixed, // Ensure all items are shown
-      backgroundColor: Colors.white, // Adjust background color as needed
-      elevation: 5, // Add elevation if you want a shadow
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white,
+      elevation: 5,
     );
   }
 }

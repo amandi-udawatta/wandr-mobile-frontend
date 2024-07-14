@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:wandr/theme/app_colors.dart';
 
 class ServiceSlider extends StatelessWidget {
   final List<String> categoryNames;
   final List<String> imagePaths;
 
-  const ServiceSlider({Key? key, required this.categoryNames, required this.imagePaths}) : super(key: key);
+  const ServiceSlider({super.key, required this.categoryNames, required this.imagePaths});
 
   @override
   Widget build(BuildContext context) {
@@ -13,29 +14,29 @@ class ServiceSlider extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Categories',
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.brown[800]
+                  color: Kcolours.brownShade4
               ),
             ),
             GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/all_shops'); // Make sure you have the route defined
               },
-              child: Text(
+              child: const Text(
                 'See All',
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: Kcolours.blueShade2,
                   fontSize: 16,
                 ),
               ),
             ),
           ],
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Container(
           height: 100,
           child: ListView.builder(
@@ -45,7 +46,7 @@ class ServiceSlider extends StatelessWidget {
               return Column(
                 children: [
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 10.0),
+                    margin: const EdgeInsets.symmetric(horizontal: 10.0),
                     width: 70,
                     height: 70,
                     decoration: BoxDecoration(
@@ -56,10 +57,10 @@ class ServiceSlider extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   Text(
                     categoryNames[index],
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
