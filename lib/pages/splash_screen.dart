@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wandr/pages/login_page.dart';
-import 'package:wandr/pages/onboarding/onboarding_page.dart';
 
 import 'package:wandr/pages/home/home_search_screen.dart';
 
@@ -18,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => SearchScreen()), //LoginPage
+        MaterialPageRoute(builder: (context) => LoginPage()), //LoginPage
       );
     });
     // TODO: implement initState

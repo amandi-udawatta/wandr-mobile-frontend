@@ -73,11 +73,10 @@ flutter:
     - assets/images/Onboarding-2.png
     - assets/images/Onboarding-3.png
     - assets/advertisements/shops-ad-1.png
-    - assets/shop-categories/category-handicrafts.png
-    - assets/shop-categories/category-souvenirs.png
-    - assets/shop-categories/category-localcuisine.png
-    - assets/shop-categories/category-travelessentials.png
-    - assets/shop-categories/category-clothing.png
+    - assets/images/shop-categories/
+    - assets/images/service-categories/
+    - assets/images/shops/
+    - assets/images/services/
     - assets/images/home/
 
   # An image asset can refer to one or more resolution-specific "variants", see
