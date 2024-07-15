@@ -55,6 +55,18 @@ class _SearchScreenState extends State<SearchScreen> {
         body: Column(
           children: [
             SizedBox(height: 25),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0), // Added padding
+              child: Text(
+                "Where do you want to explore today?",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 22,
+                  color: Kcolours.primary,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
             custom.SearchBar(
               controller: _searchController,
               onChanged: _onSearchChanged,
