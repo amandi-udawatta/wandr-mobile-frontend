@@ -79,12 +79,12 @@ class MainShopsPage extends StatelessWidget {
 
     // Mock data for recommended services - replace this with your actual data fetching logic
     final recommendedServiceNames = [
-      'Surfing Academy',
-      'Hot Air Balloons',
-      'Adventure Park',
-      'Atiken Spence Hotel',
-      'Camping Tours',
-      'Hike Tour Guiding',
+      "John's Surf Shack",
+      "Hot Air Balloons",
+      "Adventure Park",
+      "Atiken Spence Hotel",
+      "Camping Tours",
+      "Hike Tour Guiding",
     ];
     final recommendedServiceImages = [
       'assets/images/services/surfing-academy.png',
@@ -225,6 +225,7 @@ class MainShopsPage extends StatelessWidget {
                             itemImages: recommendedItemImages,
                             itemPrices: recommendedItemPrices,
                             itemStores: recommendedItemStores,
+                            isShop: true, // Indicate that this is for shops
                           ),
                         ),
                       ],
@@ -279,6 +280,7 @@ class MainShopsPage extends StatelessWidget {
                             itemImages: recommendedServiceImages,
                             itemPrices: recommendedServicePrices,
                             itemStores: recommendedServiceStores,
+                            isShop: false, // Indicate that this is for services
                           ),
                         ),
                       ],
