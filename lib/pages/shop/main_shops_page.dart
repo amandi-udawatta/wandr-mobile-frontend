@@ -5,6 +5,7 @@ import '../../components/bottom_nav_bar.dart';
 import '../../components/custom_carousel.dart';
 import '../../components/service_slider.dart';
 import '../../components/recommended_services_vertical_list.dart'; // Import the RecommendedItems component
+import 'package:wandr/pages/home/home_search_screen.dart';
 
 class MainShopsPage extends StatelessWidget {
   const MainShopsPage({super.key});
@@ -121,7 +122,7 @@ class MainShopsPage extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const DashboardPage()),
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
               );
             },
           ),

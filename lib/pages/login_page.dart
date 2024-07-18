@@ -7,6 +7,7 @@ import 'package:wandr/components/google_button.dart';
 import 'package:wandr/pages/dashboard_page.dart';
 import 'package:wandr/pages/onboarding/onboarding_page.dart';
 import 'package:wandr/pages/signup/register_page.dart';
+import 'package:wandr/pages/home/home_search_screen.dart';
 import 'package:wandr/theme/app_colors.dart';
 
 // import 'package:get/get.dart';
@@ -133,7 +134,7 @@ class LoginPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context){
-                            return DashboardPage();
+                            return SearchScreen();
                           }
                       )
                   );
