@@ -8,6 +8,7 @@ import 'package:wandr/components/bottom_nav_bar.dart';
 import 'package:wandr/components/categories_button.dart';
 import 'package:wandr/components/activity_card.dart';
 import 'package:wandr/components/blog_card.dart';
+import 'package:wandr/components/primary_button.dart';
 
 class DestinationProfileScreen extends StatelessWidget {
   const DestinationProfileScreen({super.key});
@@ -242,9 +243,23 @@ class DestinationProfileScreen extends StatelessWidget {
 
               // Add to Trip
               SizedBox(height: 20),
-              
-              
-
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: PrimaryButton(
+                  onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context){
+                            return DestinationProfileScreen();
+                          }
+                      )
+                  );
+                },
+                text: "Add to Trip",
+                ),
+              ),
+              SizedBox(height: 20),
             ],
           ),
         ),
