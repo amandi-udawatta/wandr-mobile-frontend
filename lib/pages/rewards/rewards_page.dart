@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:wandr/theme/app_colors.dart';
 import '../../components/bottom_nav_bar.dart';
 import '../dashboard_page.dart';
+import 'completed_challenges_page.dart';
+import 'new_challenges_page.dart';
 
 class RewardsPage extends StatelessWidget {
   const RewardsPage({super.key});
@@ -80,17 +82,14 @@ class RewardsPage extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_outlined, size: 30,),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DashboardPage()),
-              );
-            },
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_outlined, size: 30,),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DashboardPage()),
+            );
+          },
         ),
       ),
       bottomNavigationBar: BottomNavBar(),
@@ -99,6 +98,7 @@ class RewardsPage extends StatelessWidget {
           child: ListView(
             children: [
               const SizedBox(height: 5),
+
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30.0),
                 child: Text(
@@ -115,7 +115,7 @@ class RewardsPage extends StatelessWidget {
 
               // Description
               const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.0), // Add horizontal padding
+                padding: EdgeInsets.symmetric(horizontal: 30.0),
                 child: Text(
                   'Complete challenges, earn badges, and unlock exclusive rewards.',
                   textAlign: TextAlign.left, // Align the text to the left
@@ -130,7 +130,7 @@ class RewardsPage extends StatelessWidget {
 
               // Badges Section Header
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30.0), // Add horizontal padding
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -143,7 +143,10 @@ class RewardsPage extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Handle navigation to completed challenges
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const CompletedChallengesPage()),
+                        );
                       },
                       child: const Text(
                         'See Completed Challenges',
@@ -153,6 +156,7 @@ class RewardsPage extends StatelessWidget {
                         ),
                       ),
                     ),
+
                   ],
                 ),
               ),
@@ -358,7 +362,10 @@ class RewardsPage extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Handle navigation to see all new challenges
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const NewChallengesPage()),
+                        );
                       },
                       child: Text(
                         'See All',
