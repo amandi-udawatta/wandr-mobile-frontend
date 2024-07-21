@@ -4,7 +4,7 @@ import 'package:wandr/theme/app_colors.dart';
 import '../../components/bottom_nav_bar.dart';
 import '../../components/custom_carousel.dart';
 import '../../components/service_slider.dart';
-import '../../components/recommended_services_vertical_list.dart'; // Import the RecommendedItems component
+import '../../components/recommended_services_vertical_list.dart';
 
 class MainShopsPage extends StatelessWidget {
   const MainShopsPage({super.key});
@@ -79,12 +79,12 @@ class MainShopsPage extends StatelessWidget {
 
     // Mock data for recommended services - replace this with your actual data fetching logic
     final recommendedServiceNames = [
-      "John's Surf Shack",
-      "Hot Air Balloons",
-      "Adventure Park",
-      "Atiken Spence Hotel",
-      "Camping Tours",
-      "Hike Tour Guiding",
+      'Surfing Academy',
+      'Hot Air Balloons',
+      'Adventure Park',
+      'Atiken Spence Hotel',
+      'Camping Tours',
+      'Hike Tour Guiding',
     ];
     final recommendedServiceImages = [
       'assets/images/services/surfing-academy.png',
@@ -103,12 +103,12 @@ class MainShopsPage extends StatelessWidget {
       'Rs.16,450.00',
     ];
     final recommendedServiceStores = [
-      'by Elephant Craft Store',
-      'by Rattan Wonders',
-      'by Jewel Paradise',
-      'by Batik Boutique',
-      'by Spice Emporium',
-      'by Artistic Expressions',
+      'by Surfing Academy',
+      'by Balloon Adventures',
+      'by Adventure Park',
+      'by Atiken Spence',
+      'by Camping Tours',
+      'by Hike Tour Guides',
     ];
 
     return DefaultTabController(
@@ -225,7 +225,7 @@ class MainShopsPage extends StatelessWidget {
                             itemImages: recommendedItemImages,
                             itemPrices: recommendedItemPrices,
                             itemStores: recommendedItemStores,
-                            isShop: true, // Indicate that this is for shops
+                            isShop: true, // Indicate that these are shop items
                           ),
                         ),
                       ],
@@ -280,7 +280,7 @@ class MainShopsPage extends StatelessWidget {
                             itemImages: recommendedServiceImages,
                             itemPrices: recommendedServicePrices,
                             itemStores: recommendedServiceStores,
-                            isShop: false, // Indicate that this is for services
+                            isShop: false, // Indicate that these are service items
                           ),
                         ),
                       ],

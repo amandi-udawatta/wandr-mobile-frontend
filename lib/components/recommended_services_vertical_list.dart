@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wandr/theme/app_colors.dart';
 import 'package:wandr/pages/shop/shop_profile_page.dart';
 import 'package:wandr/pages/shop/service_profile_page.dart';
+import 'package:wandr/theme/app_colors.dart';
 
 class RecommendedServicesVerticalList extends StatefulWidget {
   final String title;
@@ -9,7 +9,7 @@ class RecommendedServicesVerticalList extends StatefulWidget {
   final List<String> itemImages;
   final List<String> itemPrices;
   final List<String> itemStores;
-  final bool isShop; // Add a flag to determine if it's a shop or service
+  final bool isShop; // Added to determine the type of items
 
   const RecommendedServicesVerticalList({
     Key? key,
@@ -18,7 +18,7 @@ class RecommendedServicesVerticalList extends StatefulWidget {
     required this.itemImages,
     required this.itemPrices,
     required this.itemStores,
-    this.isShop = false, // Default to false (service)
+    required this.isShop, // Initialize the new parameter
   }) : super(key: key);
 
   @override
@@ -26,6 +26,7 @@ class RecommendedServicesVerticalList extends StatefulWidget {
 }
 
 class _RecommendedServicesVerticalListState extends State<RecommendedServicesVerticalList> {
+  bool isExpanded = false;
   late List<bool> likedItems;
 
   @override
@@ -38,24 +39,6 @@ class _RecommendedServicesVerticalListState extends State<RecommendedServicesVer
     setState(() {
       likedItems[index] = !likedItems[index];
     });
-  }
-
-  void navigateToProfile(String name) {
-    if (widget.isShop) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ShopProfilePage(itemName: name),
-        ),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ServiceProfilePage(serviceName: name),
-        ),
-      );
-    }
   }
 
   @override
@@ -100,7 +83,16 @@ class _RecommendedServicesVerticalListState extends State<RecommendedServicesVer
           itemCount: widget.itemNames.length > 6 ? 6 : widget.itemNames.length,
           itemBuilder: (context, index) {
             return GestureDetector(
-              onTap: () => navigateToProfile(widget.itemNames[index]),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => widget.isShop
+                        ? ShopProfilePage(itemName: widget.itemNames[index])
+                        : ServiceProfilePage(serviceName: widget.itemNames[index]),
+                  ),
+                );
+              },
               child: Stack(
                 children: [
                   Container(

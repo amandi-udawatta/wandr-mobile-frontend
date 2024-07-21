@@ -24,7 +24,7 @@ class ServiceSlider extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/all_shops'); // Make sure you have the route defined
+                Navigator.pushNamed(context, '/all_shops'); // Put the correct link
               },
               child: const Text(
                 'See All',
