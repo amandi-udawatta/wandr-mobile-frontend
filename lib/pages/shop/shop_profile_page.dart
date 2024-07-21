@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wandr/theme/app_colors.dart';
 import 'main_shops_page.dart'; // Import MainShopsPage for navigation
+import 'cart_page.dart'; // Import CartPage for navigation
 
 class ShopProfilePage extends StatefulWidget {
   final String itemName;
@@ -14,6 +15,8 @@ class ShopProfilePage extends StatefulWidget {
 class _ShopProfilePageState extends State<ShopProfilePage> {
   bool isExpanded = false;
   int quantity = 1; // Initial quantity
+  bool isInCart = false; // To track cart status
+  bool isLiked = false; // To track like status
 
   @override
   Widget build(BuildContext context) {
@@ -585,6 +588,62 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
                           ),
                         );
                       },
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Add to Cart and Like button section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isInCart ? Kcolours.secondary : Kcolours.primary, // Button background color
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                isInCart = !isInCart;
+                              });
+                              if (isInCart) {
+                                // Add item to cart logic here
+                              } else {
+                                // Remove item from cart logic here
+                              }
+                            },
+                            child: Text(
+                              isInCart ? "View Cart" : "Add to Cart",
+                              style: TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isLiked = !isLiked;
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: isLiked ? Kcolours.primary : Kcolours.primary.withOpacity(0.7)),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              isLiked ? Icons.favorite : Icons.favorite_border,
+                              color: isLiked ? Kcolours.primary : Kcolours.primary.withOpacity(0.7),
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

@@ -4,8 +4,9 @@ import 'package:wandr/pages/shop/main_shops_page.dart';
 import 'package:wandr/pages/trips_page.dart';
 import 'package:wandr/pages/blogs_page.dart';
 import 'package:wandr/pages/home/home_search_screen.dart';
-import 'package:wandr/pages/challenges_page.dart';
+import 'package:wandr/pages/rewards/rewards_page.dart';
 import 'package:wandr/theme/app_colors.dart';
+
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -48,7 +49,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       case 4:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ChallengesPage()),
+          MaterialPageRoute(builder: (context) => RewardsPage()),
         );
         break;
     }
