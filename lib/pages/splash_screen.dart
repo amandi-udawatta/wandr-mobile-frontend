@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wandr/pages/login_page.dart';
 
-import 'package:wandr/pages/home/home_search_screen.dart';
+import 'package:wandr/pages/profile/profile_main.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
