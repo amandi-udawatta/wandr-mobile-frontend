@@ -80,6 +80,7 @@ flutter:
     - assets/images/services/
     - assets/images/services/service-main-photos/
     - assets/images/services/service-logos/
+    - assets/images/badges/
     - assets/images/home/
     - assets/images/trip/
     - assets/images/profile/
