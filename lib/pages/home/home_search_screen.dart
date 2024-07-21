@@ -7,6 +7,7 @@ import 'package:wandr/components/search_bar.dart' as custom;
 import 'package:wandr/components/categories_button.dart';
 import 'package:wandr/pages/home/home_filter_screen.dart';
 import 'package:wandr/components/bottom_nav_bar.dart';
+import 'package:wandr/components/home_profile.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -44,7 +45,6 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       );
     }
-    // You can add more cases for other categories if needed
   }
 
   @override
@@ -55,6 +55,14 @@ class _SearchScreenState extends State<SearchScreen> {
         body: Column(
           children: [
             SizedBox(height: 25),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: HomeProfile(
+                image: 'assets/images/profile/Profile_pic.png',
+                text: 'Ayubowan James!',
+              ),
+            ),
+            SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0), // Added padding
               child: Text(

@@ -6,6 +6,7 @@ import '../../components/custom_carousel.dart';
 import '../../components/service_slider.dart';
 import '../../components/recommended_services_vertical_list.dart';
 
+
 class MainShopsPage extends StatelessWidget {
   const MainShopsPage({super.key});
 
@@ -121,7 +122,7 @@ class MainShopsPage extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const DashboardPage()),
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
               );
             },
           ),
