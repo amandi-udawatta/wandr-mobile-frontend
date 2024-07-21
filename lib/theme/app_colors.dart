@@ -28,4 +28,6 @@ class Kcolours {
 
   static const Color greyShade1 = Color(0xFF6C7072);
   static const Color greyShade2 = Color(0xFF5F5847);
+  static const Color greyShade3 = Color.fromARGB(255, 221, 221, 221);
+  
 }

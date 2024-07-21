@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wandr/theme/app_colors.dart'; // Ensure this has your grey color definitions
+import 'package:wandr/pages/profile/profile_main.dart'; // Adjust the import path if necessary
 
 class HomeProfile extends StatelessWidget {
   final String image;
@@ -15,14 +16,23 @@ class HomeProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 50, // Adjust size as needed
-          height: 50, // Adjust size as needed
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            image: DecorationImage(
-              image: AssetImage(image),
-              fit: BoxFit.cover,
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const ProfileMain(),
+              ),
+            );
+          },
+          child: Container(
+            width: 50, // Adjust size as needed
+            height: 50, // Adjust size as needed
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                image: AssetImage(image),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),
