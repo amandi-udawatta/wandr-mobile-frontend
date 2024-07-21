@@ -76,6 +76,7 @@ flutter:
     - assets/images/shop-categories/
     - assets/images/service-categories/
     - assets/images/shops/
+    - assets/images/shops/shop-logos/
     - assets/images/services/
     - assets/images/services/service-main-photos/
     - assets/images/services/service-logos/
