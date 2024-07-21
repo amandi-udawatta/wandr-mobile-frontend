@@ -122,7 +122,7 @@ class MainShopsPage extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SearchScreen()),
+                MaterialPageRoute(builder: (context) => const DashboardPage()),
               );
             },
           ),
