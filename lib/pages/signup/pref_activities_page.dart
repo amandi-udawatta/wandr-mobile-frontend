@@ -3,8 +3,6 @@ import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/pages/home/home_search_screen.dart';
 import 'package:wandr/theme/app_colors.dart';
 
-import '../../components/bottom_nav_bar.dart';
-
 class PrefActivitiesPage extends StatefulWidget {
   const PrefActivitiesPage({super.key});
 
@@ -119,7 +117,7 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Kcolours.white,
                           borderRadius: BorderRadius.circular(15),
                           border: isSelected ? Border.all(color: Kcolours.primary, width: 3) : null,
                           boxShadow: isSelected
@@ -139,16 +137,22 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Image.asset(
-                                    activity["image"]!,
-                                    height: 60,
-                                    fit: BoxFit.cover,
+                                  Container(
+                                    width: 60, // Set width of the container
+                                    height: 60, // Set height of the container
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(activity["image"]!),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                    alignment: Alignment.center,
                                   ),
                                   SizedBox(height: 10),
                                   Text(
                                     activity["name"]!,
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
+                                    style: TextStyle(fontSize: 16, color: Kcolours.black),
                                   ),
                                 ],
                               ),
@@ -159,7 +163,7 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                                 right: 8,
                                 child: Icon(
                                   Icons.check_circle,
-                                  color: Color(0xFF437B17),
+                                  color: Kcolours.primary,
                                   size: 20,
                                 ),
                               ),
