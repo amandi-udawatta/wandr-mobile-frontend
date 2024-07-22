@@ -143,10 +143,15 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Image.asset(
-                                    destination["image"]!,
-                                    height: 60,
-                                    fit: BoxFit.cover,
+                                  Container(
+                                    width: 60, // Set width of the container
+                                    height: 60, // Set height of the container
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(destination["image"]!),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Text(

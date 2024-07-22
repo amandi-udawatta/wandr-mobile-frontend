@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:wandr/pages/login_page.dart';
 
 import 'package:wandr/pages/profile/profile_main.dart';
+import 'package:wandr/pages/signup/pref_activities_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
