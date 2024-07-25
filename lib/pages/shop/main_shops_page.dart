@@ -5,6 +5,7 @@ import '../../components/bottom_nav_bar.dart';
 import '../../components/custom_carousel.dart';
 import '../../components/service_slider.dart';
 import '../../components/recommended_services_vertical_list.dart';
+import 'cart_page.dart';
 
 
 class MainShopsPage extends StatelessWidget {
@@ -127,8 +128,22 @@ class MainShopsPage extends StatelessWidget {
             },
           ),
           actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.favorite_border, size: 30,)),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.shopping_cart_outlined, size: 30,))
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CartPage()),
+                );
+              },
+              icon: const Icon(Icons.favorite_border, size: 30,)),
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CartPage()),
+                );
+              },
+              icon: const Icon(Icons.shopping_cart_outlined, size: 30,))
           ],
           backgroundColor: Colors.white,
           elevation: 0,
