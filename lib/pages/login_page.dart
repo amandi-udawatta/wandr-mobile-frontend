@@ -28,9 +28,11 @@ class LoginPage extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: ListView(
+
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(height: 50),
+
               //   Welcome back
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
