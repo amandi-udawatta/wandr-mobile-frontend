@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:wandr/components/bottom_nav_bar.dart';
 import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/components/secondary_button.dart';
 import 'package:wandr/components/cust_textfield.dart';
 import 'package:wandr/components/google_button.dart';
 import 'package:wandr/pages/dashboard_page.dart';
 import 'package:wandr/pages/onboarding/onboarding_page.dart';
-import 'package:wandr/pages/signup/register_page.dart';
 import 'package:wandr/pages/home/home_search_screen.dart';
 import 'package:wandr/theme/app_colors.dart';
-
-// import 'package:get/get.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:wandr/utils.dart'; // Import the utils file for hashPassword
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -18,8 +17,79 @@ class LoginPage extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  // log user in
-  void logUserIn() {}
+  Future<void> login(String role, String email, String password, BuildContext context) async {
+    final url = Uri.parse('http://10.22.163.155:8081/api/proxy/login'); // Replace with your local IP
+    final hashedPassword = hashPassword(password);
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'role': role,
+        'email': email,
+        'password': hashedPassword,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(response.body);
+      if (responseBody['success']) {
+        handleLoginResponse(responseBody, context);
+      } else {
+        // Display error message
+        _showError(context, responseBody['message']);
+      }
+    } else {
+      // Handle error
+      print('Login request failed with status: ${response.statusCode}');
+      _showError(context, 'Login request failed. Please try again.');
+    }
+  }
+
+  void handleLoginResponse(Map<String, dynamic> responseBody, BuildContext context) {
+    if (responseBody['success']) {
+      final accessToken = responseBody['data']['accessToken'];
+      final refreshToken = responseBody['data']['refreshToken'];
+      loginUser(accessToken, refreshToken, context);
+    } else {
+      print('Login failed: ${responseBody['message']}');
+      _showError(context, responseBody['message']);
+    }
+  }
+
+  void loginUser(String accessToken, String refreshToken, BuildContext context) {
+    // Save tokens to secure storage (not implemented here)
+    // Navigate to the Dashboard page
+    print('User logged in with access token: $accessToken');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DashboardPage(),
+      ),
+    );
+  }
+
+  void logUserIn () {}
+
+  void _showError(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +98,10 @@ class LoginPage extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: ListView(
-
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(height: 50),
-
-              //   Welcome back
+              // Welcome back
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: Text(
@@ -48,7 +116,7 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
 
-              //   Description
+              // Description
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0), // Add horizontal padding
                 child: Text(
@@ -63,7 +131,7 @@ class LoginPage extends StatelessWidget {
 
               SizedBox(height: 50),
 
-              //   Email Address label
+              // Email Address label
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -78,7 +146,7 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
 
-              //   Email Address field
+              // Email Address field
               CustTextfield(
                 controller: emailController,
                 obsecureText: false,
@@ -87,7 +155,7 @@ class LoginPage extends StatelessWidget {
 
               SizedBox(height: 25),
 
-              //   Password label
+              // Password label
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -102,18 +170,18 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
 
-              //   Password field
+              // Password field
               CustTextfield(
                 controller: passwordController,
                 obsecureText: true,
                 borderRadius: 16.0,
               ),
 
-              //   Remember Me checkbox
+              // Remember Me checkbox
 
               SizedBox(height: 15),
 
-              //   Forgot Password?
+              // Forgot Password?
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -129,33 +197,28 @@ class LoginPage extends StatelessWidget {
 
               SizedBox(height: 150),
 
-              //   Login Button
+              // Login Button
               PrimaryButton(
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context){
-                            return SearchScreen();
-                          }
-                      )
-                  );
+                  final email = emailController.text;
+                  final password = passwordController.text;
+                  final role = 'TRAVELLER';
+
+                  login(role, email, password, context);
                 },
                 text: "Login",
               ),
 
               SizedBox(height: 15),
 
-              //   Create Account Button
+              // Create Account Button
               SecondaryButton(
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context){
-                            return OnboardingPage();
-                          }
-                      )
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OnboardingPage(),
+                    ),
                   );
                 },
                 text: "Create Account",
@@ -163,7 +226,7 @@ class LoginPage extends StatelessWidget {
 
               SizedBox(height: 20),
 
-              //   -----OR-----
+              // -----OR-----
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: Row(
@@ -192,15 +255,14 @@ class LoginPage extends StatelessWidget {
                         thickness: 0.5,
                         color: Colors.grey[500],
                       ),
-                    )
-
+                    ),
                   ],
                 ),
               ),
 
               SizedBox(height: 20),
 
-              //   Continue with Google
+              // Continue with Google
               GoogleButton(
                 onTap: logUserIn,
               ),
