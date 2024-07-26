@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class JournalText extends StatelessWidget {
-  final String trip_place_name;
-  final String trip_place_description;
-  final String? trip_place_image; 
+class JournalTextMain extends StatelessWidget {
+  final String full_trip_title;
+  final String full_trip_description;
+  final String? full_trip_image; 
 
-  const JournalText({
+  const JournalTextMain({
     Key? key,
-    required this.trip_place_name,
-    required this.trip_place_description,
-    this.trip_place_image,
+    required this.full_trip_title,
+    required this.full_trip_description,
+    this.full_trip_image,
   }) : super(key: key);
 
   @override
@@ -21,7 +21,7 @@ class JournalText extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            trip_place_name,
+            full_trip_title,
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w500,
               fontSize: 16,
@@ -30,17 +30,17 @@ class JournalText extends StatelessWidget {
           ),
           // Remove the SizedBox between title and text
           Text(
-            trip_place_description,
+            full_trip_description,
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w400,
               fontSize: 14,
               color: Colors.black87,
             ),
           ),
-          if (trip_place_image != null) ...[
+          if (full_trip_image != null) ...[
             SizedBox(height: 12), // This space is between text and image, if needed
             Image.asset(
-              trip_place_image!,
+              full_trip_image!,
               fit: BoxFit.cover,
             ),
           ],
