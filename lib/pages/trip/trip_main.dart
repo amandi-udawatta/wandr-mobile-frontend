@@ -105,9 +105,9 @@ class _SearchScreenState extends State<TripScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: JournalCard2(
-                    title: "My trip to Arugam Bay",
+                    trip_title: "My trip to Arugam Bay",
                     created_on: "created on 12th June 2024",
-                    image: "assets/images/trip/Trip - Arugam Bay.png",
+                    trip_image: "assets/images/trip/Trip - Arugam Bay.png",
                   ),
                 ),
               ],

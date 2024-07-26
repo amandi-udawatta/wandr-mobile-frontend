@@ -5,15 +5,17 @@ import 'package:wandr/theme/app_colors.dart';
 import 'package:wandr/pages/trip/trip_journal.dart'; // Import the JournalScreen
 
 class JournalCard2 extends StatefulWidget {
-  final String title;
+  final String trip_title;
   final String created_on;
-  final String image;
+  final String trip_image;
+  final String? updated_on;
 
   const JournalCard2({
     Key? key,
-    required this.title,
+    required this.trip_title,
     required this.created_on,
-    required this.image,
+    required this.trip_image,
+    this.updated_on,
   }) : super(key: key);
 
   @override
@@ -31,9 +33,9 @@ class _JournalCard2State extends State<JournalCard2> {
           context,
           MaterialPageRoute(
             builder: (context) => JournalScreen(
-              title: widget.title,
+              title: widget.trip_title,
               createdOn: widget.created_on,
-              image: widget.image,
+              image: widget.trip_image,
             ),
           ),
         );
@@ -44,7 +46,7 @@ class _JournalCard2State extends State<JournalCard2> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16), // Added border radius
           image: DecorationImage(
-            image: AssetImage(widget.image),
+            image: AssetImage(widget.trip_image),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.black.withOpacity(0.4),
@@ -62,7 +64,7 @@ class _JournalCard2State extends State<JournalCard2> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.title,
+                    widget.trip_title,
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w600,
                       fontSize: 20,
