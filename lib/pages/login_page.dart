@@ -18,7 +18,7 @@ class LoginPage extends StatelessWidget {
   final passwordController = TextEditingController();
 
   Future<void> login(String role, String email, String password, BuildContext context) async {
-    final url = Uri.parse('http://10.22.163.155:8081/api/proxy/login'); // Replace with your local IP
+    final url = Uri.parse('http://192.168.1.10:8081/api/proxy/login'); // Replace with your local IP
     final hashedPassword = hashPassword(password);
 
     final response = await http.post(
