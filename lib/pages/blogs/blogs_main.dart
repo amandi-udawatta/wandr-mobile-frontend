@@ -2,51 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wandr/theme/app_colors.dart';
 
-import 'package:wandr/components/search_bar.dart' as custom;
-import 'package:wandr/pages/home/home_filter_screen.dart';
+import 'package:wandr/components/search_bar2.dart' as custom;
 import 'package:wandr/components/bottom_nav_bar.dart';
 import 'package:wandr/components/journal_card1.dart';
 import 'package:wandr/components/journal_card2.dart';
 import 'package:wandr/components/add_button.dart';
 
-class BlogScreen extends StatefulWidget {
-  const BlogScreen({Key? key}) : super(key: key);
-
-  @override
-  State<BlogScreen> createState() => _SearchScreenState();
-}
-
-class _SearchScreenState extends State<BlogScreen> {
-  int _selectedIndex = 1;
+class BlogScreen extends StatelessWidget {
   final TextEditingController _searchController = TextEditingController();
-  int _selectedCategoryIndex = -1;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  void _onSearchChanged(String query) {
-    // Handle search query change
-  }
-
-  void _onCategorySelected(int index) {
-    setState(() {
-      _selectedCategoryIndex = index;
-    });
-
-    // Navigate to FilterScreen for Beach category
-    if (index == 0) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FilterScreen(category: "Beach", initialIndex: 0),
-        ),
-      );
-    }
-    // You can add more cases for other categories if needed
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +22,7 @@ class _SearchScreenState extends State<BlogScreen> {
               children: [
                 SizedBox(height: 25),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0), // Added padding
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Text(
                     "What do you want to journal today?",
                     style: GoogleFonts.poppins(
@@ -70,36 +33,41 @@ class _SearchScreenState extends State<BlogScreen> {
                   ),
                 ),
                 SizedBox(height: 25),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      JournalCard1(
-                        title: "Sigiriya",
-                        image: "assets/images/trip/Trip - Sigiriya.png",
-                      ),
-                      SizedBox(width: 16),
-                      JournalCard1(
-                        title: "Arugam Bay",
-                        image: "assets/images/trip/Trip - Arugam Bay.png",
-                      ),
-                      SizedBox(width: 16),
-                      JournalCard1(
-                        title: "Horton Plains",
-                        image: "assets/images/trip/Trip - Horton Plains.png",
-                      ),
-                      SizedBox(width: 16),
-                      JournalCard1(
-                        title: "Kithulgala",
-                        image: "assets/images/trip/Trip - Kithulgala.png",
-                      ),
-                    ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        JournalCard1(
+                          title: "Sigiriya",
+                          image: "assets/images/trip/Trip - Sigiriya.png",
+                        ),
+                        SizedBox(width: 16),
+                        JournalCard1(
+                          title: "Arugam Bay",
+                          image: "assets/images/trip/Trip - Arugam Bay.png",
+                        ),
+                        SizedBox(width: 16),
+                        JournalCard1(
+                          title: "Horton Plains",
+                          image: "assets/images/trip/Trip - Horton Plains.png",
+                        ),
+                        SizedBox(width: 16),
+                        JournalCard1(
+                          title: "Kithulgala",
+                          image: "assets/images/trip/Trip - Kithulgala.png",
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 25),
-                custom.SearchBar(
+                custom.SearchBar2(
                   controller: _searchController,
-                  onChanged: _onSearchChanged,
+                  onChanged: (query) {
+                    // Handle search query change if needed
+                  },
                 ),
                 SizedBox(height: 25),
                 Padding(
@@ -114,9 +82,9 @@ class _SearchScreenState extends State<BlogScreen> {
             ),
             Positioned(
               bottom: 20,
-              right: 5, // Adjusted right positioning
+              right: 5,
               child: Padding(
-                padding: const EdgeInsets.only(left: 5), // Adjusted padding for AddButton
+                padding: const EdgeInsets.only(left: 5),
                 child: AddButton(
                   onTap: () {
                     // Add functionality for the AddButton here
