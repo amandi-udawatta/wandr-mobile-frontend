@@ -9,14 +9,14 @@ import 'package:wandr/components/journal_card1.dart';
 import 'package:wandr/components/journal_card2.dart';
 import 'package:wandr/components/add_button.dart';
 
-class TripScreen extends StatefulWidget {
-  const TripScreen({Key? key}) : super(key: key);
+class BlogScreen extends StatefulWidget {
+  const BlogScreen({Key? key}) : super(key: key);
 
   @override
-  State<TripScreen> createState() => _SearchScreenState();
+  State<BlogScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<TripScreen> {
+class _SearchScreenState extends State<BlogScreen> {
   int _selectedIndex = 1;
   final TextEditingController _searchController = TextEditingController();
   int _selectedCategoryIndex = -1;
@@ -61,7 +61,7 @@ class _SearchScreenState extends State<TripScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0), // Added padding
                   child: Text(
-                    "What do you want to travel today?",
+                    "What do you want to journal today?",
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w800,
                       fontSize: 22,

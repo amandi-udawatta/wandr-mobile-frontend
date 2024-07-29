@@ -5,6 +5,7 @@ import 'package:wandr/pages/trips_page.dart';
 import 'package:wandr/pages/blogs_page.dart';
 import 'package:wandr/pages/home/home_search_screen.dart';
 import 'package:wandr/pages/trip/trip_main.dart';
+import 'package:wandr/pages/blogs/blogs_main.dart';
 import 'package:wandr/pages/rewards/rewards_page.dart';
 import 'package:wandr/theme/app_colors.dart';
 
@@ -32,7 +33,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       case 1:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => BlogsPage()),
+          MaterialPageRoute(builder: (context) => BlogScreen()),
         );
         break;
       case 2:
