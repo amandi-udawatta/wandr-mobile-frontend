@@ -9,6 +9,7 @@ import 'package:wandr/components/categories_button.dart';
 import 'package:wandr/components/activity_card.dart';
 import 'package:wandr/components/blog_card.dart';
 import 'package:wandr/components/primary_button.dart';
+import 'package:wandr/components/trip_popup.dart'; 
 
 class DestinationProfileScreen extends StatelessWidget {
   const DestinationProfileScreen({super.key});
@@ -247,16 +248,17 @@ class DestinationProfileScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: PrimaryButton(
                   onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context){
-                            return DestinationProfileScreen();
-                          }
-                      )
-                  );
-                },
-                text: "Add to Trip",
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return TripPopup(
+                          backgroundImage: "assets/images/trip/Trip_popup.png",
+                          created_trips: ["My trip to Arugam Bay", "21st Bday Trip", "Honeymoon", "Trip to Sigiriya"], 
+                        );
+                      }
+                    );
+                  },
+                  text: "Add to Trip",
                 ),
               ),
               SizedBox(height: 20),
