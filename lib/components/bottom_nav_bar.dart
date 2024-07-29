@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:wandr/pages/shop/main_shops_page.dart';
-import 'package:wandr/pages/trips_page.dart';
-import 'package:wandr/pages/blogs_page.dart';
 import 'package:wandr/pages/home/home_search_screen.dart';
 import 'package:wandr/pages/trip/trip_main.dart';
 import 'package:wandr/pages/blogs/blogs_main.dart';

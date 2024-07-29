@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wandr/theme/app_colors.dart';
 
-import 'package:wandr/pages/trip/trip_journal.dart'; // Import the JournalScreen
+import 'package:wandr/pages/blogs/blog_description.dart'; 
 
 class JournalCard2 extends StatefulWidget {
   final String trip_title;
