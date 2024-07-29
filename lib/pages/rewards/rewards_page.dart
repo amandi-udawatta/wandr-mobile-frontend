@@ -83,11 +83,14 @@ class RewardsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_outlined, size: 30,),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_outlined,
+            size: 30,
+          ),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const DashboardPage()),
+              MaterialPageRoute(builder: (context) => const DashboardScreen()),
             );
           },
         ),
@@ -145,7 +148,9 @@ class RewardsPage extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const CompletedChallengesPage()),
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const CompletedChallengesPage()),
                         );
                       },
                       child: const Text(
@@ -156,7 +161,6 @@ class RewardsPage extends StatelessWidget {
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -181,7 +185,8 @@ class RewardsPage extends StatelessWidget {
                           border: Border.all(color: Colors.green, width: 3),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(4.0), // Add padding to create gap
+                          padding: const EdgeInsets.all(
+                              4.0), // Add padding to create gap
                           child: Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
@@ -231,7 +236,8 @@ class RewardsPage extends StatelessWidget {
                       final completedParts = challenge["completedParts"];
                       final totalParts = challenge["totalParts"];
                       final progress = completedParts / totalParts;
-                      final progressText = getProgressText(completedParts, totalParts);
+                      final progressText =
+                          getProgressText(completedParts, totalParts);
 
                       return Container(
                         margin: const EdgeInsets.symmetric(vertical: 10.0),
@@ -239,7 +245,8 @@ class RewardsPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20.0),
-                          border: Border.all(color: Kcolours.primary.withOpacity(0.5)),
+                          border: Border.all(
+                              color: Kcolours.primary.withOpacity(0.5)),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.2),
@@ -254,17 +261,18 @@ class RewardsPage extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-
                                 // Badge Image
                                 Container(
                                   width: 100,
                                   height: 100,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.green, width: 3),
+                                    border: Border.all(
+                                        color: Colors.green, width: 3),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(4.0), // Add padding to create gap
+                                    padding: const EdgeInsets.all(
+                                        4.0), // Add padding to create gap
                                     child: Container(
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
@@ -282,7 +290,8 @@ class RewardsPage extends StatelessWidget {
                                 // Challenge Details
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         progressText,
@@ -291,9 +300,7 @@ class RewardsPage extends StatelessWidget {
                                           color: Kcolours.greyShade1,
                                         ),
                                       ),
-
                                       const SizedBox(height: 5),
-
                                       Text(
                                         challenge["name"],
                                         style: const TextStyle(
@@ -307,9 +314,7 @@ class RewardsPage extends StatelessWidget {
                                 ),
                               ],
                             ),
-
                             const SizedBox(height: 10),
-
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -329,9 +334,7 @@ class RewardsPage extends StatelessWidget {
                                 ),
                               ],
                             ),
-
                             const SizedBox(height: 5),
-
                             LinearProgressIndicator(
                               value: progress,
                               backgroundColor: Colors.grey.withOpacity(0.3),
@@ -364,7 +367,8 @@ class RewardsPage extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const NewChallengesPage()),
+                          MaterialPageRoute(
+                              builder: (context) => const NewChallengesPage()),
                         );
                       },
                       child: Text(
@@ -397,7 +401,8 @@ class RewardsPage extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20.0),
-                        border: Border.all(color: Kcolours.primary.withOpacity(0.5)),
+                        border: Border.all(
+                            color: Kcolours.primary.withOpacity(0.5)),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.2),
@@ -412,22 +417,24 @@ class RewardsPage extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-
                               // Badge Image
                               Container(
                                 width: 100,
                                 height: 100,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.green, width: 3),
+                                  border:
+                                      Border.all(color: Colors.green, width: 3),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(4.0), // Add padding to create gap
+                                  padding: const EdgeInsets.all(
+                                      4.0), // Add padding to create gap
                                   child: Container(
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       image: DecorationImage(
-                                        image: AssetImage(badges[index % badges.length]),
+                                        image: AssetImage(
+                                            badges[index % badges.length]),
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -449,9 +456,7 @@ class RewardsPage extends StatelessWidget {
                                         color: Kcolours.greyShade1,
                                       ),
                                     ),
-
                                     const SizedBox(height: 5),
-
                                     Text(
                                       challenge["name"],
                                       style: const TextStyle(
@@ -465,9 +470,7 @@ class RewardsPage extends StatelessWidget {
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 10),
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -487,9 +490,7 @@ class RewardsPage extends StatelessWidget {
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 5),
-
                           LinearProgressIndicator(
                             value: progress,
                             backgroundColor: Colors.grey.withOpacity(0.3),

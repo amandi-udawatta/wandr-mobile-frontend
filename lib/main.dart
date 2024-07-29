@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wandr/pages/home/home_search_screen.dart';
+import 'package:wandr/pages/home/home_dashboard_screen.dart';
 import 'package:wandr/pages/splash_screen.dart';
 import 'package:wandr/pages/shop/main_shops_page.dart';
 import 'package:wandr/pages/shop/shop_profile_page.dart';
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const SplashScreen(),
       routes: {
-        '/dashboard': (context) => const SearchScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
         '/main_shops_page': (context) => const MainShopsPage(),
         // Other routes can be added here
       },

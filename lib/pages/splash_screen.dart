@@ -4,7 +4,7 @@ import 'package:wandr/pages/login_page.dart';
 import 'package:wandr/pages/profile/profile_main.dart';
 import 'package:wandr/pages/signup/pref_activities_page.dart';
 
-import 'package:wandr/pages/home/home_search_screen.dart';
+import 'package:wandr/pages/home/home_dashboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,12 +14,11 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => SearchScreen()), //LoginPage
+        MaterialPageRoute(builder: (context) => DashboardScreen()), //LoginPage
       );
     });
     // TODO: implement initState
@@ -37,9 +36,8 @@ class _SplashScreenState extends State<SplashScreen> {
     return Container(
       decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/logo-image.png'),
-          )
-      ),
+        image: AssetImage('assets/images/logo-image.png'),
+      )),
     );
   }
 }
