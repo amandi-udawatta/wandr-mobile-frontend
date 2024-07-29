@@ -9,14 +9,14 @@ import 'package:wandr/pages/home/home_filter_screen.dart';
 import 'package:wandr/components/bottom_nav_bar.dart';
 import 'package:wandr/components/home_profile.dart';
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({Key? key}) : super(key: key);
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 1;
   final TextEditingController _searchController = TextEditingController();
   int _selectedCategoryIndex = -1;
@@ -41,7 +41,8 @@ class _SearchScreenState extends State<SearchScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => FilterScreen(category: "Beach", initialIndex: 0),
+          builder: (context) =>
+              FilterScreen(category: "Beach", initialIndex: 0),
         ),
       );
     }
@@ -64,7 +65,8 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             SizedBox(height: 20),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0), // Added padding
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0), // Added padding
               child: Text(
                 "Where do you want to explore today?",
                 style: GoogleFonts.poppins(
@@ -97,7 +99,6 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
             // Categories
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -3,9 +3,8 @@ import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/components/secondary_button.dart';
 import 'package:wandr/components/cust_textfield.dart';
 import 'package:wandr/components/google_button.dart';
-import 'package:wandr/pages/dashboard_page.dart';
 import 'package:wandr/pages/onboarding/onboarding_page.dart';
-import 'package:wandr/pages/home/home_search_screen.dart';
+import 'package:wandr/pages/home/home_dashboard_screen.dart';
 import 'package:wandr/theme/app_colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -17,8 +16,10 @@ class LoginPage extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  Future<void> login(String role, String email, String password, BuildContext context) async {
-    final url = Uri.parse('http://10.22.163.155:8081/api/proxy/login'); // Replace with your local IP
+  Future<void> login(
+      String role, String email, String password, BuildContext context) async {
+    final url = Uri.parse(
+        'http://10.22.163.155:8081/api/proxy/login'); // Replace with your local IP
     final hashedPassword = hashPassword(password);
 
     final response = await http.post(
@@ -46,7 +47,8 @@ class LoginPage extends StatelessWidget {
     }
   }
 
-  void handleLoginResponse(Map<String, dynamic> responseBody, BuildContext context) {
+  void handleLoginResponse(
+      Map<String, dynamic> responseBody, BuildContext context) {
     if (responseBody['success']) {
       final accessToken = responseBody['data']['accessToken'];
       final refreshToken = responseBody['data']['refreshToken'];
@@ -57,19 +59,20 @@ class LoginPage extends StatelessWidget {
     }
   }
 
-  void loginUser(String accessToken, String refreshToken, BuildContext context) {
+  void loginUser(
+      String accessToken, String refreshToken, BuildContext context) {
     // Save tokens to secure storage (not implemented here)
     // Navigate to the Dashboard page
     print('User logged in with access token: $accessToken');
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DashboardPage(),
+        builder: (context) => DashboardScreen(),
       ),
     );
   }
 
-  void logUserIn () {}
+  void logUserIn() {}
 
   void _showError(BuildContext context, String message) {
     showDialog(
@@ -118,7 +121,8 @@ class LoginPage extends StatelessWidget {
 
               // Description
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0), // Add horizontal padding
+                padding: EdgeInsets.symmetric(
+                    horizontal: 16.0), // Add horizontal padding
                 child: Text(
                   'Log in to access your personalized travel itineraries and enjoy seamless journey planning.',
                   textAlign: TextAlign.center, // Center the text
@@ -237,7 +241,6 @@ class LoginPage extends StatelessWidget {
                         color: Colors.grey[500],
                       ),
                     ),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Text(
@@ -249,7 +252,6 @@ class LoginPage extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     Expanded(
                       child: Divider(
                         thickness: 0.5,

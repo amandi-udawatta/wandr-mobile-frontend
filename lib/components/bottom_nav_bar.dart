@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:wandr/pages/shop/main_shops_page.dart';
-import 'package:wandr/pages/home/home_search_screen.dart';
+import 'package:wandr/pages/home/home_dashboard_screen.dart';
 import 'package:wandr/pages/trip/trip_main.dart';
 import 'package:wandr/pages/blogs/blogs_main.dart';
 import 'package:wandr/pages/rewards/rewards_page.dart';
 import 'package:wandr/theme/app_colors.dart';
-
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -36,7 +35,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       case 2:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => SearchScreen()),
+          MaterialPageRoute(builder: (context) => DashboardScreen()),
         );
         break;
       case 3:

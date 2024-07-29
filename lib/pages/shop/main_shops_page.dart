@@ -7,7 +7,6 @@ import '../../components/service_slider.dart';
 import '../../components/recommended_services_vertical_list.dart';
 import 'cart_page.dart';
 
-
 class MainShopsPage extends StatelessWidget {
   const MainShopsPage({super.key});
 
@@ -119,31 +118,41 @@ class MainShopsPage extends StatelessWidget {
         backgroundColor: Colors.white,
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_outlined, size: 30,),
+            icon: const Icon(
+              Icons.arrow_back_ios_new_outlined,
+              size: 30,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const DashboardPage()),
+                MaterialPageRoute(
+                    builder: (context) => const DashboardScreen()),
               );
             },
           ),
           actions: [
             IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const CartPage()),
-                );
-              },
-              icon: const Icon(Icons.favorite_border, size: 30,)),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CartPage()),
+                  );
+                },
+                icon: const Icon(
+                  Icons.favorite_border,
+                  size: 30,
+                )),
             IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const CartPage()),
-                );
-              },
-              icon: const Icon(Icons.shopping_cart_outlined, size: 30,))
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CartPage()),
+                  );
+                },
+                icon: const Icon(
+                  Icons.shopping_cart_outlined,
+                  size: 30,
+                ))
           ],
           backgroundColor: Colors.white,
           elevation: 0,
@@ -174,7 +183,8 @@ class MainShopsPage extends StatelessWidget {
                 child: TabBar(
                   labelColor: Kcolours.primary,
                   unselectedLabelColor: Colors.grey,
-                  labelStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  labelStyle:
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   unselectedLabelStyle: TextStyle(fontSize: 16),
                   indicator: UnderlineTabIndicator(
                     borderSide: BorderSide(width: 4.0, color: Kcolours.primary),
@@ -296,7 +306,8 @@ class MainShopsPage extends StatelessWidget {
                             itemImages: recommendedServiceImages,
                             itemPrices: recommendedServicePrices,
                             itemStores: recommendedServiceStores,
-                            isShop: false, // Indicate that these are service items
+                            isShop:
+                                false, // Indicate that these are service items
                           ),
                         ),
                       ],
