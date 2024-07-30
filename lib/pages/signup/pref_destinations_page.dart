@@ -1,6 +1,8 @@
 // lib/pages/signup/pref_destinations_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:wandr/config.dart';
+
 import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/pages/signup/pref_activities_page.dart';
 import 'package:wandr/theme/app_colors.dart';

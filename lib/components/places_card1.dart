@@ -5,13 +5,13 @@ import 'package:wandr/pages/home/home_destination_profile_screen.dart';
 class PlacesCard1 extends StatefulWidget {
   final String title;
   final String location;
-  final String image;
+  final String? image; // Make image nullable
 
   const PlacesCard1({
     Key? key,
     required this.title,
     required this.location,
-    required this.image,
+    this.image, // Allow image to be nullable
   }) : super(key: key);
 
   @override
@@ -38,14 +38,30 @@ class _PlacesCard1State extends State<PlacesCard1> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: Colors.black,
-          image: DecorationImage(
-            fit: BoxFit.cover,
-            opacity: 0.9,
-            image: AssetImage(widget.image),
-          ),
+          image: widget.image != null && widget.image!.isNotEmpty
+              ? DecorationImage(
+                  fit: BoxFit.cover,
+                  opacity: 0.9,
+                  image: AssetImage(widget.image!),
+                )
+              : null, // No image decoration if image is null or empty
         ),
         child: Stack(
           children: [
+            if (widget.image == null || widget.image!.isEmpty)
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey.shade800, // Placeholder background color
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.image,
+                    size: 40,
+                    color: Colors.grey.shade500, // Placeholder icon color
+                  ),
+                ),
+              ),
             Positioned(
               top: 10,
               right: 10,
