@@ -28,7 +28,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
 
   Future<void> signup(String name, String role, String email, String password, String country, BuildContext context) async {
-    final url = Uri.parse('http://192.168.1.10:8081/api/proxy/signup');
+    final url = Uri.parse('http://10.22.164.114:8080/api/proxy/signup');
     final hashedPassword = hashPassword(password);
 
     final response = await http.post(
