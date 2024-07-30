@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:wandr/theme/app_colors.dart';
 import 'package:wandr/utils.dart'; // Import the utils file for hashPassword
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({super.key});
@@ -26,6 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final confirmPasswordController = TextEditingController();
   String? selectedCountry;
   String? otherCountry;
+  final storage = FlutterSecureStorage();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -63,11 +65,15 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  void handleSignupResponse(
-      Map<String, dynamic> responseBody, BuildContext context) {
+  void handleSignupResponse(Map<String, dynamic> responseBody, BuildContext context) async {
     if (responseBody['success']) {
       final accessToken = responseBody['data']['accessToken'];
       final refreshToken = responseBody['data']['refreshToken'];
+
+      // Save tokens to secure storage
+      await storage.write(key: 'accessToken', value: accessToken);
+      await storage.write(key: 'refreshToken', value: refreshToken);
+
       loginUser(accessToken, refreshToken, context);
     } else {
       print('Signup failed: ${responseBody['message']}');
@@ -75,9 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  void loginUser(
-      String accessToken, String refreshToken, BuildContext context) {
-    // Save tokens to secure storage (not implemented here)
+  void loginUser(String accessToken, String refreshToken, BuildContext context) {
     // Navigate to the home screen or dashboard
     print('User logged in with access token: $accessToken');
     Navigator.push(

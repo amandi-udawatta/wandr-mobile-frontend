@@ -5,6 +5,7 @@ import 'package:wandr/theme/app_colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PrefDestinationsPage extends StatefulWidget {
   const PrefDestinationsPage({super.key});
@@ -54,29 +55,42 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
 
   // List to keep track of selected destinations
   final List<bool> selectedDestinations = List<bool>.filled(34, false);
+  final storage = FlutterSecureStorage();
 
-  Future<void> submitSelectedCategories(List<int> selectedCategoryIds, String token) async {
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    print(decodedToken);
-    final userId = decodedToken['sub']; // Assuming the user ID is stored in the 'sub' claim
-    print(userId);
-    final url = Uri.parse('http://192.168.1.10:8081/api/proxy/forward/traveller/$userId/categories');
+  Future<void> submitSelectedCategories(List<int> selectedCategoryIds) async {
+    // Retrieve token from secure storage
+    final token = await storage.read(key: 'accessToken');
+    if (token == null) {
+      _showError(context, 'Token not found. Please login again.');
+      return;
+    }
 
-    final response = await http.put(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token,
-      },
-      body: json.encode({
-        'categories': selectedCategoryIds,
-      }),
-    );
+    try {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      print(decodedToken);
+      final userId = decodedToken['id']; // Assuming the user ID is stored in the 'sub' claim
+      print(userId);
+      final url = Uri.parse('http://192.168.8.158:8081/api/proxy/forward/traveller/$userId/categories');
 
-    if (response.statusCode == 200) {
-      print('Categories updated successfully');
-    } else {
-      print('Failed to update categories with status: ${response.statusCode}');
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+        body: json.encode({
+          'categories': selectedCategoryIds,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Categories updated successfully');
+      } else {
+        print('Failed to update categories with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Invalid token: $e');
+      _showError(context, 'Invalid token. Please login again.');
     }
   }
 
@@ -222,8 +236,7 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
                   if (selectedCategoryIds.isEmpty) {
                     _showError(context, 'Please select at least one category.');
                   } else {
-                    final token = 'your_token_here'; // Retrieve the token from your authentication logic
-                    submitSelectedCategories(selectedCategoryIds, token);
+                    submitSelectedCategories(selectedCategoryIds);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
