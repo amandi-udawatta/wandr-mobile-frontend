@@ -17,7 +17,8 @@ class TripScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         body: Stack(
           children: [
-            SingleChildScrollView( // Added SingleChildScrollView to handle overflow
+            SingleChildScrollView(
+              // Added SingleChildScrollView to handle overflow
               child: Column(
                 children: [
                   SizedBox(height: 25),
