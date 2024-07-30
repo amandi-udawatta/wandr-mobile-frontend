@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wandr/config.dart';
+
 import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/pages/signup/pref_activities_page.dart';
 import 'package:wandr/theme/app_colors.dart';
@@ -70,7 +72,7 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
       print(decodedToken);
       final userId = decodedToken['id']; // Assuming the user ID is stored in the 'sub' claim
       print(userId);
-      final url = Uri.parse('http://192.168.8.158:8081/api/proxy/forward/traveller/$userId/categories');
+      final url = Uri.parse('$baseUrl/forward/traveller/$userId/categories');
 
       final response = await http.put(
         url,

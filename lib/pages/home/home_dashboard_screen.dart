@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:wandr/theme/app_colors.dart';
 
+import 'package:wandr/theme/app_colors.dart';
 import 'package:wandr/components/places_card1.dart';
 import 'package:wandr/components/search_bar.dart' as custom;
 import 'package:wandr/components/categories_button.dart';
 import 'package:wandr/pages/home/home_filter_screen.dart';
 import 'package:wandr/components/bottom_nav_bar.dart';
 import 'package:wandr/components/home_profile.dart';
+import 'package:wandr/config.dart'; // Ensure you have baseUrl defined here
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -20,6 +25,84 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 1;
   final TextEditingController _searchController = TextEditingController();
   int _selectedCategoryIndex = -1;
+  List<dynamic> popularDestinations = [];
+  List<dynamic> favoritePlaces = [];
+  final storage = FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPopularDestinations();
+    fetchFavoritePlaces();
+  }
+
+  Future<void> fetchPopularDestinations() async {
+    final token = await storage.read(key: 'accessToken');
+    if (token == null) {
+      _showError(context, 'Token not found. Please login again.');
+      return;
+    }
+
+    try {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      final userId = decodedToken['id'];
+      final url = Uri.parse('$baseUrl/forward/traveller/popular-places/$userId');
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          popularDestinations = data['data'].take(10).toList(); // Limit to 10 items
+        });
+      } else {
+        print('Failed to load popular destinations with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching popular destinations: $e');
+      _showError(context, 'Error fetching popular destinations. Please try again later.');
+    }
+  }
+
+  Future<void> fetchFavoritePlaces() async {
+    final token = await storage.read(key: 'accessToken');
+    if (token == null) {
+      _showError(context, 'Token not found. Please login again.');
+      return;
+    }
+
+    try {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      final userId = decodedToken['id'];
+      final url = Uri.parse('$baseUrl/forward/traveller/favourite-places/$userId');
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          favoritePlaces = data['data'].take(10).toList(); // Limit to 10 items
+        });
+      } else {
+        print('Failed to load favorite places with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching favorite places: $e');
+      _showError(context, 'Error fetching favorite places. Please try again later.');
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -41,8 +124,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              FilterScreen(category: "Beach", initialIndex: 0),
+          builder: (context) => FilterScreen(category: "Beach", initialIndex: 0),
         ),
       );
     }
@@ -65,8 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             SizedBox(height: 20),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0), // Added padding
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
                 "Where do you want to explore today?",
                 style: GoogleFonts.poppins(
@@ -140,18 +221,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     title: "Mountains",
                     image: "assets/images/home/Categories - Mountains.png",
                     onPressed: () {
-                      _onCategorySelected(1);
+                      _onCategorySelected(2);
                     },
-                    isSelected: _selectedCategoryIndex == 1,
+                    isSelected: _selectedCategoryIndex == 2,
                   ),
                   SizedBox(width: 12),
                   CategoriesButton(
                     title: "Forest",
                     image: "assets/images/home/Categories - Forest.png",
                     onPressed: () {
-                      _onCategorySelected(1);
+                      _onCategorySelected(3);
                     },
-                    isSelected: _selectedCategoryIndex == 1,
+                    isSelected: _selectedCategoryIndex == 3,
                   ),
                 ],
               ),
@@ -230,30 +311,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             SizedBox(height: 12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  PlacesCard1(
-                    title: "Ella",
-                    location: "Badulla, SL",
-                    image: "assets/images/home/Pop - Ella.png",
+            popularDestinations.isNotEmpty
+                ? SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: popularDestinations.map((destination) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: PlacesCard1(
+                            title: destination['name'],
+                            location: destination['address'],
+                            image: 'assets/places/${destination['image']}',
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  )
+                : Center(
+                    child: CircularProgressIndicator(),
                   ),
-                  SizedBox(width: 16),
-                  PlacesCard1(
-                    title: "World's End",
-                    location: "Nuwara Eliya, SL",
-                    image: "assets/images/home/Pop - Worlds End.png",
-                  ),
-                  SizedBox(width: 16),
-                  PlacesCard1(
-                    title: "Ruwanweli Stupa",
-                    location: "Anuradhapura, SL",
-                    image: "assets/images/home/Pop - Ruwanweli Stupa.png",
-                  ),
-                ],
-              ),
-            ),
             SizedBox(height: 20),
 
             // Favorites
@@ -279,34 +355,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             SizedBox(height: 12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  PlacesCard1(
-                    title: "Sigiriya",
-                    location: "Mathale, SL",
-                    image: "assets/images/home/Fav - Sigiriya.png",
+            favoritePlaces.isNotEmpty
+                ? SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: favoritePlaces.map((place) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: PlacesCard1(
+                            title: place['name'],
+                            location: place['address'],
+                            image: 'assets/places/${place['image']}',
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  )
+                : Center(
+                    child: CircularProgressIndicator(),
                   ),
-                  SizedBox(width: 16),
-                  PlacesCard1(
-                    title: "Galle Fort",
-                    location: "Galle, SL",
-                    image: "assets/images/home/Fav - Galle Fort.png",
-                  ),
-                  SizedBox(width: 16),
-                  PlacesCard1(
-                    title: "Adam's Peak",
-                    location: "Hatton, SL",
-                    image: "assets/images/home/Fav - Adams Peak.png",
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
           ],
         ),
       ),
+    );
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 }
