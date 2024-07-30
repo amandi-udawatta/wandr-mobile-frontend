@@ -1,5 +1,3 @@
-// lib/pages/signup/pref_activities_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/config.dart';
@@ -19,10 +17,27 @@ class PrefActivitiesPage extends StatefulWidget {
   _PrefActivitiesPageState createState() => _PrefActivitiesPageState();
 }
 
-class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
+class _PrefActivitiesPageState extends State<PrefActivitiesPage> with SingleTickerProviderStateMixin {
   // List to keep track of selected activities
   final List<bool> selectedActivities = List<bool>.filled(activities.length, false);
   final storage = FlutterSecureStorage();
+
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   Future<void> submitSelectedActivities(List<int> selectedActivityIds) async {
     String? token = await storage.read(key: 'accessToken');
@@ -50,6 +65,41 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
     } else {
       print('Token not found');
     }
+  }
+
+  void _showProcessingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SizedBox(
+            height: 150, // Set the desired height here
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                RotatingDiamondLoadingIndicator(controller: _controller),
+                SizedBox(height: 20),
+                Text(
+                  "Fetching the best destinations in Sri Lanka just for you...",
+                  style: TextStyle(fontSize: 20),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    // Delay for 5 seconds and then navigate to DashboardScreen
+    Future.delayed(Duration(seconds: 5), () {
+      Navigator.pop(context); // Close the dialog
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DashboardScreen()),
+      );
+    });
   }
 
   @override
@@ -200,10 +250,7 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                     _showError(context, 'Please select at least one activity.');
                   } else {
                     submitSelectedActivities(selectedActivityIds);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => DashboardScreen()),
-                    );
+                    _showProcessingDialog();
                   }
                 },
               ),
@@ -244,6 +291,65 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
           ],
         );
       },
+    );
+  }
+}
+
+class RotatingDiamondLoadingIndicator extends StatelessWidget {
+  final AnimationController controller;
+
+  const RotatingDiamondLoadingIndicator({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        return Transform.rotate(
+          angle: controller.value * 6.3, // Rotate the diamond
+          child: child,
+        );
+      },
+      child: Container(
+        height: 50,
+        width: 50,
+        child: Stack(
+          children: [
+            Positioned(
+              top: 0,
+              left: 20,
+              child: CircleAvatar(
+                radius: 5,
+                backgroundColor: Colors.green,
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 20,
+              child: CircleAvatar(
+                radius: 5,
+                backgroundColor: Colors.green,
+              ),
+            ),
+            Positioned(
+              left: 0,
+              top: 20,
+              child: CircleAvatar(
+                radius: 5,
+                backgroundColor: Colors.green,
+              ),
+            ),
+            Positioned(
+              right: 0,
+              top: 20,
+              child: CircleAvatar(
+                radius: 5,
+                backgroundColor: Colors.green,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
