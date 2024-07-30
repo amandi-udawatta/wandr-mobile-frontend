@@ -1,3 +1,5 @@
+// lib/pages/signup/pref_activities_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/config.dart';
@@ -8,6 +10,8 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../data.dart'; // Import the data file
+
 class PrefActivitiesPage extends StatefulWidget {
   const PrefActivitiesPage({super.key});
 
@@ -16,38 +20,8 @@ class PrefActivitiesPage extends StatefulWidget {
 }
 
 class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
-  // List of activities with their image paths, names, and IDs
-  final List<Map<String, dynamic>> activities = [
-    {"id": 1, "image": "assets/images/activities/hiking.png", "name": "Hiking"},
-    {"id": 2, "image": "assets/images/activities/surfing.png", "name": "Surfing"},
-    {"id": 3, "image": "assets/images/activities/scuba-diving.png", "name": "Scuba Diving"},
-    {"id": 4, "image": "assets/images/activities/wildlife-safari.png", "name": "Wildlife Safari"},
-    {"id": 5, "image": "assets/images/activities/bird-watching.png", "name": "Bird Watching"},
-    {"id": 6, "image": "assets/images/activities/cultural-tours.png", "name": "Cultural Tours"},
-    {"id": 7, "image": "assets/images/activities/historical-tours.png", "name": "Historical Tours"},
-    {"id": 8, "image": "assets/images/activities/temple-visits.png", "name": "Temple Visits"},
-    {"id": 9, "image": "assets/images/activities/waterfall-visits.png", "name": "Waterfall Visits"},
-    {"id": 10, "image": "assets/images/activities/whale-watching.png", "name": "Whale Watching"},
-    {"id": 11, "image": "assets/images/activities/fishing.png", "name": "Fishing"},
-    {"id": 12, "image": "assets/images/activities/camping.png", "name": "Camping"},
-    {"id": 13, "image": "assets/images/activities/rock-climbing.png", "name": "Rock Climbing"},
-    {"id": 14, "image": "assets/images/activities/cycling.png", "name": "Cycling"},
-    {"id": 15, "image": "assets/images/activities/kayaking.png", "name": "Kayaking"},
-    {"id": 16, "image": "assets/images/activities/canoeing.png", "name": "Canoeing"},
-    {"id": 17, "image": "assets/images/activities/boating.png", "name": "Boating"},
-    {"id": 18, "image": "assets/images/activities/hot-air-ballooning.png", "name": "Hot Air Ballooning"},
-    {"id": 19, "image": "assets/images/activities/tea-plantation-tours.png", "name": "Tea Plantation Tours"},
-    {"id": 20, "image": "assets/images/activities/elephant-rides.png", "name": "Elephant Rides"},
-    {"id": 21, "image": "assets/images/activities/village-tours.png", "name": "Village Tours"},
-    {"id": 22, "image": "assets/images/activities/food-tours.png", "name": "Food Tours"},
-    {"id": 23, "image": "assets/images/activities/trekking.png", "name": "Trekking"},
-    {"id": 24, "image": "assets/images/activities/photography.png", "name": "Photography"},
-    {"id": 25, "image": "assets/images/activities/caving.png", "name": "Caving"},
-  ];
-
   // List to keep track of selected activities
-  final List<bool> selectedActivities = List<bool>.filled(25, false);
-
+  final List<bool> selectedActivities = List<bool>.filled(activities.length, false);
   final storage = FlutterSecureStorage();
 
   Future<void> submitSelectedActivities(List<int> selectedActivityIds) async {
