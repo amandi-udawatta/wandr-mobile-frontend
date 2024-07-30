@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:wandr/pages/trip/trip_ongoing_screen.dart';
+import 'package:wandr/pages/trip/finalized_trip_screen.dart';
 
-class TripOngoing extends StatelessWidget {
+class TripCard2 extends StatelessWidget {
   final String title;
   final String created_on;
   final String image;
 
-  const TripOngoing({
+  const TripCard2({
     Key? key,
     required this.title,
     required this.created_on,
@@ -21,13 +21,13 @@ class TripOngoing extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TripOngoingScreen(),
+            builder: (context) => FinalizedTripScreen(),
           ),
         );
       },
       child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: 140, // Adjust height as needed
+        width: 120,
+        height: 160,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: Colors.black,
@@ -40,8 +40,8 @@ class TripOngoing extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              left: 10,
               bottom: 10,
+              left: 10,
               right: 10,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,14 +49,14 @@ class TripOngoing extends StatelessWidget {
                   Text(
                     title,
                     style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
                       color: Colors.white,
                     ),
                     maxLines: 1, // Ensure title stays on one line
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 2),
+                  SizedBox(height: 2), // Reduced space between title and created_on
                   Text(
                     created_on,
                     style: GoogleFonts.poppins(

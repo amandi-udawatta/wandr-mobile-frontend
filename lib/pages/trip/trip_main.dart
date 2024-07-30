@@ -5,6 +5,7 @@ import 'package:wandr/theme/app_colors.dart';
 import 'package:wandr/components/search_bar3.dart' as custom;
 import 'package:wandr/components/bottom_nav_bar.dart';
 import 'package:wandr/components/trip_card.dart';
+import 'package:wandr/components/trip_card2.dart';
 import 'package:wandr/components/trip_ongoing.dart';
 
 class TripScreen extends StatelessWidget {
@@ -82,7 +83,7 @@ class TripScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Planned Trips",
+                              "Pending Trips",
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 18,
@@ -137,7 +138,7 @@ class TripScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Completed Trip",
+                              "Finalized Trip",
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 18,
@@ -159,19 +160,19 @@ class TripScreen extends StatelessWidget {
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
-                              TripCard(
+                              TripCard2(
                                 title: "Mihintale Rock",
                                 created_on: "created on 12th July 2024",
                                 image: "assets/images/home/Related - 1.png",
                               ),
                               SizedBox(width: 16),
-                              TripCard(
+                              TripCard2(
                                 title: "Jetawanaramaya",
                                 created_on: "created on 12th July 2024",
                                 image: "assets/images/home/Related - 2.png",
                               ),
                               SizedBox(width: 16),
-                              TripCard(
+                              TripCard2(
                                 title: "Ruwanweli Stupa",
                                 created_on: "created on 12th July 2024",
                                 image: "assets/images/home/Related - 3.png",

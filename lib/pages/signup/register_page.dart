@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wandr/config.dart';
+
 import 'package:country_picker/country_picker.dart';
 import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/components/secondary_button.dart';
@@ -27,8 +29,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final _formKey = GlobalKey<FormState>();
 
-  Future<void> signup(String name, String role, String email, String password, String country, BuildContext context) async {
-    final url = Uri.parse('http://10.22.164.114:8080/api/proxy/signup');
+  Future<void> signup(String name, String role, String email, String password,
+      String country, BuildContext context) async {
+    final url = Uri.parse('$baseUrl/signup');
     final hashedPassword = hashPassword(password);
 
     final response = await http.post(
@@ -41,9 +44,11 @@ class _RegisterPageState extends State<RegisterPage> {
         'password': hashedPassword,
         'country': country,
       }),
+      //print the forwarding request
     );
 
     if (response.statusCode == 200) {
+      print(response);
       final responseBody = json.decode(response.body);
       if (responseBody['success']) {
         handleSignupResponse(responseBody, context);
@@ -58,7 +63,8 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  void handleSignupResponse(Map<String, dynamic> responseBody, BuildContext context) {
+  void handleSignupResponse(
+      Map<String, dynamic> responseBody, BuildContext context) {
     if (responseBody['success']) {
       final accessToken = responseBody['data']['accessToken'];
       final refreshToken = responseBody['data']['refreshToken'];
@@ -69,7 +75,8 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  void loginUser(String accessToken, String refreshToken, BuildContext context) {
+  void loginUser(
+      String accessToken, String refreshToken, BuildContext context) {
     // Save tokens to secure storage (not implemented here)
     // Navigate to the home screen or dashboard
     print('User logged in with access token: $accessToken');
@@ -106,7 +113,8 @@ class _RegisterPageState extends State<RegisterPage> {
   void _showCountryPicker(BuildContext context) {
     showCountryPicker(
       context: context,
-      showPhoneCode: false, // optional. Shows phone code before the country name.
+      showPhoneCode:
+          false, // optional. Shows phone code before the country name.
       onSelect: (Country country) {
         setState(() {
           selectedCountry = country.name;
@@ -145,7 +153,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -175,7 +182,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 // Description
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0), // Add horizontal padding
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 20.0), // Add horizontal padding
                   child: Text(
                     'Join us to enhance your travel experience with personalized recommendations and real-time updates.',
                     textAlign: TextAlign.center, // Center the text
@@ -376,7 +384,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       final password = passwordController.text;
                       final confirmPassword = confirmPasswordController.text;
                       final role = 'TRAVELLER';
-                      final country = selectedCountry == 'Other' ? otherCountry! : selectedCountry!;
+                      final country = selectedCountry == 'Other'
+                          ? otherCountry!
+                          : selectedCountry!;
 
                       if (password == confirmPassword) {
                         signup(name, role, email, password, country, context);
@@ -401,7 +411,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           color: Colors.grey[500],
                         ),
                       ),
-
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text(
@@ -413,7 +422,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         ),
                       ),
-
                       Expanded(
                         child: Divider(
                           thickness: 0.5,
@@ -439,7 +447,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Row(
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.0), // Add horizontal padding
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.0), // Add horizontal padding
                         child: Text(
                           'Already have an account?',
                           textAlign: TextAlign.center, // Center the text
