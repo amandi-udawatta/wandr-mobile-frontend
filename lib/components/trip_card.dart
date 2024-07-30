@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:wandr/pages/home/home_destination_profile_screen.dart';
+import 'package:wandr/pages/trip/pending_trip_screen.dart';
 
 class TripCard extends StatelessWidget {
   final String title;
@@ -21,7 +21,7 @@ class TripCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DestinationProfileScreen(),
+            builder: (context) => PendingTripScreen(),
           ),
         );
       },
