@@ -1,3 +1,5 @@
+// lib/pages/signup/pref_destinations_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:wandr/config.dart';
 
@@ -9,6 +11,9 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../config.dart';
+import '../../data.dart'; // Import the data file
+
 class PrefDestinationsPage extends StatefulWidget {
   const PrefDestinationsPage({super.key});
 
@@ -17,46 +22,8 @@ class PrefDestinationsPage extends StatefulWidget {
 }
 
 class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
-  // List of destinations with their image paths, names, and IDs
-  final List<Map<String, dynamic>> destinations = [
-    {"id": 1, "image": "assets/images/categories/mountain.png", "name": "Mountain"},
-    {"id": 2, "image": "assets/images/categories/beach.png", "name": "Beach"},
-    {"id": 3, "image": "assets/images/categories/national-park.png", "name": "National Park"},
-    {"id": 4, "image": "assets/images/categories/historical-site.png", "name": "Historic Site"},
-    {"id": 5, "image": "assets/images/categories/museum.png", "name": "Museum"},
-    {"id": 6, "image": "assets/images/categories/art-gallery.png", "name": "Art Gallery"},
-    {"id": 7, "image": "assets/images/categories/temple.png", "name": "Temple"},
-    {"id": 8, "image": "assets/images/categories/church.png", "name": "Church"},
-    {"id": 9, "image": "assets/images/categories/monument.png", "name": "Monument"},
-    {"id": 10, "image": "assets/images/categories/archaeological-site.png", "name": "Archaeological Site"},
-    {"id": 11, "image": "assets/images/categories/waterfall.png", "name": "Waterfall"},
-    {"id": 12, "image": "assets/images/categories/lake.png", "name": "Lake"},
-    {"id": 13, "image": "assets/images/categories/river.png", "name": "River"},
-    {"id": 14, "image": "assets/images/categories/zoo.png", "name": "Zoo"},
-    {"id": 15, "image": "assets/images/categories/botanical-garden.png", "name": "Botanical Garden"},
-    {"id": 16, "image": "assets/images/categories/theme-park.png", "name": "Theme Park"},
-    {"id": 17, "image": "assets/images/categories/wildlife-sanctuary.png", "name": "Wildlife Sanctuary"},
-    {"id": 18, "image": "assets/images/categories/scenic-viewpoint.png", "name": "Scenic Viewpoint"},
-    {"id": 19, "image": "assets/images/categories/village.png", "name": "Village"},
-    {"id": 20, "image": "assets/images/categories/city.png", "name": "City"},
-    {"id": 21, "image": "assets/images/categories/neighborhood.png", "name": "Neighborhood"},
-    {"id": 22, "image": "assets/images/categories/market.png", "name": "Market"},
-    {"id": 23, "image": "assets/images/categories/shopping-mall.png", "name": "Shopping Mall"},
-    {"id": 24, "image": "assets/images/categories/library.png", "name": "Library"},
-    {"id": 25, "image": "assets/images/categories/university.png", "name": "University"},
-    {"id": 26, "image": "assets/images/categories/cave.png", "name": "Cave"},
-    {"id": 27, "image": "assets/images/categories/fortress.png", "name": "Fortress"},
-    {"id": 28, "image": "assets/images/categories/lighthouse.png", "name": "Lighthouse"},
-    {"id": 29, "image": "assets/images/categories/aquarium.png", "name": "Aquarium"},
-    {"id": 30, "image": "assets/images/categories/cultural-landmark.png", "name": "Cultural Landmark"},
-    {"id": 31, "image": "assets/images/categories/rock.png", "name": "Rock"},
-    {"id": 32, "image": "assets/images/categories/coral-reef.png", "name": "Coral Reef"},
-    {"id": 33, "image": "assets/images/categories/tea-plantation.png", "name": "Tea Plantation"},
-    {"id": 34, "image": "assets/images/categories/forest.png", "name": "Forest"},
-  ];
-
   // List to keep track of selected destinations
-  final List<bool> selectedDestinations = List<bool>.filled(34, false);
+  final List<bool> selectedDestinations = List<bool>.filled(destinations.length, false);
   final storage = FlutterSecureStorage();
 
   Future<void> submitSelectedCategories(List<int> selectedCategoryIds) async {
@@ -69,9 +36,7 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
 
     try {
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-      print(decodedToken);
-      final userId = decodedToken['id']; // Assuming the user ID is stored in the 'sub' claim
-      print(userId);
+      final userId = decodedToken['id']; // Assuming the user ID is stored in the 'id' claim
       final url = Uri.parse('$baseUrl/forward/traveller/$userId/categories');
 
       final response = await http.put(

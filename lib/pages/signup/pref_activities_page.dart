@@ -1,7 +1,16 @@
+// lib/pages/signup/pref_activities_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:wandr/components/primary_button.dart';
+import 'package:wandr/config.dart';
 import 'package:wandr/pages/home/home_dashboard_screen.dart';
 import 'package:wandr/theme/app_colors.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import '../../data.dart'; // Import the data file
 
 class PrefActivitiesPage extends StatefulWidget {
   const PrefActivitiesPage({super.key});
@@ -11,75 +20,37 @@ class PrefActivitiesPage extends StatefulWidget {
 }
 
 class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
-  // List of activities with their image paths and names
-  final List<Map<String, String>> activities = [
-    {
-      "image": "assets/images/activities/bird-watching.png",
-      "name": "Bird Watching"
-    },
-    {"image": "assets/images/activities/boating.png", "name": "Boating"},
-    {"image": "assets/images/activities/camping.png", "name": "Camping"},
-    {"image": "assets/images/activities/canoeing.png", "name": "Canoeing"},
-    {"image": "assets/images/activities/caving.png", "name": "Caving"},
-    {"image": "assets/images/activities/cycling.png", "name": "Cycling"},
-    {
-      "image": "assets/images/activities/elephant-rides.png",
-      "name": "Elephant Rides"
-    },
-    {"image": "assets/images/activities/fishing.png", "name": "Fishing"},
-    {"image": "assets/images/activities/food-tours.png", "name": "Food Tours"},
-    {"image": "assets/images/activities/hiking.png", "name": "Hiking"},
-    {
-      "image": "assets/images/activities/historical-tours.png",
-      "name": "Historical Tours"
-    },
-    {
-      "image": "assets/images/activities/hot-air-ballooning.png",
-      "name": "Hot Air Ballooning"
-    },
-    {"image": "assets/images/activities/kayaking.png", "name": "Kayaking"},
-    {
-      "image": "assets/images/activities/photography.png",
-      "name": "Photography"
-    },
-    {
-      "image": "assets/images/activities/rock-climbing.png",
-      "name": "Rock Climbing"
-    },
-    {
-      "image": "assets/images/activities/scuba-diving.png",
-      "name": "Scuba Diving"
-    },
-    {"image": "assets/images/activities/surfing.png", "name": "Surfing"},
-    {
-      "image": "assets/images/activities/tea-plantation-tours.png",
-      "name": "Tea Plantation Tours"
-    },
-    {
-      "image": "assets/images/activities/temple-visits.png",
-      "name": "Temple Visits"
-    },
-    {"image": "assets/images/activities/trekking.png", "name": "Trekking"},
-    {
-      "image": "assets/images/activities/village-tours.png",
-      "name": "Village Tours"
-    },
-    {
-      "image": "assets/images/activities/waterfall-visits.png",
-      "name": "Waterfall Visits"
-    },
-    {
-      "image": "assets/images/activities/whale-watching.png",
-      "name": "Whale Watching"
-    },
-    {
-      "image": "assets/images/activities/wildlife-safari.png",
-      "name": "Wildlife Safari"
-    },
-  ];
-
   // List to keep track of selected activities
-  final List<bool> selectedActivities = List<bool>.filled(24, false);
+  final List<bool> selectedActivities = List<bool>.filled(activities.length, false);
+  final storage = FlutterSecureStorage();
+
+  Future<void> submitSelectedActivities(List<int> selectedActivityIds) async {
+    String? token = await storage.read(key: 'accessToken');
+    if (token != null) {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      final userId = decodedToken['id']; // Ensure your token has 'id' claim
+      final url = Uri.parse('$baseUrl/forward/traveller/$userId/activities');
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+        body: json.encode({
+          'activities': selectedActivityIds,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Activities updated successfully');
+      } else {
+        print('Failed to update activities with status: ${response.statusCode}');
+      }
+    } else {
+      print('Token not found');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,10 +73,8 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                   ),
                 ),
               ),
-
               Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 30.0), // Add horizontal padding
+                padding: EdgeInsets.symmetric(horizontal: 30.0), // Add horizontal padding
                 child: Text(
                   'Let us know what activities you love to do during your travels. This will help us tailor your recommendations to match your interests.',
                   textAlign: TextAlign.left, // Align the text to the left
@@ -115,9 +84,7 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                   ),
                 ),
               ),
-
               SizedBox(height: 20),
-
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -130,9 +97,7 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                   ),
                 ),
               ),
-
               SizedBox(height: 15),
-
               // Grid selection of activities
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -152,7 +117,9 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                     return GestureDetector(
                       onTap: () {
                         setState(() {
-                          selectedActivities[index] = !isSelected;
+                          if (selectedActivities.where((selected) => selected).length < 5 || isSelected) {
+                            selectedActivities[index] = !isSelected;
+                          }
                         });
                       },
                       child: Container(
@@ -164,13 +131,13 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                               : null,
                           boxShadow: isSelected
                               ? [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 2,
-                                    blurRadius: 5,
-                                    offset: Offset(0, 3),
-                                  )
-                                ]
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: Offset(0, 3),
+                            )
+                          ]
                               : [],
                         ),
                         child: Stack(
@@ -217,25 +184,32 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                   },
                 ),
               ),
-
               SizedBox(height: 50),
-
               // Proceed Button
               PrimaryButton(
                 text: "Proceed",
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => DashboardScreen()),
-                  );
+                  final selectedActivityIds = activities
+                      .asMap()
+                      .entries
+                      .where((entry) => selectedActivities[entry.key])
+                      .map((entry) => entry.value['id'] as int)
+                      .toList();
+
+                  if (selectedActivityIds.isEmpty) {
+                    _showError(context, 'Please select at least one activity.');
+                  } else {
+                    submitSelectedActivities(selectedActivityIds);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DashboardScreen()),
+                    );
+                  }
                 },
               ),
-
               SizedBox(height: 20),
-
               Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 30.0), // Add horizontal padding
+                padding: EdgeInsets.symmetric(horizontal: 30.0), // Add horizontal padding
                 child: Text(
                   '(Your preferences can be updated anytime in your profile settings)',
                   textAlign: TextAlign.left, // Align the text to the left
@@ -245,12 +219,31 @@ class _PrefActivitiesPageState extends State<PrefActivitiesPage> {
                   ),
                 ),
               ),
-
               SizedBox(height: 20),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void _showError(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
