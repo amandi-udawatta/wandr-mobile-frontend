@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/pages/signup/pref_activities_page.dart';
 import 'package:wandr/theme/app_colors.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class PrefDestinationsPage extends StatefulWidget {
   const PrefDestinationsPage({super.key});
@@ -11,42 +14,71 @@ class PrefDestinationsPage extends StatefulWidget {
 }
 
 class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
-  // List of destinations with their image paths and names
-  final List<Map<String, String>> destinations = [
-    {"image": "assets/images/categories/aquarium.png", "name": "Aquarium"},
-    {"image": "assets/images/categories/archaeological-site.png", "name": "Archaeological Site"},
-    {"image": "assets/images/categories/art-gallery.png", "name": "Art Gallery"},
-    {"image": "assets/images/categories/beach.png", "name": "Beach"},
-    {"image": "assets/images/categories/botanical-garden.png", "name": "Botanical Garden"},
-    {"image": "assets/images/categories/cave.png", "name": "Cave"},
-    {"image": "assets/images/categories/church.png", "name": "Church"},
-    {"image": "assets/images/categories/city.png", "name": "City"},
-    {"image": "assets/images/categories/cultural-landmark.png", "name": "Cultural Landmark"},
-    {"image": "assets/images/categories/fortress.png", "name": "Fortress"},
-    {"image": "assets/images/categories/historical-site.png", "name": "Historical Site"},
-    {"image": "assets/images/categories/lake.png", "name": "Lake"},
-    {"image": "assets/images/categories/library.png", "name": "Library"},
-    {"image": "assets/images/categories/lighthouse.png", "name": "Lighthouse"},
-    {"image": "assets/images/categories/market.png", "name": "Market"},
-    {"image": "assets/images/categories/monument.png", "name": "Monument"},
-    {"image": "assets/images/categories/mountain.png", "name": "Mountain"},
-    {"image": "assets/images/categories/museum.png", "name": "Museum"},
-    {"image": "assets/images/categories/national-park.png", "name": "National Park"},
-    {"image": "assets/images/categories/neighborhood.png", "name": "Neighborhood"},
-    {"image": "assets/images/categories/river.png", "name": "River"},
-    {"image": "assets/images/categories/scenic-viewpoint.png", "name": "Scenic Viewpoint"},
-    {"image": "assets/images/categories/shopping-mall.png", "name": "Shopping Mall"},
-    {"image": "assets/images/categories/temple.png", "name": "Temple"},
-    {"image": "assets/images/categories/theme-park.png", "name": "Theme Park"},
-    {"image": "assets/images/categories/university.png", "name": "University"},
-    {"image": "assets/images/categories/village.png", "name": "Village"},
-    {"image": "assets/images/categories/waterfall.png", "name": "Waterfall"},
-    {"image": "assets/images/categories/wildlife-sanctuary.png", "name": "Wildlife Sanctuary"},
-    {"image": "assets/images/categories/zoo.png", "name": "Zoo"},
+  // List of destinations with their image paths, names, and IDs
+  final List<Map<String, dynamic>> destinations = [
+    {"id": 1, "image": "assets/images/categories/mountain.png", "name": "Mountain"},
+    {"id": 2, "image": "assets/images/categories/beach.png", "name": "Beach"},
+    {"id": 3, "image": "assets/images/categories/national-park.png", "name": "National Park"},
+    {"id": 4, "image": "assets/images/categories/historical-site.png", "name": "Historic Site"},
+    {"id": 5, "image": "assets/images/categories/museum.png", "name": "Museum"},
+    {"id": 6, "image": "assets/images/categories/art-gallery.png", "name": "Art Gallery"},
+    {"id": 7, "image": "assets/images/categories/temple.png", "name": "Temple"},
+    {"id": 8, "image": "assets/images/categories/church.png", "name": "Church"},
+    {"id": 9, "image": "assets/images/categories/monument.png", "name": "Monument"},
+    {"id": 10, "image": "assets/images/categories/archaeological-site.png", "name": "Archaeological Site"},
+    {"id": 11, "image": "assets/images/categories/waterfall.png", "name": "Waterfall"},
+    {"id": 12, "image": "assets/images/categories/lake.png", "name": "Lake"},
+    {"id": 13, "image": "assets/images/categories/river.png", "name": "River"},
+    {"id": 14, "image": "assets/images/categories/zoo.png", "name": "Zoo"},
+    {"id": 15, "image": "assets/images/categories/botanical-garden.png", "name": "Botanical Garden"},
+    {"id": 16, "image": "assets/images/categories/theme-park.png", "name": "Theme Park"},
+    {"id": 17, "image": "assets/images/categories/wildlife-sanctuary.png", "name": "Wildlife Sanctuary"},
+    {"id": 18, "image": "assets/images/categories/scenic-viewpoint.png", "name": "Scenic Viewpoint"},
+    {"id": 19, "image": "assets/images/categories/village.png", "name": "Village"},
+    {"id": 20, "image": "assets/images/categories/city.png", "name": "City"},
+    {"id": 21, "image": "assets/images/categories/neighborhood.png", "name": "Neighborhood"},
+    {"id": 22, "image": "assets/images/categories/market.png", "name": "Market"},
+    {"id": 23, "image": "assets/images/categories/shopping-mall.png", "name": "Shopping Mall"},
+    {"id": 24, "image": "assets/images/categories/library.png", "name": "Library"},
+    {"id": 25, "image": "assets/images/categories/university.png", "name": "University"},
+    {"id": 26, "image": "assets/images/categories/cave.png", "name": "Cave"},
+    {"id": 27, "image": "assets/images/categories/fortress.png", "name": "Fortress"},
+    {"id": 28, "image": "assets/images/categories/lighthouse.png", "name": "Lighthouse"},
+    {"id": 29, "image": "assets/images/categories/aquarium.png", "name": "Aquarium"},
+    {"id": 30, "image": "assets/images/categories/cultural-landmark.png", "name": "Cultural Landmark"},
+    {"id": 31, "image": "assets/images/categories/rock.png", "name": "Rock"},
+    {"id": 32, "image": "assets/images/categories/coral-reef.png", "name": "Coral Reef"},
+    {"id": 33, "image": "assets/images/categories/tea-plantation.png", "name": "Tea Plantation"},
+    {"id": 34, "image": "assets/images/categories/forest.png", "name": "Forest"},
   ];
 
   // List to keep track of selected destinations
-  final List<bool> selectedDestinations = List<bool>.filled(30, false);
+  final List<bool> selectedDestinations = List<bool>.filled(34, false);
+
+  Future<void> submitSelectedCategories(List<int> selectedCategoryIds, String token) async {
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+    print(decodedToken);
+    final userId = decodedToken['sub']; // Assuming the user ID is stored in the 'sub' claim
+    print(userId);
+    final url = Uri.parse('http://192.168.1.10:8081/api/proxy/forward/traveller/$userId/categories');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token,
+      },
+      body: json.encode({
+        'categories': selectedCategoryIds,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Categories updated successfully');
+    } else {
+      print('Failed to update categories with status: ${response.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +101,6 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
                   ),
                 ),
               ),
-
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30.0), // Add horizontal padding
                 child: Text(
@@ -81,9 +112,7 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
                   ),
                 ),
               ),
-
               SizedBox(height: 20),
-
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -96,9 +125,7 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
                   ),
                 ),
               ),
-
               SizedBox(height: 15),
-
               // Grid selection of destinations
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -118,7 +145,9 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
                     return GestureDetector(
                       onTap: () {
                         setState(() {
-                          selectedDestinations[index] = !isSelected;
+                          if (selectedDestinations.where((selected) => selected).length < 10 || isSelected) {
+                            selectedDestinations[index] = !isSelected;
+                          }
                         });
                       },
                       child: Container(
@@ -179,24 +208,33 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
                   },
                 ),
               ),
-
               SizedBox(height: 50),
-
               // Proceed Button
               PrimaryButton(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PrefActivitiesPage(),
-                    ),
-                  );
+                  final selectedCategoryIds = destinations
+                      .asMap()
+                      .entries
+                      .where((entry) => selectedDestinations[entry.key])
+                      .map((entry) => entry.value['id'] as int)
+                      .toList();
+
+                  if (selectedCategoryIds.isEmpty) {
+                    _showError(context, 'Please select at least one category.');
+                  } else {
+                    final token = 'your_token_here'; // Retrieve the token from your authentication logic
+                    submitSelectedCategories(selectedCategoryIds, token);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PrefActivitiesPage(),
+                      ),
+                    );
+                  }
                 },
                 text: "Proceed",
               ),
-
               SizedBox(height: 20),
-
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30.0), // Add horizontal padding
                 child: Text(
@@ -208,12 +246,31 @@ class _PrefDestinationsPageState extends State<PrefDestinationsPage> {
                   ),
                 ),
               ),
-
               SizedBox(height: 20),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void _showError(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
