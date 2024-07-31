@@ -1,7 +1,7 @@
 // lib/pages/trip/pending_trip_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:wandr/pages/trip/trip_main.dart';
 import 'package:wandr/theme/app_colors.dart';
 import '../../components/bottom_nav_bar.dart';
 
@@ -31,9 +31,9 @@ class _PendingTripPageState extends State<PendingTripPage> {
   // Dropdown selection state
   int? _selectedOption;
   final List<Map<String, dynamic>> _dropdownOptions = [
-    {"id": 1, "name": "Shortest Path"},
-    {"id": 2, "name": "Preferences Path"},
-    {"id": 3, "name": "User Given Order"}
+    {"id": 1, "name": "Optimized Route (Shortest Path)"},
+    {"id": 2, "name": "Custom Route (Your Selection)"},
+    {"id": 3, "name": "Recommended Route (By Us)"}
   ];
 
   // Function to send the selected ID to the backend
@@ -63,6 +63,19 @@ class _PendingTripPageState extends State<PendingTripPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_outlined,
+            size: 30,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => TripScreen()),
+            );
+          },
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -83,6 +96,30 @@ class _PendingTripPageState extends State<PendingTripPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Text(
+                  "Your Current Destination List",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Kcolours.primary
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 10.0), // Add horizontal padding
+                child: Text(
+                  "Drag the places to adjust the order",
+                  textAlign: TextAlign.left, // Center the text
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
               // Destinations list
               ReorderableListView(
                 shrinkWrap: true,
@@ -163,18 +200,42 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 25),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Text(
+                  "Select Your Route",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Kcolours.primary
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 10.0), // Add horizontal padding
+                child: Text(
+                  "Choose an option to calculate the estimated time for your trip",
+                  textAlign: TextAlign.left, // Center the text
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Container(
                   height: 60,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Kcolours.primary, width: 2),
+                    border: Border.all(color: Kcolours.primary, width: 1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 12),
                   child: DropdownButtonHideUnderline(
-                    child: DropdownButton2<int>(
+                    child: DropdownButton<int>(
                       isExpanded: true,
                       value: _selectedOption,
                       hint: Text("Select an option"),
@@ -192,9 +253,6 @@ class _PendingTripPageState extends State<PendingTripPage> {
                           _sendSelectionToBackend(value);
                         }
                       },
-                      dropdownDecoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
                     ),
                   ),
                 ),
@@ -207,3 +265,5 @@ class _PendingTripPageState extends State<PendingTripPage> {
     );
   }
 }
+
+

@@ -62,7 +62,7 @@ class TripCard extends StatelessWidget {
                   ),
                   SizedBox(height: 2), // Reduced space between title and created_on
                   Text(
-                    created_on,
+                    "Created on $created_on",
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w400,
                       fontSize: 10,
