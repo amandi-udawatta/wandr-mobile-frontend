@@ -1,29 +1,22 @@
 // lib/pages/trip/finalized_trip_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:wandr/components/bottom_nav_bar.dart';
 import 'package:wandr/theme/app_colors.dart';
 
 class FinalizedTripPage extends StatelessWidget {
   final String title;
   final String createdOn;
+  final List<dynamic> tripPlaces;
 
   const FinalizedTripPage({
     Key? key,
     required this.title,
     required this.createdOn,
+    required this.tripPlaces,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Mockup data for finalized trip destinations
-    final List<String> destinations = [
-      "Mihintale Rock",
-      "Ruwanwelisaya Stupa",
-      "Wilpattu National Park",
-      "Kalu Diya Pokuna",
-    ];
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -32,19 +25,15 @@ class FinalizedTripPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back_ios_new_outlined,
             size: 30,
-            color: Colors.black,
           ),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context); // Use pop to go back to the previous screen
           },
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: TextStyle(color: Kcolours.black),
-            ),
+            Text(title, style: TextStyle(color: Kcolours.black)),
             Text(
               "Created on $createdOn",
               style: TextStyle(
@@ -72,38 +61,25 @@ class FinalizedTripPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: destinations.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  color: Colors.grey[200],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    title: Text(destinations[index]),
-                  ),
-                );
-              },
-            ),
-            SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Text(
-                "Your Preferred Path",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Kcolours.primary
-                ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: tripPlaces.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    color: Colors.grey[200],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      title: Text(tripPlaces[index]['title']),
+                    ),
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
     );
   }
 }

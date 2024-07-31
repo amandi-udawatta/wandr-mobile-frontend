@@ -25,16 +25,13 @@ class _TripScreenState extends State<TripScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   List<Map<String, dynamic>> pendingTrips = [];
-  List<Map<String, String>> finalizedTrips = [
-    {"title": "Adam's Peak", "created_on": "12th July 2024"},
-    {"title": "Arugam Bay Trip", "created_on": "17th August 2023"},
-    {"title": "Mihintale Rock", "created_on": "8th July 2024"},
-  ];
+  List<Map<String, dynamic>> finalizedTrips = [];
 
   @override
   void initState() {
     super.initState();
     _fetchPendingTrips();
+    _fetchFinalizedTrips();
   }
 
   Future<void> _fetchPendingTrips() async {
@@ -62,8 +59,51 @@ class _TripScreenState extends State<TripScreen> {
               final createdAt = DateTime.fromMillisecondsSinceEpoch(trip['createdAt']);
               final createdOn = "${createdAt.day}th ${_monthName(createdAt.month)} ${createdAt.year}";
               return {
+                'tripId': trip['tripId'],
                 'title': trip['name'],
                 'created_on': createdOn,
+                'tripPlaces': trip['tripPlaces'] ?? [],
+              };
+            }).toList();
+          });
+        } else {
+          print('Failed to load trips with status: ${response.statusCode}');
+        }
+      }
+    } catch (e) {
+      print('Error fetching trips: $e');
+    }
+  }
+
+  Future<void> _fetchFinalizedTrips() async {
+    try {
+      String? token = await _storage.read(key: 'accessToken');
+      if (token != null) {
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+        final userId = decodedToken['id'];
+        final url = Uri.parse('$baseUrl/forward/trip/finalized/$userId');
+
+        final response = await http.get(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token,
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          final trips = data['data'] as List<dynamic>;
+
+          setState(() {
+            finalizedTrips = trips.map((trip) {
+              final createdAt = DateTime.fromMillisecondsSinceEpoch(trip['createdAt']);
+              final createdOn = "${createdAt.day}th ${_monthName(createdAt.month)} ${createdAt.year}";
+              return {
+                'tripId': trip['tripId'],
+                'title': trip['name'],
+                'created_on': createdOn,
+                'tripPlaces': trip['tripPlaces'] ?? [],
               };
             }).toList();
           });
@@ -183,6 +223,7 @@ class _TripScreenState extends State<TripScreen> {
                                           builder: (context) => PendingTripPage(
                                             title: trip['title'] as String,
                                             createdOn: trip['created_on'] as String,
+                                            tripPlaces: trip['tripPlaces'] as List<dynamic>,
                                           ),
                                         ),
                                       );
@@ -222,15 +263,16 @@ class _TripScreenState extends State<TripScreen> {
                                 return Padding(
                                   padding: const EdgeInsets.only(right: 16.0),
                                   child: TripCard2(
-                                    title: trip['title']!,
-                                    created_on: trip['created_on']!,
+                                    title: trip['title'] as String,
+                                    created_on: trip['created_on'] as String,
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => FinalizedTripPage(
-                                            title: trip['title']!,
-                                            createdOn: trip['created_on']!,
+                                            title: trip['title'] as String,
+                                            createdOn: trip['created_on'] as String,
+                                            tripPlaces: trip['tripPlaces'] as List<dynamic>,
                                           ),
                                         ),
                                       );
