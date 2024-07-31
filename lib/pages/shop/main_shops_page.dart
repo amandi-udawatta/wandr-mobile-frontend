@@ -251,7 +251,7 @@ class MainShopsPage extends StatelessWidget {
                             itemImages: recommendedItemImages,
                             itemPrices: recommendedItemPrices,
                             itemStores: recommendedItemStores,
-                            isShop: true, // Indicate that these are shop items
+                            isShop: true, // shop items or not?
                           ),
                         ),
                       ],
