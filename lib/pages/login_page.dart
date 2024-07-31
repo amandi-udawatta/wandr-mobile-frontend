@@ -11,12 +11,14 @@ import 'package:wandr/theme/app_colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:wandr/utils.dart'; // Import the utils file for hashPassword
+import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Import FlutterSecureStorage
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final storage = FlutterSecureStorage(); // Initialize FlutterSecureStorage
 
   Future<void> login(String role, String email, String password, BuildContext context) async {
     final url = Uri.parse('$baseUrl/login'); // Replace with your local IP
@@ -59,9 +61,11 @@ class LoginPage extends StatelessWidget {
     }
   }
 
-  void loginUser(
-      String accessToken, String refreshToken, BuildContext context) {
-    // Save tokens to secure storage (not implemented here)
+  void loginUser(String accessToken, String refreshToken, BuildContext context) async {
+    // Save tokens to secure storage
+    await storage.write(key: 'accessToken', value: accessToken);
+    await storage.write(key: 'refreshToken', value: refreshToken);
+
     // Navigate to the Dashboard page
     print('User logged in with access token: $accessToken');
     Navigator.push(
