@@ -6,12 +6,14 @@ class PlacesCard1 extends StatefulWidget {
   final String title;
   final String location;
   final String? image; // Make image nullable
+  final bool isLiked; // New field to indicate if the place is liked
 
   const PlacesCard1({
     Key? key,
     required this.title,
     required this.location,
     this.image, // Allow image to be nullable
+    this.isLiked = false, // Default value for isLiked
   }) : super(key: key);
 
   @override
@@ -19,7 +21,13 @@ class PlacesCard1 extends StatefulWidget {
 }
 
 class _PlacesCard1State extends State<PlacesCard1> {
-  bool isFavorite = false;
+  late bool isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorite = widget.isLiked; // Initialize isFavorite based on isLiked
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +103,8 @@ class _PlacesCard1State extends State<PlacesCard1> {
                     maxLines: 1, // Ensure title stays on one line
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 2), // Reduced space between title and location
+                  SizedBox(
+                      height: 2), // Reduced space between title and location
                   Row(
                     children: [
                       Icon(
