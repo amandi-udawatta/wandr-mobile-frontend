@@ -36,7 +36,7 @@ class _DescriptionCardState extends State<DescriptionCard> {
       child: Stack(
         children: [
           Positioned(
-            bottom: 10,
+            top: 10,
             right: 10,
             child: GestureDetector(
               onTap: () {

@@ -9,10 +9,15 @@ import 'package:wandr/components/categories_button.dart';
 import 'package:wandr/components/activity_card.dart';
 import 'package:wandr/components/blog_card.dart';
 import 'package:wandr/components/primary_button.dart';
-import 'package:wandr/components/trip_popup.dart'; 
+import 'package:wandr/components/trip_popup.dart';
 
 class DestinationProfileScreen extends StatelessWidget {
-  const DestinationProfileScreen({super.key});
+  final Map<String, dynamic> place; // Add this line to accept place data
+
+  const DestinationProfileScreen({
+    super.key,
+    required this.place, // Add this line to accept place data
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,34 +29,36 @@ class DestinationProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DescriptionCard(
-                title: "Sigiriya",
-                location: "Mathale, SL",
-                image: "assets/images/home/Des - Sigiriya.png",
+                title: place['name'],
+                location: place['address'],
+                image: 'assets/places/${place['image']}',
               ),
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CategoriesButton(
-                      title: "Rocks",
-                      image: "assets/images/home/Des - rocks.png",
-                      onPressed: () {
-                        // Add onPressed action if needed
-                      },
-                      isSelected: false, 
-                    ),
-                  ],
+                  children: place['categories'].map<Widget>((category) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: CategoriesButton(
+                        title: category,
+                        image:
+                            'assets/images/categories/${category.toLowerCase()}.png',
+                        onPressed: () {
+                          // Add onPressed action if needed
+                        },
+                        isSelected: false,
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  "Sigiriya or Sinhagiri is an ancient rock fortress located in the northern Matale District near the town of Dambulla in the Central Province, Sri Lanka.  It is a site of historical and archaeological significance that is  dominated by a massive column of granite approximately 180 m (590 ft)  high.\n\n"
-                  "According to the ancient Sri Lankan chronicle the Cuḷavasa, this area was a large forest, then after storms and landslides it became a hill and was selected by King Kashyapa (AD 477–495) for his new capital. He built his palace on top of this rock and decorated its sides with colourful frescoes.  On a small plateau about halfway up the side of this rock he built a  gateway in the form of an enormous lion. The name of this place is  derived from this structure; Sinhagiri, the Lion Rock.\n\n"
-                  "The capital and the royal palace were abandoned after the king's  death. It was used as a Buddhist monastery until the 14th century. Sigiriya today is a UNESCO listed World Heritage Site. It is one of the best preserved examples of ancient urban planning.",
+                  place['description'], // Use place description
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w400,
                     fontSize: 14,
@@ -60,7 +67,7 @@ class DestinationProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              // Location 
+              // Location
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -87,8 +94,9 @@ class DestinationProfileScreen extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Image.asset(
-                          "assets/images/home/Des - location.png",
-                          width: MediaQuery.of(context).size.width - 32, // Adjust width as needed
+                          "assets/images/home/Des - location.png", // Static image for now
+                          width: MediaQuery.of(context).size.width -
+                              32, // Adjust width as needed
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -116,24 +124,23 @@ class DestinationProfileScreen extends StatelessWidget {
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        children: [
-                          ActivityButton(
-                            title: "Hill Climbing",
-                            image: "assets/images/home/Act - 1.png",
-                          ),
-                          SizedBox(width: 16),
-                          ActivityButton(
-                            title: "Cultural Exploration",
-                            image: "assets/images/home/Act - 2.png",
-                          ),
-                        ],
+                        children: place['activities'].map<Widget>((activity) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: ActivityButton(
+                              title: activity,
+                              image:
+                                  "assets/images/activities/${activity.toLowerCase().replaceAll(' ', '-')}.png", // Adjust image source
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              // Blogs
+              // Blogs - NOT CONNECTED WITH BACKEND
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -185,7 +192,8 @@ class DestinationProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              // Related Destinations
+
+              // Related Destinations - NOT CONNECTED WITH BACKEND
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -253,9 +261,14 @@ class DestinationProfileScreen extends StatelessWidget {
                       builder: (BuildContext context) {
                         return TripPopup(
                           backgroundImage: "assets/images/trip/Trip_popup.png",
-                          created_trips: ["My trip to Arugam Bay", "21st Bday Trip", "Honeymoon", "Trip to Sigiriya"], 
+                          created_trips: [
+                            "My trip to Arugam Bay",
+                            "21st Bday Trip",
+                            "Honeymoon",
+                            "Trip to Sigiriya"
+                          ],
                         );
-                      }
+                      },
                     );
                   },
                   text: "Add to Trip",

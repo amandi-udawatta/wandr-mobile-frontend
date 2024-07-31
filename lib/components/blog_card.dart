@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:wandr/pages/home/home_destination_profile_screen.dart';
 
 class BlogButton extends StatelessWidget {
   final String title;
@@ -8,6 +7,7 @@ class BlogButton extends StatelessWidget {
   final String image;
   final String image_author;
   final String author;
+  final VoidCallback? onTap; // Add onTap callback
 
   const BlogButton({
     Key? key,
@@ -16,19 +16,13 @@ class BlogButton extends StatelessWidget {
     required this.image,
     required this.image_author,
     required this.author,
+    this.onTap, // Initialize onTap
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DestinationProfileScreen(),
-          ),
-        );
-      },
+      onTap: onTap, // Correctly assign onTap
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: 140, // Adjust height as needed

@@ -1,3 +1,5 @@
+// lib/pages/home/dashboard_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wandr/theme/app_colors.dart';
@@ -13,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:wandr/data.dart'; // Importing destinations from data.dart
+import 'package:wandr/pages/home/home_destination_profile_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -27,6 +30,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedCategoryIndex = -1;
   List<dynamic> popularDestinations = [];
   List<dynamic> favoritePlaces = [];
+  List<dynamic> allPlaces = []; // Add this line to store all places data
   final storage = FlutterSecureStorage();
 
   @override
@@ -34,6 +38,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     fetchPopularDestinations();
     fetchFavoritePlaces();
+    fetchAllPlaces(); // Add this line to fetch all places data
   }
 
   Future<void> fetchPopularDestinations() async {
@@ -104,6 +109,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Future<void> fetchAllPlaces() async {
+    final token = await storage.read(key: 'accessToken');
+    if (token == null) {
+      _showError(context, 'Token not found. Please login again.');
+      return;
+    }
+
+    try {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      final userId = decodedToken['id'];
+      final url = Uri.parse('$baseUrl/forward/traveller/all-places/$userId');
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          allPlaces = data['data'];
+        });
+      } else {
+        print('Failed to load all places with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching all places: $e');
+      _showError(context, 'Error fetching all places. Please try again later.');
+    }
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -117,7 +156,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _onCategorySelected(int index) {
     // Find the category based on the index
     final selectedCategory = destinations.firstWhere(
-      (category) => category['id'] == index,
+          (category) => category['id'] == index,
       orElse: () => {'name': 'Unknown Category'},
     )['name'];
 
@@ -296,24 +335,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
             SizedBox(height: 12),
             popularDestinations.isNotEmpty
                 ? SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: popularDestinations.map((destination) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 16.0),
-                          child: PlacesCard1(
-                            title: destination['name'],
-                            location: destination['address'],
-                            image: 'assets/places/${destination['image']}',
-                            isLiked: destination['liked'],
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: popularDestinations.map((destination) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: PlacesCard1(
+                      title: destination['name'],
+                      location: destination['address'],
+                      image: 'assets/places/${destination['image']}',
+                      isLiked: destination['liked'],
+                      onTap: () {
+                        // Navigate to DestinationProfileScreen with place details
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DestinationProfileScreen(
+                              place: destination,
+                            ),
                           ),
                         );
-                      }).toList(),
+                      },
                     ),
-                  )
+                  );
+                }).toList(),
+              ),
+            )
                 : Center(
-                    child: CircularProgressIndicator(),
-                  ),
+              child: CircularProgressIndicator(),
+            ),
             SizedBox(height: 20),
 
             // Favorites
@@ -341,24 +391,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
             SizedBox(height: 12),
             favoritePlaces.isNotEmpty
                 ? SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: favoritePlaces.map((place) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 16.0),
-                          child: PlacesCard1(
-                            title: place['name'],
-                            location: place['address'],
-                            image: 'assets/places/${place['image']}',
-                            isLiked: place['liked'],
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: favoritePlaces.map((place) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: PlacesCard1(
+                      title: place['name'],
+                      location: place['address'],
+                      image: 'assets/places/${place['image']}',
+                      isLiked: place['liked'],
+                      onTap: () {
+                        // Navigate to DestinationProfileScreen with place details
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DestinationProfileScreen(
+                              place: place,
+                            ),
                           ),
                         );
-                      }).toList(),
+                      },
                     ),
-                  )
+                  );
+                }).toList(),
+              ),
+            )
                 : Center(
-                    child: CircularProgressIndicator(),
-                  ),
+              child: CircularProgressIndicator(),
+            ),
           ],
         ),
       ),
