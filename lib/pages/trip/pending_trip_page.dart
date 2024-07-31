@@ -8,11 +8,13 @@ import '../../components/bottom_nav_bar.dart';
 class PendingTripPage extends StatefulWidget {
   final String title;
   final String createdOn;
+  final List<dynamic> tripPlaces; // Accept tripPlaces as a parameter
 
   const PendingTripPage({
     Key? key,
     required this.title,
     required this.createdOn,
+    required this.tripPlaces, // Add tripPlaces to the constructor
   }) : super(key: key);
 
   @override
@@ -20,14 +22,6 @@ class PendingTripPage extends StatefulWidget {
 }
 
 class _PendingTripPageState extends State<PendingTripPage> {
-  // Mockup data for destinations with their order
-  List<Map<String, dynamic>> destinations = [
-    {"name": "Mihintale Rock", "order": 1},
-    {"name": "Ruwanwelisaya Stupa", "order": 2},
-    {"name": "Wilpattu National Park", "order": 3},
-    {"name": "Kalu Diya Pokuna", "order": 4}
-  ];
-
   // Dropdown selection state
   int? _selectedOption;
   final List<Map<String, dynamic>> _dropdownOptions = [
@@ -38,23 +32,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
 
   // Function to send the selected ID to the backend
   Future<void> _sendSelectionToBackend(int id) async {
-    // final url = Uri.parse('http://your-backend-url/endpoint'); // Replace with your actual backend URL
-    //
-    // try {
-    //   final response = await http.post(
-    //     url,
-    //     headers: {'Content-Type': 'application/json'},
-    //     body: json.encode({"selectedId": id}),
-    //   );
-    //
-    //   if (response.statusCode == 200) {
-    //     print('Selection sent successfully');
-    //   } else {
-    //     print('Failed to send selection with status: ${response.statusCode}');
-    //   }
-    // } catch (e) {
-    //   print('Error sending selection: $e');
-    // }
+    // Implement backend request here
   }
 
   @override
@@ -69,11 +47,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
             size: 30,
           ),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => TripScreen()),
-            );
+            Navigator.pop(context); // Use pop to go back to the previous screen
           },
         ),
         title: Column(
@@ -129,25 +103,25 @@ class _PendingTripPageState extends State<PendingTripPage> {
                     if (newIndex > oldIndex) {
                       newIndex -= 1;
                     }
-                    final item = destinations.removeAt(oldIndex);
-                    destinations.insert(newIndex, item);
+                    final item = widget.tripPlaces.removeAt(oldIndex);
+                    widget.tripPlaces.insert(newIndex, item);
 
                     // Update the order values
-                    for (int i = 0; i < destinations.length; i++) {
-                      destinations[i]['order'] = i + 1;
+                    for (int i = 0; i < widget.tripPlaces.length; i++) {
+                      widget.tripPlaces[i]['placeOrder'] = i + 1;
                     }
                   });
                 },
-                children: destinations.map((destination) {
+                children: widget.tripPlaces.map((destination) {
                   return Card(
-                    key: ValueKey(destination['order']),
+                    key: ValueKey(destination['placeOrder']),
                     color: Colors.grey[200],
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ListTile(
                       leading: Icon(Icons.menu, color: Kcolours.black),
-                      title: Text(destination['name']),
+                      title: Text(destination['title']),
                       trailing: IconButton(
                         icon: Icon(Icons.delete_outline, color: Colors.red),
                         onPressed: () {
@@ -265,5 +239,3 @@ class _PendingTripPageState extends State<PendingTripPage> {
     );
   }
 }
-
-
