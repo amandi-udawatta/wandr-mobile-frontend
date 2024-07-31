@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wandr/pages/blogs/blogs_main.dart';
-import 'package:wandr/pages/dashboard_page.dart';
-import 'package:wandr/pages/rewards/rewards_page.dart';
 import 'package:wandr/pages/shop/main_shops_page.dart';
+import 'package:wandr/pages/home/home_dashboard_screen.dart';
 import 'package:wandr/pages/trip/trip_main.dart';
+import 'package:wandr/pages/blogs/blogs_main.dart';
+import 'package:wandr/pages/rewards/rewards_page.dart';
 import 'package:wandr/theme/app_colors.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -12,42 +12,40 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  int _selectedIndex = 2; // Default to the Home screen
+  int _selectedIndex = 2;
 
   void _onItemTapped(int index) {
-    if (_selectedIndex == index) return; // If the tapped item is already selected, do nothing
-
     setState(() {
       _selectedIndex = index;
     });
 
     switch (index) {
       case 0:
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => TripScreen()),
         );
         break;
       case 1:
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => BlogScreen()),
         );
         break;
       case 2:
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => DashboardScreen()),
         );
         break;
       case 3:
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MainShopsPage()),
         );
         break;
       case 4:
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => RewardsPage()),
         );
