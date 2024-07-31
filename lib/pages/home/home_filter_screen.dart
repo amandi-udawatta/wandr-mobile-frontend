@@ -76,8 +76,7 @@ class _FilterScreenState extends State<FilterScreen> {
               return {
                 'title': place['name'],
                 'location': place['address'],
-                'image': 'assets/places/${place['image']}', // Ensure the correct path is used
-                'isLiked': place['liked'],
+                'image': place['image']
               };
             }).take(10).toList(); // Take only the first 10 items
           });
@@ -250,7 +249,6 @@ class _FilterScreenState extends State<FilterScreen> {
                   title: place["title"]!,
                   location: place["location"]!,
                   image: place["image"]!,
-                  isLiked: place["isLiked"]!,
                 );
               },
             ),

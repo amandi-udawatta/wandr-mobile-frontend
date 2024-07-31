@@ -1,3 +1,5 @@
+// lib/components/places_card1.dart
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wandr/pages/home/home_destination_profile_screen.dart';
@@ -7,6 +9,7 @@ class PlacesCard1 extends StatefulWidget {
   final String location;
   final String? image; // Make image nullable
   final bool isLiked; // New field to indicate if the place is liked
+  final VoidCallback? onTap; // Add onTap callback
 
   const PlacesCard1({
     Key? key,
@@ -14,6 +17,7 @@ class PlacesCard1 extends StatefulWidget {
     required this.location,
     this.image, // Allow image to be nullable
     this.isLiked = false, // Default value for isLiked
+    this.onTap, // Initialize onTap
   }) : super(key: key);
 
   @override
@@ -32,14 +36,7 @@ class _PlacesCard1State extends State<PlacesCard1> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DestinationProfileScreen(),
-          ),
-        );
-      },
+      onTap: widget.onTap,
       child: Container(
         width: 120,
         height: 160,
@@ -48,10 +45,10 @@ class _PlacesCard1State extends State<PlacesCard1> {
           color: Colors.black,
           image: widget.image != null && widget.image!.isNotEmpty
               ? DecorationImage(
-                  fit: BoxFit.cover,
-                  opacity: 0.9,
-                  image: AssetImage(widget.image!),
-                )
+            fit: BoxFit.cover,
+            opacity: 0.9,
+            image: AssetImage(widget.image!),
+          )
               : null, // No image decoration if image is null or empty
         ),
         child: Stack(
