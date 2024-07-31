@@ -31,6 +31,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<dynamic> popularDestinations = [];
   List<dynamic> favoritePlaces = [];
   List<dynamic> allPlaces = []; // Add this line to store all places data
+  List<dynamic> recommendedPlaces = []; // Add this line to store recommended places data
   final storage = FlutterSecureStorage();
 
   @override
@@ -39,6 +40,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     fetchPopularDestinations();
     fetchFavoritePlaces();
     fetchAllPlaces(); // Add this line to fetch all places data
+    fetchRecommendedPlaces(); // Add this line to fetch recommended places data
   }
 
   Future<void> fetchPopularDestinations() async {
@@ -142,6 +144,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _showError(context, 'Error fetching all places. Please try again later.');
     }
   }
+
+  Future<void> fetchRecommendedPlaces() async {
+    final token = await storage.read(key: 'accessToken');
+    if (token == null) {
+      _showError(context, 'Token not found. Please login again.');
+      return;
+    }
+
+    try {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      final userId = decodedToken['id'];
+      final url = Uri.parse('$baseUrl/forward/recommendations/$userId');
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          recommendedPlaces = (data['data'] as List)
+              .where((place) => place['similarity'] != null)
+              .toList()
+              ..sort((a, b) => b['similarity'].compareTo(a['similarity']))
+              ..take(10)
+              .toList();
+        });
+      } else {
+        print('Failed to load recommended places with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching recommended places: $e');
+      _showError(context, 'Error fetching recommended places. Please try again later.');
+    }
+  }
+
+
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -284,30 +328,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             SizedBox(height: 12),
-            SingleChildScrollView(
+            recommendedPlaces.isNotEmpty
+                ? SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: [
-                  PlacesCard1(
-                    title: "Sigiriya",
-                    location: "Mathale, SL",
-                    image: "assets/images/home/Rec - Sigiriya.png",
-                  ),
-                  SizedBox(width: 16),
-                  PlacesCard1(
-                    title: "Nilaweli",
-                    location: "Trincomalee, SL",
-                    image: "assets/images/home/Rec - Nilaweli.png",
-                  ),
-                  SizedBox(width: 16),
-                  PlacesCard1(
-                    title: "Sinharaja",
-                    location: "Deniyaya, SL",
-                    image: "assets/images/home/Rec - Sinharaja.png",
-                  ),
-                ],
+                children: recommendedPlaces.map((place) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: PlacesCard1(
+                      title: place['title'],
+                      location: place['location'],
+                      image: place['image'],
+                      isLiked: place['liked'],
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DestinationProfileScreen(
+                              place: place,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }).toList(),
               ),
-            ),
+            )
+                : Text("No recommended places available"),
+
             SizedBox(height: 20),
 
             // Popular Destinations
@@ -425,7 +474,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
-
   void _showError(BuildContext context, String message) {
     showDialog(
       context: context,
