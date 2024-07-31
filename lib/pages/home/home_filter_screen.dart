@@ -248,7 +248,7 @@ class _FilterScreenState extends State<FilterScreen> {
                 return PlacesCard1(
                   title: place["title"]!,
                   location: place["location"]!,
-                  image: place["image"]!,
+                  image: 'assets/places/${place['image']}',
                 );
               },
             ),

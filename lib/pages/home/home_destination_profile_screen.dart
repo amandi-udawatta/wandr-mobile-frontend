@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:wandr/theme/app_colors.dart';
 
 import 'package:wandr/components/places_card1.dart';
@@ -10,14 +14,72 @@ import 'package:wandr/components/activity_card.dart';
 import 'package:wandr/components/blog_card.dart';
 import 'package:wandr/components/primary_button.dart';
 import 'package:wandr/components/trip_popup.dart';
+import '../../config.dart';
 
-class DestinationProfileScreen extends StatelessWidget {
-  final Map<String, dynamic> place; // Add this line to accept place data
+class DestinationProfileScreen extends StatefulWidget {
+  final Map<String, dynamic> place;
 
   const DestinationProfileScreen({
-    super.key,
-    required this.place, // Add this line to accept place data
-  });
+    Key? key,
+    required this.place,
+  }) : super(key: key);
+
+  @override
+  _DestinationProfileScreenState createState() =>
+      _DestinationProfileScreenState();
+}
+
+class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
+  List<String> pendingTrips = [];
+  final storage = FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPendingTrips();
+  }
+
+  Future<void> fetchPendingTrips() async {
+    final token = await storage.read(key: 'accessToken');
+    if (token == null) {
+      _showError(context, 'Token not found. Please login again.');
+      return;
+    }
+
+    try {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      final userId = decodedToken['id'];
+      final response = await http.get(
+        Uri.parse('$baseUrl/forward/trip/pending/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success']) {
+          setState(() {
+            pendingTrips = (data['data'] as List)
+                .map<String>((trip) => trip['name'] as String)
+                .toList();
+          });
+        } else {
+          _showError(context, data['message']);
+        }
+      } else {
+        _showError(context, 'Failed to fetch pending trips');
+      }
+    } catch (e) {
+      _showError(context, 'An error occurred while fetching pending trips');
+    }
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,22 +91,22 @@ class DestinationProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DescriptionCard(
-                title: place['name'],
-                location: place['address'],
-                image: 'assets/places/${place['image']}',
+                title: widget.place['name'],
+                location: widget.place['address'],
+                image: 'assets/places/${widget.place['image']}',
               ),
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: place['categories'].map<Widget>((category) {
+                  children: widget.place['categories'].map<Widget>((category) {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: CategoriesButton(
                         title: category,
                         image:
-                            'assets/images/categories/${category.toLowerCase()}.png',
+                            'assets/images/categories/${category.toLowerCase().replaceAll(' ', '-')}.png',
                         onPressed: () {
                           // Add onPressed action if needed
                         },
@@ -58,7 +120,7 @@ class DestinationProfileScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  place['description'], // Use place description
+                  widget.place['description'],
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w400,
                     fontSize: 14,
@@ -66,8 +128,6 @@ class DestinationProfileScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // Location
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -94,9 +154,8 @@ class DestinationProfileScreen extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Image.asset(
-                          "assets/images/home/Des - location.png", // Static image for now
-                          width: MediaQuery.of(context).size.width -
-                              32, // Adjust width as needed
+                          "assets/images/home/Des - location.png",
+                          width: MediaQuery.of(context).size.width - 32,
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -104,8 +163,6 @@ class DestinationProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Activities
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -124,13 +181,14 @@ class DestinationProfileScreen extends StatelessWidget {
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        children: place['activities'].map<Widget>((activity) {
+                        children: widget.place['activities']
+                            .map<Widget>((activity) {
                           return Padding(
                             padding: const EdgeInsets.only(right: 16.0),
                             child: ActivityButton(
                               title: activity,
                               image:
-                                  "assets/images/activities/${activity.toLowerCase().replaceAll(' ', '-')}.png", // Adjust image source
+                                  "assets/images/activities/${activity.toLowerCase().replaceAll(' ', '-')}.png",
                             ),
                           );
                         }).toList(),
@@ -139,8 +197,6 @@ class DestinationProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Blogs - NOT CONNECTED WITH BACKEND
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -191,9 +247,6 @@ class DestinationProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-
-              // Related Destinations - NOT CONNECTED WITH BACKEND
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -249,8 +302,6 @@ class DestinationProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Add to Trip
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -261,12 +312,7 @@ class DestinationProfileScreen extends StatelessWidget {
                       builder: (BuildContext context) {
                         return TripPopup(
                           backgroundImage: "assets/images/trip/Trip_popup.png",
-                          created_trips: [
-                            "My trip to Arugam Bay",
-                            "21st Bday Trip",
-                            "Honeymoon",
-                            "Trip to Sigiriya"
-                          ],
+                          created_trips: pendingTrips,
                         );
                       },
                     );
