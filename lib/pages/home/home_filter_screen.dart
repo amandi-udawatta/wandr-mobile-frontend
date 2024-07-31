@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:wandr/theme/app_colors.dart';
-import 'package:wandr/components/categories_button.dart'; // Ensure this import is correct
-import 'package:wandr/components/filter_button.dart'; // Ensure this import is correct
+import 'package:wandr/components/categories_button.dart';
+import 'package:wandr/components/filter_button.dart';
 import 'package:wandr/components/places_card1.dart';
 import 'package:wandr/components/search_bar.dart' as custom;
 import 'package:wandr/components/bottom_nav_bar.dart';
+import 'package:wandr/config.dart'; // Ensure you have baseUrl defined here
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:wandr/data.dart'; // Importing destinations from data.dart
 
 class FilterScreen extends StatefulWidget {
   final String category;
@@ -18,24 +24,87 @@ class FilterScreen extends StatefulWidget {
 }
 
 class _FilterScreenState extends State<FilterScreen> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0; // Default index for filter
   final TextEditingController _searchController = TextEditingController();
   int _selectedCategoryIndex = -1;
+  List<Map<String, dynamic>> _places = [];
+  final storage = FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
-    _selectedCategoryIndex = widget.initialIndex; // Set initial selected index
+    _selectedCategoryIndex = widget.initialIndex; // Set initial category index
+    _fetchAndUpdatePlaces(); // Fetch initial places
   }
 
-  void _onItemTapped(int index) {
+  Future<void> _fetchAndUpdatePlaces() async {
+    final token = await storage.read(key: 'accessToken');
+    if (token == null) {
+      _showError(context, 'Token not found. Please login again.');
+      return;
+    }
+
+    try {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      final userId = decodedToken['id'];
+      String category = _selectedCategoryIndex == -1 ? "All" : destinations.firstWhere((d) => d['id'] == _selectedCategoryIndex)['name'];
+      String filter = _selectedIndex == 0 ? "All Destinations" :
+                      _selectedIndex == 1 ? "Most Popular" :
+                      "Recommended";
+      final url = Uri.parse('$baseUrl/forward/traveller/all-places/$userId');
+      
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success']) {
+          List<dynamic> placesData = data['data'];
+          setState(() {
+            _places = placesData.where((place) {
+              bool matchesCategory = category == "All" || place['categories'].contains(category);
+              bool matchesFilter = filter == "All Destinations" ||
+                                   (filter == "Most Popular" && place['activities'].contains('Popular Activity')) ||
+                                   (filter == "Recommended" && place['liked']);
+              return matchesCategory && matchesFilter;
+            }).map((place) {
+              return {
+                'title': place['name'],
+                'location': place['address'],
+                'image': 'assets/places/${place['image']}', // Ensure the correct path is used
+                'isLiked': place['liked'],
+              };
+            }).take(10).toList(); // Take only the first 10 items
+          });
+        } else {
+          throw Exception('Failed to load places');
+        }
+      } else {
+        throw Exception('Failed to load places');
+      }
+    } catch (e) {
+      print('Error fetching places: $e');
+      _showError(context, 'Error fetching places. Please try again later.');
+    }
+  }
+
+  void _onCategorySelected(int index) {
+    setState(() {
+      _selectedCategoryIndex = index;
+    });
+    _fetchAndUpdatePlaces();
+  }
+
+  void _onFilterSelected(int index) {
     setState(() {
       _selectedIndex = index;
     });
-  }
-
-  void _onSearchChanged(String query) {
-    // Handle search query change
+    _fetchAndUpdatePlaces();
   }
 
   @override
@@ -48,7 +117,9 @@ class _FilterScreenState extends State<FilterScreen> {
             SizedBox(height: 25),
             custom.SearchBar(
               controller: _searchController,
-              onChanged: _onSearchChanged,
+              onChanged: (query) {
+                // Handle search query change
+              },
             ),
             SizedBox(height: 20),
             Expanded(
@@ -62,29 +133,6 @@ class _FilterScreenState extends State<FilterScreen> {
   }
 
   Widget buildTabContent() {
-    final places = [
-      {
-        "title": "Mirissa Beach",
-        "location": "Mirissa, Sri Lanka",
-        "image": "assets/images/home/Filter - Mirissa.png",
-      },
-      {
-        "title": "Bentota Beach",
-        "location": "Bentota, Sri Lanka",
-        "image": "assets/images/home/Filter - Bentota.png",
-      },
-      {
-        "title": "Jungle Beach",
-        "location": "Unawatuna, Sri Lanka",
-        "image": "assets/images/home/Filter - Jungle.png",
-      },
-      {
-        "title": "Arugam Bay",
-        "location": "Arugam Bay, Sri Lanka",
-        "image": "assets/images/home/Filter - Arugam Bay.png",
-      },
-    ];
-
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
@@ -110,41 +158,29 @@ class _FilterScreenState extends State<FilterScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  CategoriesButton(
-                    title: "Ocean",
-                    image: "assets/images/home/Categories - Ocean.png",
-                    onPressed: () {
-                      _onCategorySelected(0);
-                    },
-                    isSelected: _selectedCategoryIndex == 0,
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10.0), // Adjust the right padding as needed
+                    child: CategoriesButton(
+                      title: "All",
+                      onPressed: () {
+                        _onCategorySelected(-1); // Update the logic as needed
+                      },
+                      isSelected: _selectedCategoryIndex == -1,
+                    ),
                   ),
-                  SizedBox(width: 12),
-                  CategoriesButton(
-                    title: "Beach",
-                    image: "assets/images/home/Categories - Beach.png",
-                    onPressed: () {
-                      _onCategorySelected(1);
-                    },
-                    isSelected: _selectedCategoryIndex == 1,
-                  ),
-                  SizedBox(width: 12),
-                  CategoriesButton(
-                    title: "Mountains",
-                    image: "assets/images/home/Categories - Mountains.png",
-                    onPressed: () {
-                      _onCategorySelected(2);
-                    },
-                    isSelected: _selectedCategoryIndex == 2,
-                  ),
-                  SizedBox(width: 12),
-                  CategoriesButton(
-                    title: "Forest",
-                    image: "assets/images/home/Categories - Forest.png",
-                    onPressed: () {
-                      _onCategorySelected(3);
-                    },
-                    isSelected: _selectedCategoryIndex == 3,
-                  ),
+                  ...destinations.map((destination) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: CategoriesButton(
+                        title: destination['name'],
+                        image: destination['image'],
+                        onPressed: () {
+                          _onCategorySelected(destination['id']);
+                        },
+                        isSelected: _selectedCategoryIndex == destination['id'],
+                      ),
+                    );
+                  }).toList(),
                 ],
               ),
             ),
@@ -170,25 +206,25 @@ class _FilterScreenState extends State<FilterScreen> {
               child: Row(
                 children: [
                   FilterButton(
-                    text: "Most Popular",
+                    text: "All Destinations",
                     onPressed: () {
-                      // Handle filter logic for "Most Popular"
+                      _onFilterSelected(0); // Handle filter logic for "All Destinations"
                     },
                     isSelected: _selectedIndex == 0,
                   ),
                   SizedBox(width: 12),
                   FilterButton(
-                    text: "Recommended",
+                    text: "Most Popular",
                     onPressed: () {
-                      // Handle filter logic for "Recommended"
+                      _onFilterSelected(1); // Handle filter logic for "Most Popular"
                     },
                     isSelected: _selectedIndex == 1,
                   ),
                   SizedBox(width: 12),
                   FilterButton(
-                    text: "All Destinations",
+                    text: "Recommended",
                     onPressed: () {
-                      // Handle filter logic for "All Destinations"
+                      _onFilterSelected(2); // Handle filter logic for "Recommended"
                     },
                     isSelected: _selectedIndex == 2,
                   ),
@@ -207,13 +243,14 @@ class _FilterScreenState extends State<FilterScreen> {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
               ),
-              itemCount: places.length,
+              itemCount: _places.length,
               itemBuilder: (context, index) {
-                final place = places[index];
+                final place = _places[index];
                 return PlacesCard1(
                   title: place["title"]!,
                   location: place["location"]!,
                   image: place["image"]!,
+                  isLiked: place["isLiked"]!,
                 );
               },
             ),
@@ -223,20 +260,19 @@ class _FilterScreenState extends State<FilterScreen> {
     );
   }
 
-  void _onCategorySelected(int index) {
-    setState(() {
-      _selectedCategoryIndex = index;
-    });
-
-    // Navigate to FilterScreen for Beach category
-    if (index == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FilterScreen(category: "Beach", initialIndex: 0),
-        ),
-      );
-    }
-    // You can add more cases for other categories if needed
+  void _showError(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }

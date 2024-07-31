@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:wandr/theme/app_colors.dart';
 import 'package:wandr/components/places_card1.dart';
 import 'package:wandr/components/search_bar.dart' as custom;
@@ -13,6 +12,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:wandr/data.dart'; // Importing destinations from data.dart
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -115,19 +115,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _onCategorySelected(int index) {
+    // Find the category based on the index
+    final selectedCategory = destinations.firstWhere(
+      (category) => category['id'] == index,
+      orElse: () => {'name': 'Unknown Category'},
+    )['name'];
+
     setState(() {
       _selectedCategoryIndex = index;
     });
 
-    // Navigate to FilterScreen for Beach category
-    if (index == 0) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FilterScreen(category: "Beach", initialIndex: 0),
+    // Navigate to FilterScreen for the selected category
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FilterScreen(
+          category: selectedCategory,
+          initialIndex: index,
         ),
-      );
-    }
+      ),
+    );
   }
 
   @override
@@ -198,43 +205,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: [
-                  CategoriesButton(
-                    title: "Ocean",
-                    image: "assets/images/home/Categories - Ocean.png",
-                    onPressed: () {
-                      _onCategorySelected(0);
-                    },
-                    isSelected: _selectedCategoryIndex == 0,
-                  ),
-                  SizedBox(width: 12),
-                  CategoriesButton(
-                    title: "Beach",
-                    image: "assets/images/home/Categories - Beach.png",
-                    onPressed: () {
-                      _onCategorySelected(1);
-                    },
-                    isSelected: _selectedCategoryIndex == 1,
-                  ),
-                  SizedBox(width: 12),
-                  CategoriesButton(
-                    title: "Mountains",
-                    image: "assets/images/home/Categories - Mountains.png",
-                    onPressed: () {
-                      _onCategorySelected(2);
-                    },
-                    isSelected: _selectedCategoryIndex == 2,
-                  ),
-                  SizedBox(width: 12),
-                  CategoriesButton(
-                    title: "Forest",
-                    image: "assets/images/home/Categories - Forest.png",
-                    onPressed: () {
-                      _onCategorySelected(3);
-                    },
-                    isSelected: _selectedCategoryIndex == 3,
-                  ),
-                ],
+                children: destinations.map((destination) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: CategoriesButton(
+                      title: destination['name'],
+                      image: destination['image'],
+                      onPressed: () {
+                        _onCategorySelected(destination['id']);
+                      },
+                      isSelected: _selectedCategoryIndex == destination['id'],
+                    ),
+                  );
+                }).toList(),
               ),
             ),
             SizedBox(height: 20),
@@ -322,6 +305,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             title: destination['name'],
                             location: destination['address'],
                             image: 'assets/places/${destination['image']}',
+                            isLiked: destination['liked'],
                           ),
                         );
                       }).toList(),
@@ -366,6 +350,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             title: place['name'],
                             location: place['address'],
                             image: 'assets/places/${place['image']}',
+                            isLiked: place['liked'],
                           ),
                         );
                       }).toList(),
@@ -381,8 +366,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
     );
   }
 }

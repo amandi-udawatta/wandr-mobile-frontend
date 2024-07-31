@@ -4,14 +4,14 @@ import 'package:wandr/theme/app_colors.dart';
 
 class CategoriesButton extends StatelessWidget {
   final String title;
-  final String image;
+  final String? image;
   final VoidCallback onPressed;
   final bool isSelected;
 
   const CategoriesButton({
     Key? key,
     required this.title,
-    required this.image,
+    this.image,
     required this.onPressed,
     required this.isSelected,
   }) : super(key: key);
@@ -35,20 +35,21 @@ class CategoriesButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                bottomLeft: Radius.circular(8),
+            if (image != null)
+              ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  bottomLeft: Radius.circular(8),
+                ),
+                child: Image.asset(
+                  image!,
+                  width: 40, // Smaller image size
+                  height: 40, // Smaller image size
+                  fit: BoxFit.cover,
+                ),
               ),
-              child: Image.asset(
-                image,
-                width: 40, // Smaller image size
-                height: 40, // Smaller image size
-                fit: BoxFit.cover,
-              ),
-            ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: EdgeInsets.symmetric(horizontal: image != null ? 8.0 : 16.0),
               child: Text(
                 title,
                 style: GoogleFonts.poppins(
