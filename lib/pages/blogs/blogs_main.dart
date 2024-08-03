@@ -40,22 +40,22 @@ class BlogScreen extends StatelessWidget {
                     child: Row(
                       children: [
                         JournalCard1(
-                          title: "Sigiriya",
+                          title: "My Honeymoon",
                           image: "assets/images/trip/Trip - Sigiriya.png",
                         ),
                         SizedBox(width: 16),
                         JournalCard1(
-                          title: "Arugam Bay",
+                          title: "21st Trip",
                           image: "assets/images/trip/Trip - Arugam Bay.png",
                         ),
                         SizedBox(width: 16),
                         JournalCard1(
-                          title: "Horton Plains",
+                          title: "Trip arounnd SL",
                           image: "assets/images/trip/Trip - Horton Plains.png",
                         ),
                         SizedBox(width: 16),
                         JournalCard1(
-                          title: "Kithulgala",
+                          title: "New year week",
                           image: "assets/images/trip/Trip - Kithulgala.png",
                         ),
                       ],
@@ -73,7 +73,7 @@ class BlogScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: JournalCard2(
-                    trip_title: "My trip to Arugam Bay",
+                    trip_title: "My trip around Sri Lanka",
                     created_on: "created on 12th June 2024",
                     trip_image: "assets/images/trip/Trip - Arugam Bay.png",
                   ),
