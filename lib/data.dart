@@ -4,7 +4,7 @@ const List<Map<String, dynamic>> destinations = [
   {"id": 1, "image": "assets/images/categories/mountain.png", "name": "Mountain"},
   {"id": 2, "image": "assets/images/categories/beach.png", "name": "Beach"},
   {"id": 3, "image": "assets/images/categories/national-park.png", "name": "National Park"},
-  {"id": 4, "image": "assets/images/categories/historical-site.png", "name": "Historic Site"},
+  {"id": 4, "image": "assets/images/categories/historic-site.png", "name": "Historic Site"},
   {"id": 5, "image": "assets/images/categories/museum.png", "name": "Museum"},
   {"id": 6, "image": "assets/images/categories/art-gallery.png", "name": "Art Gallery"},
   {"id": 7, "image": "assets/images/categories/temple.png", "name": "Temple"},
