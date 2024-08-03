@@ -232,7 +232,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: HomeProfile(
                 image: 'assets/images/profile/Profile_pic.png',
-                text: 'Ayubowan James!',
+                text: 'Ayubowan Nushara!',
               ),
             ),
             SizedBox(height: 20),
@@ -410,9 +410,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 }).toList(),
               ),
             )
-                : Center(
-              child: CircularProgressIndicator(),
-            ),
+                : Text("No popular places available"),
             SizedBox(height: 20),
 
             // Favorites
@@ -466,9 +464,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 }).toList(),
               ),
             )
-                : Center(
-              child: CircularProgressIndicator(),
-            ),
+            : Text("No favourite places available"),
           ],
         ),
       ),
