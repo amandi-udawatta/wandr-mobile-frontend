@@ -1,5 +1,3 @@
-// lib/pages/home/dashboard_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wandr/theme/app_colors.dart';
@@ -276,7 +274,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Text(
                   "Categories",
-                  style: GoogleFonts.poppins(
+                    style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
                     fontSize: 18,
                     color: Kcolours.brownShade4,

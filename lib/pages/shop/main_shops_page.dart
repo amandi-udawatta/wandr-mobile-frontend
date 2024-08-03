@@ -6,6 +6,7 @@ import '../../components/custom_carousel.dart';
 import '../../components/service_slider.dart';
 import '../../components/recommended_services_vertical_list.dart';
 import 'cart_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MainShopsPage extends StatelessWidget {
   const MainShopsPage({super.key});
@@ -161,23 +162,19 @@ class MainShopsPage extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              const SizedBox(height: 10),
-              // Main Heading
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.0),
-                child: Text(
-                  'Discover Local Treasures',
-                  textAlign: TextAlign.center, // Center the text
-                  style: TextStyle(
-                    color: Kcolours.primary,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins-Bold',
-                  ),
+              SizedBox(height: 10),
+
+              Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                "What local treasures do you want to explore today?",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 22,
+                  color: Kcolours.primary,
                 ),
               ),
-
-              // Tab Bar
+            ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30.0),
                 child: TabBar(
