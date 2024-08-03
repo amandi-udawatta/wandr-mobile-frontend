@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wandr/theme/app_colors.dart';
 import 'package:wandr/config.dart';
 import 'package:wandr/theme/app_colors.dart';
 import 'package:wandr/components/search_bar3.dart' as custom;
@@ -136,15 +137,14 @@ class _TripScreenState extends State<TripScreen> {
                 child: Column(
                   children: [
                     SizedBox(height: 25),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Text(
                         "Where do you want to travel today?",
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 22,
                           color: Kcolours.primary,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins-Bold',
                         ),
                       ),
                     ),
@@ -156,7 +156,7 @@ class _TripScreenState extends State<TripScreen> {
                       },
                     ),
                     SizedBox(height: 20),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,10 +165,10 @@ class _TripScreenState extends State<TripScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "On-going Trip",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                "On-going Trips",
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
                                   color: Kcolours.brownShade4,
                                 ),
                               ),
@@ -198,9 +198,9 @@ class _TripScreenState extends State<TripScreen> {
                             children: [
                               Text(
                                 "Pending Trips",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
                                   color: Kcolours.brownShade4,
                                 ),
                               ),
@@ -247,9 +247,9 @@ class _TripScreenState extends State<TripScreen> {
                             children: [
                               Text(
                                 "Finalized Trips",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
                                   color: Kcolours.brownShade4,
                                 ),
                               ),

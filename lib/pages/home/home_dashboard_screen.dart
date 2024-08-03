@@ -277,7 +277,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(
                   "Categories",
                   style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     fontSize: 18,
                     color: Kcolours.brownShade4,
                   ),
@@ -312,7 +312,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(
                   "Recommended Places",
                   style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     fontSize: 18,
                     color: Kcolours.brownShade4,
                   ),
@@ -366,7 +366,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(
                   "Popular Destinations",
                   style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     fontSize: 18,
                     color: Kcolours.brownShade4,
                   ),
@@ -420,7 +420,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(
                   "Favorites",
                   style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     fontSize: 18,
                     color: Kcolours.brownShade4,
                   ),
@@ -465,6 +465,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             )
             : Text("No favourite places available"),
+
+
+
+
+           
+
+
+
+            
           ],
         ),
       ),
