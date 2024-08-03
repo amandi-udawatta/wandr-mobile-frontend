@@ -4,6 +4,7 @@ import '../../components/bottom_nav_bar.dart';
 import '../dashboard_page.dart';
 import 'completed_challenges_page.dart';
 import 'new_challenges_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class RewardsPage extends StatelessWidget {
   const RewardsPage({super.key});
@@ -102,21 +103,17 @@ class RewardsPage extends StatelessWidget {
             children: [
               const SizedBox(height: 5),
 
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.0),
-                child: Text(
-                  'Achieve and Unlock',
-                  textAlign: TextAlign.left, // Align the text to the left
-                  style: TextStyle(
-                    color: Color(0xFF437B17),
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins-Bold',
-                  ),
+              Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                "Achieve and unlock badges now!",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 22,
+                  color: Kcolours.primary,
                 ),
               ),
-
-              // Description
+            ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30.0),
                 child: Text(
@@ -137,11 +134,12 @@ class RewardsPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Your Badges',
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: Kcolours.blackAlternative,
+                    Text(
+                      "Your Badges",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: Kcolours.brownShade4,
                       ),
                     ),
                     GestureDetector(
@@ -206,16 +204,17 @@ class RewardsPage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Ongoing Challenges Section Header
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Ongoing Challenges',
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: Kcolours.blackAlternative,
+                      "Ongoing Challenges",
+                        style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: Kcolours.brownShade4,
                       ),
                     ),
                   ],
