@@ -73,7 +73,7 @@ class BlogScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: JournalCard2(
-                    trip_title: "My trip to Arugam Bay",
+                    trip_title: "My trip around Sri Lanka",
                     created_on: "created on 12th June 2024",
                     trip_image: "assets/images/trip/Trip - Arugam Bay.png",
                   ),

@@ -171,9 +171,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           recommendedPlaces = (data['data'] as List)
               .where((place) => place['similarity'] != null)
               .toList()
-              ..sort((a, b) => b['similarity'].compareTo(a['similarity']))
-              ..take(10)
-              .toList();
+            ..sort((a, b) => b['similarity'].compareTo(a['similarity'])) // Sort by similarity
+            ..take(10)
+                .toList();
+          print(recommendedPlaces);
         });
       } else {
         print('Failed to load recommended places with status: ${response.statusCode}');
@@ -183,6 +184,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _showError(context, 'Error fetching recommended places. Please try again later.');
     }
   }
+
 
 
 
@@ -232,7 +234,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: HomeProfile(
                 image: 'assets/images/profile/Profile_pic.png',
-                text: 'Ayubowan James!',
+                text: 'Ayubowan Nushara!',
               ),
             ),
             SizedBox(height: 20),
@@ -336,9 +338,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 16.0),
                     child: PlacesCard1(
-                      title: place['title'],
-                      location: place['location'],
-                      image: place['image'],
+                      title: place['name'],
+                      location: place['address'],
+                      image: place['image'] != null ? 'assets/places/${place['image']}' : null,
                       isLiked: place['liked'],
                       onTap: () {
                         Navigator.push(
