@@ -291,7 +291,7 @@ class _TripScreenState extends State<TripScreen> {
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavBar(),
+        // bottomNavigationBar: BottomNavBar(),
       ),
     );
   }

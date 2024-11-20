@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wandr/components/bottom_nav_bar.dart';
 import 'package:wandr/config.dart';
 
 import 'package:wandr/components/primary_button.dart';
@@ -71,7 +72,7 @@ class LoginPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DashboardScreen(),
+        builder: (context) => BottomNavBar()
       ),
     );
   }

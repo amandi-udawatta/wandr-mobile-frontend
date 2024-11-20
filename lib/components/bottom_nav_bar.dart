@@ -12,94 +12,56 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  int _selectedIndex = 2;
+  int _currentIndex = 2; // Start with Dashboard selected
 
-  void _onItemTapped(int index) {
+  // List of pages to switch between
+  final List<Widget> _pages = [
+    TripScreen(),     // Trip Page
+    BlogScreen(),         // Blogs Page
+    DashboardScreen(),     // Dashboard Page
+    MainShopsPage(),    // Shops and Services Page
+    RewardsPage(),     // Challenges Page
+  ];
+
+  // Method to handle tab switching
+  void _onTabTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      _currentIndex = index;
     });
-
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => TripScreen()),
-        );
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => BlogScreen()),
-        );
-        break;
-      case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => DashboardScreen()),
-        );
-        break;
-      case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MainShopsPage()),
-        );
-        break;
-      case 4:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => RewardsPage()),
-        );
-        break;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: const [
-        BottomNavigationBarItem(
-          icon: Padding(
-            padding: EdgeInsets.only(bottom: 8.0),
-            child: Icon(Icons.directions_car_outlined, size: 30),
+    return Scaffold(
+      body: _pages[_currentIndex],  // Display the currently selected page
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex, // Keep track of selected tab
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.black,
+        onTap: _onTabTapped,  // Switch tabs when tapped
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.directions_car_outlined, size: 30),
+            label: 'My Trips',
           ),
-          label: 'My Trips',
-        ),
-        BottomNavigationBarItem(
-          icon: Padding(
-            padding: EdgeInsets.only(bottom: 8.0),
-            child: Icon(Icons.edit_outlined, size: 30),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.edit_outlined, size: 30),
+            label: 'Blogs',
           ),
-          label: 'Blogs',
-        ),
-        BottomNavigationBarItem(
-          icon: Padding(
-            padding: EdgeInsets.only(bottom: 8.0),
-            child: Icon(Icons.home_outlined, size: 30),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined, size: 30),
+            label: 'Home',
           ),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Padding(
-            padding: EdgeInsets.only(bottom: 8.0),
-            child: Icon(Icons.shopping_cart_outlined, size: 30),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart_outlined, size: 30),
+            label: 'Shop',
           ),
-          label: 'Shop',
-        ),
-        BottomNavigationBarItem(
-          icon: Padding(
-            padding: EdgeInsets.only(bottom: 8.0),
-            child: Icon(Icons.emoji_events_outlined, size: 30),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.emoji_events_outlined, size: 30),
+            label: 'Rewards',
           ),
-          label: 'Rewards',
-        ),
-      ],
-      currentIndex: _selectedIndex,
-      selectedItemColor: Kcolours.blueShade2,
-      unselectedItemColor: Colors.black,
-      onTap: _onItemTapped,
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
-      elevation: 5,
+        ],
+      ),
     );
   }
 }

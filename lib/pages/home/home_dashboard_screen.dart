@@ -153,7 +153,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       final userId = decodedToken['id'];
-      final url = Uri.parse('$baseUrl/forward/recommendations/$userId');
+      final url = Uri.parse('$baseUrl/forward/traveller/recommended-places/$userId');
 
       final response = await http.get(
         url,
@@ -258,7 +258,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ),
-        bottomNavigationBar: BottomNavBar(),
+        // bottomNavigationBar: BottomNavBar(),
+
       ),
     );
   }
@@ -465,11 +466,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             )
             : Text("No favourite places available"),
-
-
-
-
-           
 
 
 
