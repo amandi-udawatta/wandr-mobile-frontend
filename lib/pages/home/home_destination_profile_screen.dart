@@ -324,7 +324,7 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavBar(),
+        // bottomNavigationBar: BottomNavBar(),
       ),
     );
   }

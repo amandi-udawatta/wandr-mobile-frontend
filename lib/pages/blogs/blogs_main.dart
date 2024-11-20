@@ -94,7 +94,7 @@ class BlogScreen extends StatelessWidget {
             ),
           ],
         ),
-        bottomNavigationBar: BottomNavBar(),
+        // bottomNavigationBar: BottomNavBar(),
       ),
     );
   }

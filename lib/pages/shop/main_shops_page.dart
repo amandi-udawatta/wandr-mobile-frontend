@@ -315,7 +315,7 @@ class MainShopsPage extends StatelessWidget {
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavBar(),
+        // bottomNavigationBar: BottomNavBar(),
       ),
     );
   }
