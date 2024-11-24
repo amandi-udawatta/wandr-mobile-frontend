@@ -22,7 +22,8 @@ class LoginPage extends StatelessWidget {
   final storage = FlutterSecureStorage(); // Initialize FlutterSecureStorage
 
   Future<void> login(String role, String email, String password, BuildContext context) async {
-    final url = Uri.parse('$baseUrl/login'); // Replace with your local IP
+    print('Base URL being used: $baseUrl');
+    final url = Uri.parse('http://192.168.10.47:8081/api/proxy/login');
     final hashedPassword = hashPassword(password);
 
     final response = await http.post(
@@ -72,7 +73,7 @@ class LoginPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BottomNavBar()
+        builder: (context) => DashboardScreen()
       ),
     );
   }

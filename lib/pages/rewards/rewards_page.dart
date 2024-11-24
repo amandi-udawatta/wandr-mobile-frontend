@@ -96,7 +96,7 @@ class RewardsPage extends StatelessWidget {
           },
         ),
       ),
-      // bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: BottomNavBar(),
       body: SafeArea(
         child: Center(
           child: ListView(
