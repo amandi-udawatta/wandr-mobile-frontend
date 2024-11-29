@@ -6,6 +6,8 @@ import '../../components/bottom_nav_bar.dart';
 import 'package:wandr/components/places_card1.dart';
 import 'package:wandr/components/trip_recommended_item.dart';
 import 'package:wandr/components/trip_recommended_service.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'dart:async'; // Needed for the Completer
 
 class PendingTripPage extends StatefulWidget {
   final String title;
@@ -24,6 +26,15 @@ class PendingTripPage extends StatefulWidget {
 }
 
 class _PendingTripPageState extends State<PendingTripPage> {
+
+  final Completer<GoogleMapController> _controller = Completer();
+
+  final List<LatLng> _markerPositions = [
+    LatLng(7.957113000000000, 80.760257000000000), // First location
+    LatLng(7.293609000000000, 80.641325000000000), // Second location
+    LatLng(8.569559000000000, 81.213307000000000),
+  ];
+
   // Dropdown selection state
   int? _selectedOption;
   final List<Map<String, dynamic>> _dropdownOptions = [
@@ -32,6 +43,44 @@ class _PendingTripPageState extends State<PendingTripPage> {
     {"id": 3, "name": "Recommended Route (By Us)"}
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fitMarkersToMap();
+    });
+  }
+  Future<void> _fitMarkersToMap() async {
+    if (widget.tripPlaces.isEmpty) return;
+
+    // Create LatLngBounds for all markers
+    LatLngBounds bounds;
+    if (widget.tripPlaces.length == 1) {
+      final LatLng singleMarker = LatLng(
+        widget.tripPlaces.first['latitude'],
+        widget.tripPlaces.first['longitude'],
+      );
+      bounds = LatLngBounds(
+        southwest: singleMarker,
+        northeast: singleMarker,
+      );
+    } else {
+      bounds = LatLngBounds(
+        southwest: LatLng(
+          widget.tripPlaces.map((place) => place['latitude']).reduce((a, b) => a < b ? a : b),
+          widget.tripPlaces.map((place) => place['longitude']).reduce((a, b) => a < b ? a : b),
+        ),
+        northeast: LatLng(
+          widget.tripPlaces.map((place) => place['latitude']).reduce((a, b) => a > b ? a : b),
+          widget.tripPlaces.map((place) => place['longitude']).reduce((a, b) => a > b ? a : b),
+        ),
+      );
+    }
+
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+  }
+
   // Function to send the selected ID to the backend
   Future<void> _sendSelectionToBackend(int id) async {
     // Implement backend request here
@@ -39,6 +88,9 @@ class _PendingTripPageState extends State<PendingTripPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double latitude = 7.957113000000000; // Latitude from backend
+    final double longitude = 80.760257000000000; // Longitude from backend
+    final String placeName = "Sigiriya Lion Rock"; // Place name from backend
     // Define a common padding value
     const EdgeInsets commonPadding = EdgeInsets.symmetric(horizontal: 10.0);
 
@@ -234,6 +286,54 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   ),
                 ),
               ),
+              SizedBox(height: 15),
+
+              // GOOGLE MAPS
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Container(
+                  height: 500,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Kcolours.white,
+                      width: 1,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: GoogleMap(
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller.complete(controller);
+                      },
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(
+                          widget.tripPlaces.first['latitude'],
+                          widget.tripPlaces.first['longitude'],
+                        ),
+                        zoom: 10, // Default zoom level
+                      ),
+                      markers: widget.tripPlaces.map((place) {
+                        return Marker(
+                          markerId: MarkerId(place['id'].toString()), // Use unique ID
+                          position: LatLng(place['latitude'], place['longitude']),
+                          infoWindow: InfoWindow(
+                            title: place['name'], // Place name
+                          ),
+                        );
+                      }).toSet(),
+                      mapType: MapType.normal,
+                      scrollGesturesEnabled: true,
+                      zoomGesturesEnabled: true,
+                      tiltGesturesEnabled: true,
+                      rotateGesturesEnabled: true,
+                    ),
+                  ),
+                ),
+              ),
+
+
+
               SizedBox(height: 15),
 
               // Recommended services based on your preferences

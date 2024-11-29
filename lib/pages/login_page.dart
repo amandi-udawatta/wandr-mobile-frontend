@@ -23,7 +23,7 @@ class LoginPage extends StatelessWidget {
 
   Future<void> login(String role, String email, String password, BuildContext context) async {
     print('Base URL being used: $baseUrl');
-    final url = Uri.parse('http://192.168.10.47:8081/api/proxy/login');
+    final url = Uri.parse('$baseUrl/login');
     final hashedPassword = hashPassword(password);
 
     final response = await http.post(
