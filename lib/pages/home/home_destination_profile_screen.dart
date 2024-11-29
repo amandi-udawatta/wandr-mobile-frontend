@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:wandr/components/bottom_nav_bar.dart';
+import 'package:wandr/pages/home/destination_profile_gmap.dart';
 import 'package:wandr/theme/app_colors.dart';
 import 'package:wandr/components/places_card1.dart';
 import 'package:wandr/components/description_card.dart';
@@ -13,6 +14,7 @@ import 'package:wandr/components/activity_card.dart';
 import 'package:wandr/components/blog_card.dart';
 import 'package:wandr/components/primary_button.dart';
 import '../../config.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DestinationProfileScreen extends StatefulWidget {
   final Map<String, dynamic> place;
@@ -28,9 +30,12 @@ class DestinationProfileScreen extends StatefulWidget {
 }
 
 class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
+  // late GoogleMapController mapController;
+
   List<String> pendingTrips = []; // Stores the user's pending trips
   final storage = FlutterSecureStorage();
   final TextEditingController _tripNameController = TextEditingController(); // Controller for trip name input
+
 
   @override
   void initState() {
@@ -191,6 +196,10 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final double latitude = widget.place['latitude']; // Latitude from backend
+    final double longitude = widget.place['longitude']; // Longitude from backend
+    final String placeName = widget.place['name']; // Place name from backend
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -240,40 +249,46 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
                 ),
               ),
               SizedBox(height: 20),
+
+
+              // GOOGLE MAPS
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Location",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 18,
-                        color: Kcolours.brownShade4,
-                      ),
+                child: Container(
+                  height: 250,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Kcolours.white,
+                      width: 1,
                     ),
-                    SizedBox(height: 12),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Kcolours.white,
-                          width: 1,
-                        ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(latitude, longitude), // Center map at the destination
+                        zoom: 14, // Reasonable zoom level for clarity
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          "assets/images/home/Des - location.png",
-                          width: MediaQuery.of(context).size.width - 32,
-                          fit: BoxFit.cover,
+                      markers: {
+                        Marker(
+                          markerId: MarkerId('destination_marker'), // Unique marker ID
+                          position: LatLng(latitude, longitude), // Marker position on the map
+                          infoWindow: InfoWindow(
+                            title: placeName, // Place name displayed on tap
+                          ),
                         ),
-                      ),
+                      },
+                      mapType: MapType.normal, // Standard map type (roadmap style)
+                      onMapCreated: (GoogleMapController controller) {
+                        // Optional: You can use this to customize the map controller.
+                      },
                     ),
-                  ],
+                  ),
                 ),
               ),
+
+
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
