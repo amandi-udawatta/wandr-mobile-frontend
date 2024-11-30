@@ -146,6 +146,64 @@ class _PendingTripPageState extends State<PendingTripPage> {
               Padding(
                 padding: commonPadding,
                 child: Text(
+                  "Select Your Route",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    color: Kcolours.primary,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: commonPadding,
+                child: Text(
+                  "Choose an option to calculate the estimated time for your trip",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              Padding(
+                padding: commonPadding,
+                child: Container(
+                  height: 60,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Kcolours.primary, width: 1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<int>(
+                      isExpanded: true,
+                      value: _selectedOption,
+                      hint: Text("Select an option"),
+                      items: _dropdownOptions.map((option) {
+                        return DropdownMenuItem<int>(
+                          value: option['id'],
+                          child: Text(option['name']),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedOption = value;
+                        });
+                        if (value != null) {
+                          _sendSelectionToBackend(value);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 25),
+
+              Padding(
+                padding: commonPadding,
+                child: Text(
                   "Your Current Destination List",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
@@ -204,7 +262,13 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   );
                 }).toList(),
               ),
+
               SizedBox(height: 16),
+
+              //Add the start and end points
+
+              SizedBox(height: 16),
+
               Padding(
                 padding: commonPadding,
                 child: Row(
@@ -246,62 +310,8 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 25),
-              Padding(
-                padding: commonPadding,
-                child: Text(
-                  "Select Your Route",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                    color: Kcolours.primary,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: commonPadding,
-                child: Text(
-                  "Choose an option to calculate the estimated time for your trip",
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-              Padding(
-                padding: commonPadding,
-                child: Container(
-                  height: 60,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Kcolours.primary, width: 1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<int>(
-                      isExpanded: true,
-                      value: _selectedOption,
-                      hint: Text("Select an option"),
-                      items: _dropdownOptions.map((option) {
-                        return DropdownMenuItem<int>(
-                          value: option['id'],
-                          child: Text(option['name']),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedOption = value;
-                        });
-                        if (value != null) {
-                          _sendSelectionToBackend(value);
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ),
+
+
               SizedBox(height: 15),
 
               // GOOGLE MAPS

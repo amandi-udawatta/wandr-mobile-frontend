@@ -31,11 +31,11 @@ class DestinationProfileScreen extends StatefulWidget {
 
 class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
 
-  List<String> pendingTrips = []; // Stores the user's pending trips
+  List<Map<String, dynamic>> pendingTrips = [];
   final storage = FlutterSecureStorage();
   final TextEditingController _tripNameController = TextEditingController(); // Controller for trip name input
 
-  String? _selectedTrip;
+  Map<String, dynamic>? _selectedTrip;
 
   @override
   void initState() {
@@ -76,13 +76,18 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
           'Authorization': token,
         },
       );
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success']) {
           setState(() {
-            pendingTrips = (data['data'] as List)
-                .map<String>((trip) => trip['name'] as String)
-                .toList();
+            // Extract relevant fields: tripId and name
+            pendingTrips = (data['data'] as List).map<Map<String, dynamic>>((trip) {
+              return {
+                'id': trip['tripId'], // Extract tripId as ID
+                'name': trip['name'], // Extract name of the trip
+              };
+            }).toList();
           });
         } else {
           _showError(context, data['message']);
@@ -94,6 +99,49 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
       _showError(context, 'An error occurred while fetching pending trips');
     }
   }
+
+  // /// Saves a new trip to the backend
+  // Future<void> saveNewTrip(String tripName) async {
+  //   final token = await storage.read(key: 'accessToken');
+  //   if (token == null) {
+  //     _showError(context, 'Token not found. Please login again.');
+  //     return;
+  //   }
+  //
+  //   try {
+  //     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+  //     final travellerId = decodedToken['id'];
+  //
+  //     final response = await http.post(
+  //       Uri.parse('$baseUrl/forward/trip/create'),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': token,
+  //       },
+  //       body: json.encode({
+  //         'travellerId': travellerId,
+  //         'name': tripName,
+  //         'placeId': widget.place['id'], // Assuming the place object has an ID field
+  //       }),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       if (data['success']) {
+  //         Navigator.of(context).pop(); // Close the popup
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text('Trip saved successfully!')),
+  //         );
+  //       } else {
+  //         _showError(context, data['message']);
+  //       }
+  //     } else {
+  //       _showError(context, 'Failed to save the trip. Please try again.');
+  //     }
+  //   } catch (e) {
+  //     _showError(context, 'An error occurred while saving the trip');
+  //   }
+  // }
 
   /// Saves a new trip to the backend
   Future<void> saveNewTrip(String tripName) async {
@@ -116,7 +164,7 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
         body: json.encode({
           'travellerId': travellerId,
           'name': tripName,
-          'placeId': widget.place['id'], // Assuming the place object has an ID field
+          'placeId': widget.place['id'], // Location to associate
         }),
       );
 
@@ -125,7 +173,7 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
         if (data['success']) {
           Navigator.of(context).pop(); // Close the popup
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Trip saved successfully!')),
+            SnackBar(content: Text('Trip created and place added successfully!')),
           );
         } else {
           _showError(context, data['message']);
@@ -138,6 +186,46 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
     }
   }
 
+  /// Adds a place to an existing trip
+  Future<void> addPlaceToExistingTrip() async {
+    final token = await storage.read(key: 'accessToken');
+    if (token == null) {
+      _showError(context, 'Token not found. Please login again.');
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/forward/trip/add-place'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+        body: json.encode({
+          'tripId': _selectedTrip!['id'], // Use selected trip's ID
+          'placeId': widget.place['id'], // Location to associate
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success']) {
+          Navigator.of(context).pop(); // Close the popup
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Place added to selected trip successfully!')),
+          );
+        } else {
+          _showError(context, data['message']);
+        }
+      } else {
+        _showError(context, 'Failed to add place to the trip. Please try again.');
+      }
+    } catch (e) {
+      _showError(context, 'An error occurred while adding the place to the trip');
+    }
+  }
+
+
   /// Displays an error message
   void _showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -145,7 +233,7 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
     ));
   }
 
-  /// Shows the "Add to Trip" pop-up dialog with no pre-selected trip
+  /// Shows the "Add to Trip" pop-up dialog
   void _showTripPopup() {
     setState(() {
       _selectedTrip = null; // Reset the selection when the dialog opens
@@ -170,16 +258,16 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
                 children: [
                   // Dropdown for selecting an existing trip
                   if (pendingTrips.isNotEmpty) ...[
-                    DropdownButtonFormField<String>(
+                    DropdownButtonFormField<Map<String, dynamic>>(
                       value: _selectedTrip,
                       hint: Text("Select an existing trip"),
                       items: pendingTrips.map((trip) {
-                        return DropdownMenuItem<String>(
-                          value: trip,
-                          child: Text(trip),
+                        return DropdownMenuItem<Map<String, dynamic>>(
+                          value: trip, // Entire trip object
+                          child: Text(trip['name']), // Display trip name
                         );
                       }).toList(),
-                      onChanged: (String? newValue) {
+                      onChanged: (Map<String, dynamic>? newValue) {
                         setState(() {
                           _selectedTrip = newValue; // Update the selected trip
                           _tripNameController.clear(); // Clear input field
@@ -230,12 +318,9 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
                   onPressed: () {
                     final tripName = _tripNameController.text.trim();
                     if (tripName.isNotEmpty) {
-                      saveNewTrip(tripName); // Save the new trip
+                      saveNewTrip(tripName); // Create a new trip
                     } else if (_selectedTrip != null) {
-                      Navigator.of(context).pop(); // Close the dialog
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Selected trip: $_selectedTrip')),
-                      );
+                      addPlaceToExistingTrip(); // Add place to existing trip
                     } else {
                       _showError(context, "Please select or enter a trip name.");
                     }
@@ -257,11 +342,12 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
 
 
 
+
   @override
   Widget build(BuildContext context) {
-    final double latitude = widget.place['latitude']; // Latitude from backend
-    final double longitude = widget.place['longitude']; // Longitude from backend
-    final String placeName = widget.place['name']; // Place name from backend
+    final double latitude = widget.place['latitude'] ?? 0.0; // Default to 0.0 if missing
+    final double longitude = widget.place['longitude'] ?? 0.0;
+    final String placeName = widget.place['name'] ?? 'Unknown Place';
 
     return SafeArea(
       child: Scaffold(
@@ -509,3 +595,4 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
     );
   }
 }
+
