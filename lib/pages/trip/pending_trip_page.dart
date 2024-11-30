@@ -8,6 +8,8 @@ import 'package:wandr/components/trip_recommended_item.dart';
 import 'package:wandr/components/trip_recommended_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async'; // Needed for the Completer
+import 'package:google_places_flutter/google_places_flutter.dart';
+
 
 class PendingTripPage extends StatefulWidget {
   final String title;
@@ -26,6 +28,10 @@ class PendingTripPage extends StatefulWidget {
 }
 
 class _PendingTripPageState extends State<PendingTripPage> {
+
+  bool _isConfirmEnabled() {
+    return _startLocation != null && _endLocation != null && widget.tripPlaces.isNotEmpty;
+  }
 
   final Completer<GoogleMapController> _controller = Completer();
 
@@ -50,13 +56,35 @@ class _PendingTripPageState extends State<PendingTripPage> {
     },
   ];
 
+  // Variables to store estimated time and distance
+  String _estimatedTime = "N/A";
+  String _totalDistance = "N/A";
+
+  // Example function to simulate updating estimates
+  void _updateEstimates() {
+    // Simulate fetching estimates (replace this with real calculations/API response)
+    setState(() {
+      _estimatedTime = "2 hrs 30 mins"; // Replace with real estimate
+      _totalDistance = "120 km"; // Replace with real distance
+    });
+  }
+
   // Dropdown selection state
   int? _selectedOption;
   final List<Map<String, dynamic>> _dropdownOptions = [
-    {"id": 1, "name": "Optimized Route (Shortest Path)"},
-    {"id": 2, "name": "Custom Route (Your Selection)"},
-    {"id": 3, "name": "Recommended Route (By Us)"}
+    {"id": 1, "name": "Custom Route (Your Selection)"},
+    {"id": 2, "name": "Optimized Route (Shortest Path)"},
   ];
+
+  // Controllers for start and end location autocomplete
+  final TextEditingController _startLocationController =
+  TextEditingController();
+  final TextEditingController _endLocationController = TextEditingController();
+
+  // Selected latitude and longitude for start and end locations
+  LatLng? _startLocation;
+  LatLng? _endLocation;
+
 
   @override
   void initState() {
@@ -266,28 +294,185 @@ class _PendingTripPageState extends State<PendingTripPage> {
               SizedBox(height: 16),
 
               //Add the start and end points
+              Padding(
+                padding: commonPadding,
+                child: Text(
+                  "Add Start and End Points",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    color: Kcolours.primary,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+
+              // Start Location Autocomplete
+              Padding(
+                padding: commonPadding,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Where are you going to start your trip from?",
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15,
+                      ),
+                    ),
+                    GooglePlaceAutoCompleteTextField(
+                      textEditingController: _startLocationController,
+                      googleAPIKey: "AIzaSyDCzzl6gpAj0PP32qgHMNG8CviCZqpttgE",
+                      inputDecoration: InputDecoration(
+                        hintText: "Enter Start Location",
+                        hintStyle: TextStyle(color: Colors.grey[600]),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Kcolours.primary,
+                            width: 1.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Kcolours.primary,
+                            width: 1.0,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 14.0,
+                        ),
+                      ),
+                      debounceTime: 800,
+                      countries: const ["lk", "us"],
+                      isLatLngRequired: true,
+                      getPlaceDetailWithLatLng: (prediction) {
+                        setState(() {
+                          _startLocation = LatLng(
+                            (prediction.lat ?? 0.0) as double,
+                            (prediction.lng ?? 0.0) as double,
+                          );
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+
+              // End Location Autocomplete
+              Padding(
+                padding: commonPadding,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Where do you want to end your trip?",
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15,
+                      ),
+                    ),
+                    GooglePlaceAutoCompleteTextField(
+                      textEditingController: _endLocationController,
+                      googleAPIKey: "AIzaSyDCzzl6gpAj0PP32qgHMNG8CviCZqpttgE",
+                      inputDecoration: InputDecoration(
+                        hintText: "Enter End Location",
+                        hintStyle: TextStyle(color: Colors.grey[600]),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Kcolours.primary,
+                            width: 1.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Kcolours.primary,
+                            width: 1.0,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 14.0,
+                        ),
+                      ),
+                      debounceTime: 800,
+                      countries: const ["lk", "us"],
+                      isLatLngRequired: true,
+                      getPlaceDetailWithLatLng: (prediction) {
+                        setState(() {
+                          _endLocation = LatLng(
+                            (prediction.lat ?? 0.0) as double,
+                            (prediction.lng ?? 0.0) as double,
+                          );
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
 
               SizedBox(height: 16),
 
+              Padding(
+                padding: commonPadding,
+                child: Text(
+                  "Add the start and end locations and click here to confirm your destination details and generate your estimated trip details",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 10),
+
+              // Confirm Destinations Button
               Padding(
                 padding: commonPadding,
                 child: Row(
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {
-                          // Handle Set Order action here
-                        },
+                        onPressed: _isConfirmEnabled()
+                            ? () {
+                          // Handle confirm action here
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Destinations confirmed!"),
+                            ),
+                          );
+                        }
+                            : null, // Disable the button if conditions aren't met
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Kcolours.primary, // Background color
+                          backgroundColor: _isConfirmEnabled()
+                              ? Kcolours.primary
+                              : Colors.grey[400], // Primary color if enabled, grey if not
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                           padding: EdgeInsets.symmetric(vertical: 16),
                         ),
                         child: Text(
-                          'Set Order',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                          'Confirm Destinations',
+                          style: TextStyle(
+                            color: _isConfirmEnabled()
+                                ? Colors.white
+                                : Colors.grey[400], // Adjust text color based on state
+                            fontSize: 18,
+                          ),
                         ),
                       ),
                     ),
@@ -310,6 +495,80 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   ],
                 ),
               ),
+
+
+              SizedBox(height: 15),
+
+              // Estimated Details Section
+              Padding(
+                padding: commonPadding,
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Kcolours.primary, width: 1),
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Estimated Details",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          color: Kcolours.primary,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Estimated Time:",
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Kcolours.brownShade4,
+                            ),
+                          ),
+                          Text(
+                            _estimatedTime,
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Kcolours.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Estimated Distance:",
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Kcolours.brownShade4,
+                            ),
+                          ),
+                          Text(
+                            _totalDistance,
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Kcolours.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
 
 
               SizedBox(height: 15),
@@ -359,14 +618,13 @@ class _PendingTripPageState extends State<PendingTripPage> {
               ),
 
 
-
               SizedBox(height: 15),
 
               // Recommended services based on your preferences
               Padding(
                 padding: commonPadding,
                 child: Text(
-                  "Recommended services to enhance your trip",
+                  "Recommended shops and services to enhance your trip",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
@@ -413,59 +671,35 @@ class _PendingTripPageState extends State<PendingTripPage> {
                 ),
               ),
 
+              SizedBox(height: 15),
 
-              SizedBox(height: 20),
-
-              // Recommended items based on your preferences
               Padding(
                 padding: commonPadding,
-                child: Text(
-                  "Recommended items to make your trip memorable",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                    color: Kcolours.brownShade4,
-                  ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Handle Finalize Trip action here
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Kcolours.primary, // Background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: Text(
+                          'Finalize Trip',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: 10),
-              Padding(
-                padding: commonPadding,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      ItemCard(
-                        title: "Handcrafted Wooden Elephant",
-                        store: "Elephant Craft Store",
-                        rating: 4.9,
-                        image: "assets/images/shops/item-elephant.png",
-                      ),
-                      SizedBox(width: 16),
-                      ItemCard(
-                        title: "Handwoven Rattan Basket",
-                        store: "Rattan Wonders",
-                        rating: 4.5,
-                        image: "assets/images/shops/item-basket.png",
-                      ),
-                      SizedBox(width: 16),
-                      ItemCard(
-                        title: "Batik Print Scarf",
-                        store: "Batik Boutique",
-                        rating: 4.2,
-                        image: "assets/images/shops/item-scarf.png",
-                      ),
-                      SizedBox(width: 16),
-                      ItemCard(
-                        title: "Handwoven Baskets",
-                        store: "Rattan Wonders",
-                        rating: 3.1,
-                        image: "assets/images/shops/item-handwoven-baskets.png",
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+
+
             ],
           ),
         ),
