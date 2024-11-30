@@ -29,10 +29,25 @@ class _PendingTripPageState extends State<PendingTripPage> {
 
   final Completer<GoogleMapController> _controller = Completer();
 
-  final List<LatLng> _markerPositions = [
-    LatLng(7.957113000000000, 80.760257000000000), // First location
-    LatLng(7.293609000000000, 80.641325000000000), // Second location
-    LatLng(8.569559000000000, 81.213307000000000),
+  final List<Map<String, dynamic>> _sampleLocations = [
+    {
+      'id': 1,
+      'name': 'Sigiriya Lion Rock',
+      'latitude': 7.957113000000000,
+      'longitude': 80.760257000000000,
+    },
+    {
+      'id': 2,
+      'name': 'Temple of the Sacred Tooth Relic',
+      'latitude': 7.293609000000000,
+      'longitude': 80.641325000000000,
+    },
+    {
+      'id': 3,
+      'name': 'Pasikuda Beach',
+      'latitude': 8.569559000000000,
+      'longitude': 81.213307000000000,
+    },
   ];
 
   // Dropdown selection state
@@ -51,28 +66,29 @@ class _PendingTripPageState extends State<PendingTripPage> {
     });
   }
   Future<void> _fitMarkersToMap() async {
-    if (widget.tripPlaces.isEmpty) return;
+    if (_sampleLocations.isEmpty) return;
 
-    // Create LatLngBounds for all markers
     LatLngBounds bounds;
-    if (widget.tripPlaces.length == 1) {
+    if (_sampleLocations.length == 1) {
+      // Only one marker
       final LatLng singleMarker = LatLng(
-        widget.tripPlaces.first['latitude'],
-        widget.tripPlaces.first['longitude'],
+        _sampleLocations.first['latitude'],
+        _sampleLocations.first['longitude'],
       );
       bounds = LatLngBounds(
         southwest: singleMarker,
         northeast: singleMarker,
       );
     } else {
+      // Multiple markers: calculate bounds
       bounds = LatLngBounds(
         southwest: LatLng(
-          widget.tripPlaces.map((place) => place['latitude']).reduce((a, b) => a < b ? a : b),
-          widget.tripPlaces.map((place) => place['longitude']).reduce((a, b) => a < b ? a : b),
+          _sampleLocations.map((place) => place['latitude']).reduce((a, b) => a < b ? a : b),
+          _sampleLocations.map((place) => place['longitude']).reduce((a, b) => a < b ? a : b),
         ),
         northeast: LatLng(
-          widget.tripPlaces.map((place) => place['latitude']).reduce((a, b) => a > b ? a : b),
-          widget.tripPlaces.map((place) => place['longitude']).reduce((a, b) => a > b ? a : b),
+          _sampleLocations.map((place) => place['latitude']).reduce((a, b) => a > b ? a : b),
+          _sampleLocations.map((place) => place['longitude']).reduce((a, b) => a > b ? a : b),
         ),
       );
     }
@@ -308,17 +324,17 @@ class _PendingTripPageState extends State<PendingTripPage> {
                       },
                       initialCameraPosition: CameraPosition(
                         target: LatLng(
-                          widget.tripPlaces.first['latitude'],
-                          widget.tripPlaces.first['longitude'],
+                          _sampleLocations.first['latitude'],
+                          _sampleLocations.first['longitude'],
                         ),
                         zoom: 10, // Default zoom level
                       ),
-                      markers: widget.tripPlaces.map((place) {
+                      markers: _sampleLocations.map((place) {
                         return Marker(
-                          markerId: MarkerId(place['id'].toString()), // Use unique ID
+                          markerId: MarkerId(place['id'].toString()),
                           position: LatLng(place['latitude'], place['longitude']),
                           infoWindow: InfoWindow(
-                            title: place['name'], // Place name
+                            title: place['name'],
                           ),
                         );
                       }).toSet(),
