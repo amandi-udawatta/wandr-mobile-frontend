@@ -30,17 +30,32 @@ class DestinationProfileScreen extends StatefulWidget {
 }
 
 class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
-  // late GoogleMapController mapController;
 
   List<String> pendingTrips = []; // Stores the user's pending trips
   final storage = FlutterSecureStorage();
   final TextEditingController _tripNameController = TextEditingController(); // Controller for trip name input
 
+  String? _selectedTrip;
 
   @override
   void initState() {
     super.initState();
-    fetchPendingTrips(); // Fetch pending trips on initialization
+    fetchPendingTrips();
+
+    // Add a listener to clear selected trip when typing in the input field
+    _tripNameController.addListener(() {
+      if (_tripNameController.text.isNotEmpty && _selectedTrip != null) {
+        setState(() {
+          _selectedTrip = null; // Clear selected trip when typing
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tripNameController.dispose(); // Dispose of the controller to avoid memory leaks
+    super.dispose();
   }
 
   /// Fetches the user's pending trips from the backend
@@ -89,6 +104,9 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
     }
 
     try {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      final travellerId = decodedToken['id'];
+
       final response = await http.post(
         Uri.parse('$baseUrl/forward/trip/create'),
         headers: {
@@ -96,6 +114,7 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
           'Authorization': token,
         },
         body: json.encode({
+          'travellerId': travellerId,
           'name': tripName,
           'placeId': widget.place['id'], // Assuming the place object has an ID field
         }),
@@ -126,72 +145,116 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
     ));
   }
 
-  /// Shows the "Add to Trip" pop-up dialog
+  /// Shows the "Add to Trip" pop-up dialog with no pre-selected trip
   void _showTripPopup() {
+    setState(() {
+      _selectedTrip = null; // Reset the selection when the dialog opens
+      _tripNameController.clear(); // Clear the input field
+    });
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          title: Text(
-            "Save trip to",
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (pendingTrips.isNotEmpty) ...[
-                for (var trip in pendingTrips)
-                  ListTile(
-                    title: Text(trip),
-                    trailing: Icon(Icons.check_box_outline_blank),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              title: Text(
+                "Save trip to",
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Dropdown for selecting an existing trip
+                  if (pendingTrips.isNotEmpty) ...[
+                    DropdownButtonFormField<String>(
+                      value: _selectedTrip,
+                      hint: Text("Select an existing trip"),
+                      items: pendingTrips.map((trip) {
+                        return DropdownMenuItem<String>(
+                          value: trip,
+                          child: Text(trip),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedTrip = newValue; // Update the selected trip
+                          _tripNameController.clear(); // Clear input field
+                        });
+                      },
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 10.0,
+                          horizontal: 12.0,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                  ],
+                  // Input field for adding a new trip
+                  TextField(
+                    controller: _tripNameController,
+                    onChanged: (value) {
+                      if (value.isNotEmpty) {
+                        setState(() {
+                          _selectedTrip = null; // Deselect dropdown when typing
+                        });
+                      }
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Enter new trip name",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10), // Rounded border
+                      ),
+                    ),
                   ),
-                Divider(),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.green, // Green font color
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final tripName = _tripNameController.text.trim();
+                    if (tripName.isNotEmpty) {
+                      saveNewTrip(tripName); // Save the new trip
+                    } else if (_selectedTrip != null) {
+                      Navigator.of(context).pop(); // Close the dialog
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Selected trip: $_selectedTrip')),
+                      );
+                    } else {
+                      _showError(context, "Please select or enter a trip name.");
+                    }
+                  },
+                  child: Text(
+                    "Save",
+                    style: TextStyle(
+                      color: Colors.green, // Green font color
+                    ),
+                  ),
+                ),
               ],
-              TextField(
-                controller: _tripNameController,
-                decoration: InputDecoration(
-                  hintText: "Enter new trip name",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10), // Rounded border
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                "Cancel",
-                style: TextStyle(
-                  color: Colors.green, // Green font color
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                final tripName = _tripNameController.text.trim();
-                if (tripName.isNotEmpty) {
-                  saveNewTrip(tripName); // Call saveNewTrip
-                } else {
-                  _showError(context, "Please enter a trip name.");
-                }
-              },
-              child: Text(
-                "Save",
-                style: TextStyle(
-                  color: Colors.green, // Green font color
-                ),
-              ),
-            ),
-          ],
+            );
+          },
         );
       },
     );
   }
+
 
 
   @override
