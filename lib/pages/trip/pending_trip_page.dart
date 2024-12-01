@@ -76,7 +76,8 @@ class _PendingTripPageState extends State<PendingTripPage> {
   }
 
   // Dropdown selection state
-  int? _selectedOption;
+  int? _selectedOption; // 1 = Custom Route, 2 = Optimized Route
+  bool get _isReorderEnabled => _selectedOption == 1;
   final List<Map<String, dynamic>> _dropdownOptions = [
     {"id": 1, "name": "Custom Route (Your Selection)"},
     {"id": 2, "name": "Optimized Route (Shortest Path)"},
@@ -224,8 +225,13 @@ class _PendingTripPageState extends State<PendingTripPage> {
                         setState(() {
                           _selectedOption = value;
                         });
-                        if (value != null) {
-                          _sendSelectionToBackend(value);
+                        if (value == 2) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Reordering is disabled for Optimized Route."),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
                         }
                       },
                     ),
@@ -262,19 +268,26 @@ class _PendingTripPageState extends State<PendingTripPage> {
               ReorderableListView(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                onReorder: (int oldIndex, int newIndex) {
-                  setState(() {
-                    if (newIndex > oldIndex) {
-                      newIndex -= 1;
-                    }
-                    final item = widget.tripPlaces.removeAt(oldIndex);
-                    widget.tripPlaces.insert(newIndex, item);
+                onReorder: (oldIndex, newIndex) {
+                  if (_isReorderEnabled) {
+                    setState(() {
+                      if (newIndex > oldIndex) newIndex -= 1;
+                      final item = widget.tripPlaces.removeAt(oldIndex);
+                      widget.tripPlaces.insert(newIndex, item);
 
-                    // Update the order values
-                    for (int i = 0; i < widget.tripPlaces.length; i++) {
-                      widget.tripPlaces[i]['placeOrder'] = i + 1;
-                    }
-                  });
+                      // Update the order values
+                      for (int i = 0; i < widget.tripPlaces.length; i++) {
+                        widget.tripPlaces[i]['placeOrder'] = i + 1;
+                      }
+                    });
+                  } else {
+                    // Optional: Show a message when reordering is disabled
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Reordering is disabled for Optimized Route."),
+                      ),
+                    );
+                  }
                 },
                 children: widget.tripPlaces.map((destination) {
                   return Card(
@@ -289,7 +302,9 @@ class _PendingTripPageState extends State<PendingTripPage> {
                       trailing: IconButton(
                         icon: Icon(Icons.delete_outline, color: Colors.red),
                         onPressed: () {
-                          // Handle deletion here
+                          setState(() {
+                            widget.tripPlaces.remove(destination);
+                          });
                         },
                       ),
                     ),
@@ -333,100 +348,93 @@ class _PendingTripPageState extends State<PendingTripPage> {
               SizedBox(height: 16),
 
 
-              // Start Location Autocomplete
               Padding(
                 padding: commonPadding,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Start Location Input
                     Text(
                       "Where are you going to start your trip from?",
                       textAlign: TextAlign.left,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15,
-                      ),
+                      style: TextStyle(color: Colors.grey, fontSize: 15),
                     ),
-                    GooglePlaceAutoCompleteTextField(
-                      textEditingController: _startLocationController,
-                      googleAPIKey: "AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY",
-                      inputDecoration: InputDecoration(
-                        hintText: "Enter Start Location",
-                        hintStyle: TextStyle(color: Colors.grey[600]),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Kcolours.primary,
-                            width: 1.0,
+                    Stack(
+                      children: [
+                        GooglePlaceAutoCompleteTextField(
+                          textEditingController: _startLocationController,
+                          googleAPIKey: "AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY",
+                          inputDecoration: InputDecoration(
+                            hintText: "Enter Start Location",
+                            hintStyle: TextStyle(color: Colors.grey[600]),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Kcolours.primary, width: 1.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Kcolours.primary, width: 1.0),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 14.0,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Kcolours.primary,
-                            width: 1.0,
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 14.0,
-                        ),
-                      ),
-                      debounceTime: 800,
-                      countries: const ["lk", "us"],
-                      isLatLngRequired: true,
-                      itemClick: (prediction) async {
-                        if (prediction != null && prediction.placeId != null) {
-                          print("Prediction Place ID: ${prediction.placeId}");
-                          print("Prediction Description: ${prediction.description}");
-
-                          // Call the Google Place Details API
-                          try {
-                            var response = await http.get(
-                              Uri.parse(
-                                'https://maps.googleapis.com/maps/api/place/details/json?place_id=${prediction.placeId}&key=AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY',
-                              ),
-                            );
-
-                            if (response.statusCode == 200) {
-                              var result = jsonDecode(response.body);
-
-                              // Extract latitude and longitude from API response
-                              var location = result['result']['geometry']['location'];
-                              double latitude = location['lat'];
-                              double longitude = location['lng'];
-
-                              setState(() {
-                                _startLocation = LatLng(latitude, longitude);
-                                _startLocationController.text =
-                                    prediction.description ?? "Unknown Place";
-                              });
-
-                              print("Start Location - Lat: $latitude, Lng: $longitude");
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Failed to fetch place details.")),
-                              );
+                          debounceTime: 800,
+                          countries: const ["lk", "us"],
+                          isLatLngRequired: true,
+                          itemClick: (prediction) async {
+                            if (prediction != null && prediction.placeId != null) {
+                              try {
+                                var response = await http.get(
+                                  Uri.parse(
+                                    'https://maps.googleapis.com/maps/api/place/details/json?place_id=${prediction.placeId}&key=AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY',
+                                  ),
+                                );
+                                if (response.statusCode == 200) {
+                                  var result = jsonDecode(response.body);
+                                  var location = result['result']['geometry']['location'];
+                                  setState(() {
+                                    _startLocation = LatLng(location['lat'], location['lng']);
+                                    _startLocationController.text =
+                                        prediction.description ?? "Unknown Place";
+                                  });
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("Failed to fetch start location details.")),
+                                  );
+                                }
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Error retrieving start location.")),
+                                );
+                              }
                             }
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Error retrieving place details. Please try again.")),
-                            );
-                          }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Invalid place selection.")),
-                          );
-                        }
-                      },
+                          },
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: IconButton(
+                            icon: Icon(Icons.clear, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                _startLocation = null;
+                                _startLocationController.clear();
+                              });
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
+              SizedBox(height: 10),
 
-// End Location Autocomplete
+              // End Location Input
               Padding(
                 padding: commonPadding,
                 child: Column(
@@ -435,85 +443,77 @@ class _PendingTripPageState extends State<PendingTripPage> {
                     Text(
                       "Where do you want to end your trip?",
                       textAlign: TextAlign.left,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15,
-                      ),
+                      style: TextStyle(color: Colors.grey, fontSize: 15),
                     ),
-                    GooglePlaceAutoCompleteTextField(
-                      textEditingController: _endLocationController,
-                      googleAPIKey: "AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY",
-                      inputDecoration: InputDecoration(
-                        hintText: "Enter End Location",
-                        hintStyle: TextStyle(color: Colors.grey[600]),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Kcolours.primary,
-                            width: 1.0,
+                    Stack(
+                      children: [
+                        GooglePlaceAutoCompleteTextField(
+                          textEditingController: _endLocationController,
+                          googleAPIKey: "AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY",
+                          inputDecoration: InputDecoration(
+                            hintText: "Enter End Location",
+                            hintStyle: TextStyle(color: Colors.grey[600]),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Kcolours.primary, width: 1.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Kcolours.primary, width: 1.0),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 14.0,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Kcolours.primary,
-                            width: 1.0,
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 14.0,
-                        ),
-                      ),
-                      debounceTime: 800,
-                      countries: const ["lk", "us"],
-                      isLatLngRequired: true,
-                      itemClick: (prediction) async {
-                        if (prediction != null && prediction.placeId != null) {
-                          print("Prediction Place ID: ${prediction.placeId}");
-                          print("Prediction Description: ${prediction.description}");
-
-                          // Call the Google Place Details API
-                          try {
-                            var response = await http.get(
-                              Uri.parse(
-                                'https://maps.googleapis.com/maps/api/place/details/json?place_id=${prediction.placeId}&key=AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY',
-                              ),
-                            );
-
-                            if (response.statusCode == 200) {
-                              var result = jsonDecode(response.body);
-
-                              // Extract latitude and longitude from API response
-                              var location = result['result']['geometry']['location'];
-                              double latitude = location['lat'];
-                              double longitude = location['lng'];
-
-                              setState(() {
-                                _endLocation = LatLng(latitude, longitude);
-                                _endLocationController.text =
-                                    prediction.description ?? "Unknown Place";
-                              });
-
-                              print("End Location - Lat: $latitude, Lng: $longitude");
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Failed to fetch place details.")),
-                              );
+                          debounceTime: 800,
+                          countries: const ["lk", "us"],
+                          isLatLngRequired: true,
+                          itemClick: (prediction) async {
+                            if (prediction != null && prediction.placeId != null) {
+                              try {
+                                var response = await http.get(
+                                  Uri.parse(
+                                    'https://maps.googleapis.com/maps/api/place/details/json?place_id=${prediction.placeId}&key=AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY',
+                                  ),
+                                );
+                                if (response.statusCode == 200) {
+                                  var result = jsonDecode(response.body);
+                                  var location = result['result']['geometry']['location'];
+                                  setState(() {
+                                    _endLocation = LatLng(location['lat'], location['lng']);
+                                    _endLocationController.text =
+                                        prediction.description ?? "Unknown Place";
+                                  });
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("Failed to fetch end location details.")),
+                                  );
+                                }
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Error retrieving end location.")),
+                                );
+                              }
                             }
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Error retrieving place details. Please try again.")),
-                            );
-                          }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Invalid place selection.")),
-                          );
-                        }
-                      },
+                          },
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: IconButton(
+                            icon: Icon(Icons.clear, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                _endLocation = null;
+                                _endLocationController.clear();
+                              });
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -546,18 +546,15 @@ class _PendingTripPageState extends State<PendingTripPage> {
                       child: ElevatedButton(
                         onPressed: _isConfirmEnabled()
                             ? () {
-                          // Handle confirm action here
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Destinations confirmed!"),
-                            ),
+                            SnackBar(content: Text("Destinations confirmed!")),
                           );
                         }
-                            : null, // Disable the button if conditions aren't met
+                            : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _isConfirmEnabled()
                               ? Kcolours.primary
-                              : Colors.grey[400], // Primary color if enabled, grey if not
+                              : Colors.grey[400],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -566,28 +563,10 @@ class _PendingTripPageState extends State<PendingTripPage> {
                         child: Text(
                           'Confirm Destinations',
                           style: TextStyle(
-                            color: _isConfirmEnabled()
-                                ? Colors.white
-                                : Colors.grey[400], // Adjust text color based on state
+                            color: Colors.white,
                             fontSize: 18,
                           ),
                         ),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Kcolours.primary, width: 2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.add, color: Kcolours.primary),
-                        iconSize: 35,
-                        onPressed: () {
-                          // Handle Add action here
-                        },
                       ),
                     ),
                   ],
@@ -796,8 +775,6 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   ],
                 ),
               ),
-
-
             ],
           ),
         ),
