@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:wandr/pages/rewards/rewards_page.dart';
@@ -11,6 +13,8 @@ import 'package:wandr/components/trip_recommended_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async'; // Needed for the Completer
 import 'package:google_places_flutter/google_places_flutter.dart';
+
+import 'package:http/http.dart' as http;
 
 
 class PendingTripPage extends StatefulWidget {
@@ -329,20 +333,6 @@ class _PendingTripPageState extends State<PendingTripPage> {
               SizedBox(height: 16),
 
 
-              //Add the start and end points
-              Padding(
-                padding: commonPadding,
-                child: Text(
-                  "Add Start and End Points",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                    color: Kcolours.primary,
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-
               // Start Location Autocomplete
               Padding(
                 padding: commonPadding,
@@ -387,21 +377,56 @@ class _PendingTripPageState extends State<PendingTripPage> {
                       debounceTime: 800,
                       countries: const ["lk", "us"],
                       isLatLngRequired: true,
-                      getPlaceDetailWithLatLng: (prediction) {
-                        setState(() {
-                          _startLocation = LatLng(
-                            (prediction.lat ?? 0.0) as double,
-                            (prediction.lng ?? 0.0) as double,
+                      itemClick: (prediction) async {
+                        if (prediction != null && prediction.placeId != null) {
+                          print("Prediction Place ID: ${prediction.placeId}");
+                          print("Prediction Description: ${prediction.description}");
+
+                          // Call the Google Place Details API
+                          try {
+                            var response = await http.get(
+                              Uri.parse(
+                                'https://maps.googleapis.com/maps/api/place/details/json?place_id=${prediction.placeId}&key=AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY',
+                              ),
+                            );
+
+                            if (response.statusCode == 200) {
+                              var result = jsonDecode(response.body);
+
+                              // Extract latitude and longitude from API response
+                              var location = result['result']['geometry']['location'];
+                              double latitude = location['lat'];
+                              double longitude = location['lng'];
+
+                              setState(() {
+                                _startLocation = LatLng(latitude, longitude);
+                                _startLocationController.text =
+                                    prediction.description ?? "Unknown Place";
+                              });
+
+                              print("Start Location - Lat: $latitude, Lng: $longitude");
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Failed to fetch place details.")),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Error retrieving place details. Please try again.")),
+                            );
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Invalid place selection.")),
                           );
-                        });
+                        }
                       },
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 10),
 
-              // End Location Autocomplete
+// End Location Autocomplete
               Padding(
                 padding: commonPadding,
                 child: Column(
@@ -445,18 +470,55 @@ class _PendingTripPageState extends State<PendingTripPage> {
                       debounceTime: 800,
                       countries: const ["lk", "us"],
                       isLatLngRequired: true,
-                      getPlaceDetailWithLatLng: (prediction) {
-                        setState(() {
-                          _endLocation = LatLng(
-                            (prediction.lat ?? 0.0) as double,
-                            (prediction.lng ?? 0.0) as double,
+                      itemClick: (prediction) async {
+                        if (prediction != null && prediction.placeId != null) {
+                          print("Prediction Place ID: ${prediction.placeId}");
+                          print("Prediction Description: ${prediction.description}");
+
+                          // Call the Google Place Details API
+                          try {
+                            var response = await http.get(
+                              Uri.parse(
+                                'https://maps.googleapis.com/maps/api/place/details/json?place_id=${prediction.placeId}&key=AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY',
+                              ),
+                            );
+
+                            if (response.statusCode == 200) {
+                              var result = jsonDecode(response.body);
+
+                              // Extract latitude and longitude from API response
+                              var location = result['result']['geometry']['location'];
+                              double latitude = location['lat'];
+                              double longitude = location['lng'];
+
+                              setState(() {
+                                _endLocation = LatLng(latitude, longitude);
+                                _endLocationController.text =
+                                    prediction.description ?? "Unknown Place";
+                              });
+
+                              print("End Location - Lat: $latitude, Lng: $longitude");
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Failed to fetch place details.")),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Error retrieving place details. Please try again.")),
+                            );
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Invalid place selection.")),
                           );
-                        });
+                        }
                       },
                     ),
                   ],
                 ),
               ),
+
 
 
               SizedBox(height: 16),
