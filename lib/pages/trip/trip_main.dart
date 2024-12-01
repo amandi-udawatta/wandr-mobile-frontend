@@ -67,6 +67,7 @@ class _TripScreenState extends State<TripScreen> {
                 'tripId': trip['tripId'],
                 'title': trip['name'],
                 'created_on': createdOn,
+                'routeType': trip['routeType'],
                 'tripPlaces': trip['tripPlaces']?.map((place) {
                   return {
                     'tripPlaceId': place['tripPlaceId'], // Place ID
@@ -238,6 +239,7 @@ class _TripScreenState extends State<TripScreen> {
                                             createdOn: trip['created_on'] as String,
                                             tripPlaces: trip['tripPlaces'] as List<dynamic>,
                                             tripId: trip['tripId'] as int,
+                                            routeType: trip['routeType'] as int,
                                           ),
                                         ),
                                       );

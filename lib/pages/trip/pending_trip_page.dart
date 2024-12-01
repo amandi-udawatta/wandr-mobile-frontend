@@ -17,6 +17,10 @@ import 'dart:async'; // Needed for the Completer
 import 'package:google_places_flutter/google_places_flutter.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 
 
 class PendingTripPage extends StatefulWidget {
@@ -24,6 +28,7 @@ class PendingTripPage extends StatefulWidget {
   final String createdOn;
   final List<dynamic> tripPlaces;
   final int tripId;
+  final int? routeType;
 
   const PendingTripPage({
     Key? key,
@@ -31,6 +36,7 @@ class PendingTripPage extends StatefulWidget {
     required this.createdOn,
     required this.tripPlaces,
     required this.tripId,
+    this.routeType,
   }) : super(key: key);
 
   @override
@@ -38,7 +44,7 @@ class PendingTripPage extends StatefulWidget {
 }
 
 class _PendingTripPageState extends State<PendingTripPage> {
-
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
   bool _isConfirmEnabled() {
     return _startLocation != null && _endLocation != null && widget.tripPlaces.isNotEmpty;
   }
@@ -101,6 +107,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
     super.initState();
     // print("HELLOOOOOOO");
     // print('Trip Places Received: ${widget.tripPlaces}');
+    _selectedOption = widget.routeType ?? 2;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fitMarkersToMap();
     });
@@ -138,7 +145,8 @@ class _PendingTripPageState extends State<PendingTripPage> {
   }
 
   Future<void> _onConfirmDestinations() async {
-    if (_selectedOption == null || _startLocation == null || _endLocation == null) {
+    if (_selectedOption == null || _startLocation == null ||
+        _endLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fill all required fields.")),
       );
@@ -146,51 +154,59 @@ class _PendingTripPageState extends State<PendingTripPage> {
     }
 
     try {
-      final url = _selectedOption == 2
-          ? Uri.parse('$baseUrl/forward/trip/reorder-route') // Custom Route
-          : Uri.parse('$baseUrl/forward/trip/shortest-route'); // Optimized Route
+      String? token = await _storage.read(key: 'accessToken');
+      if (token != null) {
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+        final userId = decodedToken['id'];
+        final url = _selectedOption == 2
+            ? Uri.parse('$baseUrl/forward/trip/reorder-route') // Custom Route
+            : Uri.parse('$baseUrl/forward/trip/shortest-route'); // Optimized Route
 
-      print("the POST request is: $url");
 
-      final payload = _selectedOption == 2
-          ? {
-        "tripId": widget.tripId,
-        "startLat": _startLocation!.latitude,
-        "startLng": _startLocation!.longitude,
-        "endLat": _endLocation!.latitude,
-        "endLng": _endLocation!.longitude,
-        "placeList": widget.tripPlaces.map((place) {
-          return {
-            "tripPlaceId": place['tripPlaceId'], // Ensure this is populated
-            "order": place['placeOrder'],
-          };
-        }).toList(),
-      }
-          : {
-        "tripId": widget.tripId,
-        "startLat": _startLocation!.latitude,
-        "startLng": _startLocation!.longitude,
-        "endLat": _endLocation!.latitude,
-        "endLng": _endLocation!.longitude,
-      };
+        final payload = _selectedOption == 2
+            ? {
+          "tripId": widget.tripId,
+          "startLat": _startLocation!.latitude,
+          "startLng": _startLocation!.longitude,
+          "endLat": _endLocation!.latitude,
+          "endLng": _endLocation!.longitude,
+          "placeList": widget.tripPlaces.map((place) {
+            return {
+              "tripPlaceId": place['tripPlaceId'], // Ensure this is populated
+              "order": place['placeOrder'],
+            };
+          }).toList(),
+        }
+            : {
+          "tripId": widget.tripId,
+          "startLat": _startLocation!.latitude,
+          "startLng": _startLocation!.longitude,
+          "endLat": _endLocation!.latitude,
+          "endLng": _endLocation!.longitude,
+        };
 
-      print("The payload is: $payload");
+        print("The payload is: $payload");
 
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(payload),
-      );
-
-      print("Response status code: ${response.statusCode}");
-      print("Raw response body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Route confirmed successfully!")),
+        final response = await http.post(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token,},
+          body: jsonEncode(payload),
         );
-      } else {
-        throw Exception("Failed to confirm route: ${response.statusCode}");
+
+        print("the POST request is: $url");
+        print("Payload sent to server: ${jsonEncode(payload)}");
+        print("Response status code: ${response.statusCode}");
+        print("Raw response body: ${response.body}");
+
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Route confirmed successfully!")),
+          );
+        } else {
+          throw Exception("Failed to confirm route: ${response.statusCode}");
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -275,7 +291,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<int>(
                       isExpanded: true,
-                      value: _selectedOption,
+                      value: _selectedOption, // Dynamically set the value
                       hint: Text("Select an option"),
                       items: _dropdownOptions.map((option) {
                         return DropdownMenuItem<int>(
@@ -283,10 +299,13 @@ class _PendingTripPageState extends State<PendingTripPage> {
                           child: Text(option['name']),
                         );
                       }).toList(),
-                      onChanged: (value) {
+                      onChanged: (value) async {
+                        if (value == null) return;
+
                         setState(() {
                           _selectedOption = value;
                         });
+
                         if (value == 1) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
