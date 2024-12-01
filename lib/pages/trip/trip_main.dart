@@ -1,5 +1,7 @@
 // lib/pages/trip/trip_main.dart
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wandr/theme/app_colors.dart';
@@ -31,6 +33,7 @@ class _TripScreenState extends State<TripScreen> {
   @override
   void initState() {
     super.initState();
+
     _fetchPendingTrips();
     _fetchFinalizedTrips();
   }
@@ -54,6 +57,7 @@ class _TripScreenState extends State<TripScreen> {
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
           final trips = data['data'] as List<dynamic>;
+          // print('Pending Trips Data: ${data['data']}');
 
           setState(() {
             pendingTrips = trips.map((trip) {
@@ -63,10 +67,17 @@ class _TripScreenState extends State<TripScreen> {
                 'tripId': trip['tripId'],
                 'title': trip['name'],
                 'created_on': createdOn,
-                'tripPlaces': trip['tripPlaces'] ?? [],
+                'tripPlaces': trip['tripPlaces']?.map((place) {
+                  return {
+                    'tripPlaceId': place['tripPlaceId'], // Place ID
+                    'placeOrder': place['placeOrder'], // Order of the place
+                    'title': place['title'],
+                  };
+                }).toList() ?? [],
               };
             }).toList();
           });
+          print("$pendingTrips");
         } else {
           print('Failed to load trips with status: ${response.statusCode}');
         }
@@ -207,6 +218,7 @@ class _TripScreenState extends State<TripScreen> {
                             ],
                           ),
                           SizedBox(height: 12),
+
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -217,6 +229,7 @@ class _TripScreenState extends State<TripScreen> {
                                     title: trip['title'] as String,
                                     created_on: trip['created_on'] as String,
                                     onTap: () {
+                                      // print('Navigating to PendingTripPage with tripPlaces: ${trip['tripPlaces']}');
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -224,6 +237,7 @@ class _TripScreenState extends State<TripScreen> {
                                             title: trip['title'] as String,
                                             createdOn: trip['created_on'] as String,
                                             tripPlaces: trip['tripPlaces'] as List<dynamic>,
+                                            tripId: trip['tripId'] as int,
                                           ),
                                         ),
                                       );
@@ -233,6 +247,37 @@ class _TripScreenState extends State<TripScreen> {
                               }).toList(),
                             ),
                           ),
+
+                          // Expanded(
+                          //   child: ListView.builder(
+                          //     scrollDirection: Axis.horizontal,
+                          //     itemCount: pendingTrips.length,
+                          //     itemBuilder: (context, index) {
+                          //       final trip = pendingTrips[index];
+                          //       return Padding(
+                          //         padding: const EdgeInsets.only(right: 16.0),
+                          //         child: TripCard(
+                          //           title: trip['title'],
+                          //           created_on: trip['created_on'],
+                          //           onTap: () {
+                          //             Navigator.push(
+                          //               context,
+                          //               MaterialPageRoute(
+                          //                 builder: (context) => PendingTripPage(
+                          //                   title: trip['title'],
+                          //                   createdOn: trip['created_on'],
+                          //                   tripPlaces: trip['tripPlaces'], // Pass complete tripPlaces list
+                          //                   tripId: trip['tripId'], // Pass tripId
+                          //                 ),
+                          //               ),
+                          //             );
+                          //           },
+                          //         ),
+                          //       );
+                          //     },
+                          //   ),
+                          // ),
+
                         ],
                       ),
                     ),
