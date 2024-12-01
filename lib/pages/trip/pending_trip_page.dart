@@ -1,5 +1,7 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
+import 'package:wandr/pages/rewards/rewards_page.dart';
+import 'package:wandr/pages/trip/generate_trip_recs.dart';
 import 'package:wandr/pages/trip/trip_main.dart';
 import 'package:wandr/theme/app_colors.dart';
 import '../../components/bottom_nav_bar.dart';
@@ -14,13 +16,13 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 class PendingTripPage extends StatefulWidget {
   final String title;
   final String createdOn;
-  final List<dynamic> tripPlaces; // Accept tripPlaces as a parameter
+  final List<dynamic> tripPlaces;
 
   const PendingTripPage({
     Key? key,
     required this.title,
     required this.createdOn,
-    required this.tripPlaces, // Add tripPlaces to the constructor
+    required this.tripPlaces,
   }) : super(key: key);
 
   @override
@@ -293,6 +295,40 @@ class _PendingTripPageState extends State<PendingTripPage> {
 
               SizedBox(height: 16),
 
+              Padding(
+                padding: commonPadding,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RewardsPage(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Kcolours.primary, // Background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: Text(
+                          'Generate My Recommendations',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 16),
+
+
               //Add the start and end points
               Padding(
                 padding: commonPadding,
@@ -323,7 +359,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                     ),
                     GooglePlaceAutoCompleteTextField(
                       textEditingController: _startLocationController,
-                      googleAPIKey: "AIzaSyDCzzl6gpAj0PP32qgHMNG8CviCZqpttgE",
+                      googleAPIKey: "AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY",
                       inputDecoration: InputDecoration(
                         hintText: "Enter Start Location",
                         hintStyle: TextStyle(color: Colors.grey[600]),
@@ -381,7 +417,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                     ),
                     GooglePlaceAutoCompleteTextField(
                       textEditingController: _endLocationController,
-                      googleAPIKey: "AIzaSyDCzzl6gpAj0PP32qgHMNG8CviCZqpttgE",
+                      googleAPIKey: "AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY",
                       inputDecoration: InputDecoration(
                         hintText: "Enter End Location",
                         hintStyle: TextStyle(color: Colors.grey[600]),
