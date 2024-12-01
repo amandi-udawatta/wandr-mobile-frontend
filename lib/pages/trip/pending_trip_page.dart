@@ -51,6 +51,11 @@ class _PendingTripPageState extends State<PendingTripPage> {
 
   final Completer<GoogleMapController> _controller = Completer();
 
+  // Estimated Details from the API response
+  int? _time; // Selected time based on routeType
+  int? _estimatedTime; // Selected estimated time
+  int? _distance; // Selected distance based on routeType
+
   final List<Map<String, dynamic>> _sampleLocations = [
     {
       'id': 1,
@@ -73,17 +78,16 @@ class _PendingTripPageState extends State<PendingTripPage> {
   ];
 
   // Variables to store estimated time and distance
-  String _estimatedTime = "N/A";
   String _totalDistance = "N/A";
 
   // Example function to simulate updating estimates
-  void _updateEstimates() {
-    // Simulate fetching estimates (replace this with real calculations/API response)
-    setState(() {
-      _estimatedTime = "2 hrs 30 mins"; // Replace with real estimate
-      _totalDistance = "120 km"; // Replace with real distance
-    });
-  }
+  // void _updateEstimates() {
+  //   // Simulate fetching estimates (replace this with real calculations/API response)
+  //   setState(() {
+  //     _estimatedTime = "2 hrs 30 mins"; // Replace with real estimate
+  //     _totalDistance = "120 km"; // Replace with real distance
+  //   });
+  // }
 
   // Dropdown selection state
   int? _selectedOption; // 1 = Custom Route, 2 = Optimized Route
@@ -145,8 +149,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
   }
 
   Future<void> _onConfirmDestinations() async {
-    if (_selectedOption == null || _startLocation == null ||
-        _endLocation == null) {
+    if (_selectedOption == null || _startLocation == null || _endLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fill all required fields.")),
       );
@@ -185,7 +188,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
           "endLng": _endLocation!.longitude,
         };
 
-        print("The payload is: $payload");
+        // print("The payload is: $payload");
 
         final response = await http.post(
           url,
@@ -195,17 +198,40 @@ class _PendingTripPageState extends State<PendingTripPage> {
           body: jsonEncode(payload),
         );
 
-        print("the POST request is: $url");
-        print("Payload sent to server: ${jsonEncode(payload)}");
-        print("Response status code: ${response.statusCode}");
+        // print("the POST request is: $url");
+        // print("Payload sent to server: ${jsonEncode(payload)}");
+        // print("Response status code: ${response.statusCode}");
         print("Raw response body: ${response.body}");
 
         if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Route confirmed successfully!")),
-          );
+          final responseData = jsonDecode(response.body);
+
+          // Check if the response indicates success
+          if (responseData['success'] == true) {
+            final data = responseData['data'];
+
+            setState(() {
+              if (_selectedOption == 1) {
+                // Optimized Route
+                _time = int.tryParse(data['optimizedTime'].toString());
+                _estimatedTime = int.tryParse(data['estimatedOptimizedTime'].toString());
+                _distance = int.tryParse(data['optimizedDistance'].toString());
+              } else if (_selectedOption == 2) {
+                // Custom Route
+                _time = int.tryParse(data['orderedTime'].toString());
+                _estimatedTime = int.tryParse(data['estimatedOrderedTime'].toString());
+                _distance = int.tryParse(data['orderedDistance'].toString());
+              }
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Route confirmed successfully!")),
+            );
+          } else {
+            throw Exception("Failed: ${responseData['message']}");
+          }
         } else {
-          throw Exception("Failed to confirm route: ${response.statusCode}");
+          throw Exception("API Error: ${response.statusCode}");
         }
       }
     } catch (e) {
@@ -215,11 +241,25 @@ class _PendingTripPageState extends State<PendingTripPage> {
     }
   }
 
+  /// Helper function to format time in seconds to "hours and minutes"
+  String formatTime(int seconds) {
+    final hours = seconds ~/ 3600;
+    final minutes = (seconds % 3600) ~/ 60;
+    return '${hours}h ${minutes}m';
+  }
+
+  /// Helper function to format distance in meters to "kilometers"
+  String formatDistance(int meters) {
+    final km = meters / 1000;
+    return '${km.toStringAsFixed(2)} km';
+  }
+
+
   // ADD MORE FUNCTIONS HERE
 
   @override
   Widget build(BuildContext context) {
-    print('Trip Places in PendingTripPage: ${widget.tripPlaces}');
+    // print('Trip Places in PendingTripPage: ${widget.tripPlaces}');
     // Define a common padding value
     const EdgeInsets commonPadding = EdgeInsets.symmetric(horizontal: 10.0);
 
@@ -680,7 +720,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Estimated Time:",
+                            "Time:",
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
@@ -688,7 +728,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                             ),
                           ),
                           Text(
-                            _estimatedTime,
+                            _time != null ? formatTime(_time!) : "N/A",
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
@@ -702,7 +742,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Estimated Distance:",
+                            "Estimated Time:",
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
@@ -710,7 +750,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                             ),
                           ),
                           Text(
-                            _totalDistance,
+                            _estimatedTime != null ? formatTime(_estimatedTime!) : "N/A",
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
@@ -719,10 +759,35 @@ class _PendingTripPageState extends State<PendingTripPage> {
                           ),
                         ],
                       ),
+
+                  SizedBox(height: 8),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Distance:",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          color: Kcolours.brownShade4,
+                        ),
+                      ),
+                      Text(
+                        _distance != null ? formatDistance(_distance!) : "N/A",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          color: Kcolours.black,
+                        ),
+                      ),
                     ],
                   ),
-                ),
+                ],
               ),
+            ),
+              ),
+
 
 
 
