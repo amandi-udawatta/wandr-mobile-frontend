@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
+import 'package:wandr/config.dart';
 import 'package:wandr/pages/rewards/rewards_page.dart';
 import 'package:wandr/pages/trip/generate_trip_recs.dart';
 import 'package:wandr/pages/trip/trip_main.dart';
@@ -21,12 +23,14 @@ class PendingTripPage extends StatefulWidget {
   final String title;
   final String createdOn;
   final List<dynamic> tripPlaces;
+  final int tripId;
 
   const PendingTripPage({
     Key? key,
     required this.title,
     required this.createdOn,
     required this.tripPlaces,
+    required this.tripId,
   }) : super(key: key);
 
   @override
@@ -77,15 +81,14 @@ class _PendingTripPageState extends State<PendingTripPage> {
 
   // Dropdown selection state
   int? _selectedOption; // 1 = Custom Route, 2 = Optimized Route
-  bool get _isReorderEnabled => _selectedOption == 1;
+  bool get _isReorderEnabled => _selectedOption == 2;
   final List<Map<String, dynamic>> _dropdownOptions = [
-    {"id": 1, "name": "Custom Route (Your Selection)"},
-    {"id": 2, "name": "Optimized Route (Shortest Path)"},
+    {"id": 1, "name": "Optimized Route (Shortest Path)"},
+    {"id": 2, "name": "Custom Route (Your Selection)"},
   ];
 
   // Controllers for start and end location autocomplete
-  final TextEditingController _startLocationController =
-  TextEditingController();
+  final TextEditingController _startLocationController = TextEditingController();
   final TextEditingController _endLocationController = TextEditingController();
 
   // Selected latitude and longitude for start and end locations
@@ -96,6 +99,8 @@ class _PendingTripPageState extends State<PendingTripPage> {
   @override
   void initState() {
     super.initState();
+    // print("HELLOOOOOOO");
+    // print('Trip Places Received: ${widget.tripPlaces}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fitMarkersToMap();
     });
@@ -132,16 +137,73 @@ class _PendingTripPageState extends State<PendingTripPage> {
     controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
   }
 
-  // Function to send the selected ID to the backend
-  Future<void> _sendSelectionToBackend(int id) async {
-    // Implement backend request here
+  Future<void> _onConfirmDestinations() async {
+    if (_selectedOption == null || _startLocation == null || _endLocation == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all required fields.")),
+      );
+      return;
+    }
+
+    try {
+      final url = _selectedOption == 2
+          ? Uri.parse('$baseUrl/forward/trip/reorder-route') // Custom Route
+          : Uri.parse('$baseUrl/forward/trip/shortest-route'); // Optimized Route
+
+      print("the POST request is: $url");
+
+      final payload = _selectedOption == 2
+          ? {
+        "tripId": widget.tripId,
+        "startLat": _startLocation!.latitude,
+        "startLng": _startLocation!.longitude,
+        "endLat": _endLocation!.latitude,
+        "endLng": _endLocation!.longitude,
+        "placeList": widget.tripPlaces.map((place) {
+          return {
+            "tripPlaceId": place['tripPlaceId'], // Ensure this is populated
+            "order": place['placeOrder'],
+          };
+        }).toList(),
+      }
+          : {
+        "tripId": widget.tripId,
+        "startLat": _startLocation!.latitude,
+        "startLng": _startLocation!.longitude,
+        "endLat": _endLocation!.latitude,
+        "endLng": _endLocation!.longitude,
+      };
+
+      print("The payload is: $payload");
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      print("Response status code: ${response.statusCode}");
+      print("Raw response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Route confirmed successfully!")),
+        );
+      } else {
+        throw Exception("Failed to confirm route: ${response.statusCode}");
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
   }
+
+  // ADD MORE FUNCTIONS HERE
 
   @override
   Widget build(BuildContext context) {
-    final double latitude = 7.957113000000000; // Latitude from backend
-    final double longitude = 80.760257000000000; // Longitude from backend
-    final String placeName = "Sigiriya Lion Rock"; // Place name from backend
+    print('Trip Places in PendingTripPage: ${widget.tripPlaces}');
     // Define a common padding value
     const EdgeInsets commonPadding = EdgeInsets.symmetric(horizontal: 10.0);
 
@@ -225,7 +287,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                         setState(() {
                           _selectedOption = value;
                         });
-                        if (value == 2) {
+                        if (value == 1) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("Reordering is disabled for Optimized Route."),
@@ -269,25 +331,18 @@ class _PendingTripPageState extends State<PendingTripPage> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 onReorder: (oldIndex, newIndex) {
-                  if (_isReorderEnabled) {
-                    setState(() {
-                      if (newIndex > oldIndex) newIndex -= 1;
-                      final item = widget.tripPlaces.removeAt(oldIndex);
-                      widget.tripPlaces.insert(newIndex, item);
+                  if (!_isReorderEnabled) return; // Do nothing if reordering is disabled
 
-                      // Update the order values
-                      for (int i = 0; i < widget.tripPlaces.length; i++) {
-                        widget.tripPlaces[i]['placeOrder'] = i + 1;
-                      }
-                    });
-                  } else {
-                    // Optional: Show a message when reordering is disabled
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Reordering is disabled for Optimized Route."),
-                      ),
-                    );
-                  }
+                  setState(() {
+                    if (newIndex > oldIndex) newIndex -= 1;
+                    final item = widget.tripPlaces.removeAt(oldIndex);
+                    widget.tripPlaces.insert(newIndex, item);
+
+                    // Update the order values in the tripPlaces
+                    for (int i = 0; i < widget.tripPlaces.length; i++) {
+                      widget.tripPlaces[i]['placeOrder'] = i + 1;
+                    }
+                  });
                 },
                 children: widget.tripPlaces.map((destination) {
                   return Card(
@@ -298,7 +353,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                     ),
                     child: ListTile(
                       leading: Icon(Icons.menu, color: Kcolours.black),
-                      title: Text(destination['title']),
+                      title: Text(destination['title'] ?? 'No Title'),
                       trailing: IconButton(
                         icon: Icon(Icons.delete_outline, color: Colors.red),
                         onPressed: () {
@@ -311,6 +366,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   );
                 }).toList(),
               ),
+
 
               SizedBox(height: 16),
 
@@ -544,12 +600,15 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: _isConfirmEnabled()
-                            ? () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Destinations confirmed!")),
-                          );
-                        }
+                        // onPressed: _isConfirmEnabled()
+                        //     ? () {
+                        //   ScaffoldMessenger.of(context).showSnackBar(
+                        //     SnackBar(content: Text("Destinations confirmed!")),
+                        //   );
+                        // }
+                        //     : null,
+                        onPressed: _selectedOption != null && _startLocation != null && _endLocation != null
+                            ? _onConfirmDestinations
                             : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _isConfirmEnabled()
