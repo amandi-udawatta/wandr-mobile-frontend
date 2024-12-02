@@ -1,15 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wandr/theme/app_colors.dart';
-
+import 'package:wandr/pages/blogs/blog_writing_page.dart';
 import 'package:wandr/components/search_bar2.dart' as custom;
 import 'package:wandr/components/bottom_nav_bar.dart';
 import 'package:wandr/components/journal_card1.dart';
 import 'package:wandr/components/journal_card2.dart';
 import 'package:wandr/components/add_button.dart';
+import 'package:wandr/components/blog_popup.dart';
 
 class BlogScreen extends StatelessWidget {
   final TextEditingController _searchController = TextEditingController();
+
+  // Add the userTrips list
+  final List<Map<String, String>> userTrips = [
+    {
+      "title": "My Honeymoon",
+      "image": "assets/images/trip/Trip - Sigiriya.png",
+      "description": "A beautiful journey through Sri Lanka's cultural triangle.",
+    },
+    {
+      "title": "21st Trip",
+      "image": "assets/images/trip/Trip - Arugam Bay.png",
+      "description": "A coastal escape with great food and amazing surf spots.",
+    },
+    {
+      "title": "Trip around SL",
+      "image": "assets/images/trip/Trip - Horton Plains.png",
+      "description": "Exploring the natural beauty and wildlife of Horton Plains.",
+    },
+    {
+      "title": "New Year Week",
+      "image": "assets/images/trip/Trip - Kithulgala.png",
+      "description": "Adventurous rafting and serene jungle hikes.",
+    },
+  ];
+
+  // Popup method for selecting a trip
+  void _showTripsPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return UserTripsPopup(
+          trips: userTrips,
+          onSelectTrip: (selectedTrip) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlogWritingPage(
+                  title: selectedTrip['title'] ?? 'No Title', // Pass only the title
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,12 +97,12 @@ class BlogScreen extends StatelessWidget {
                         ),
                         SizedBox(width: 16),
                         JournalCard1(
-                          title: "Trip arounnd SL",
+                          title: "Trip around SL",
                           image: "assets/images/trip/Trip - Horton Plains.png",
                         ),
                         SizedBox(width: 16),
                         JournalCard1(
-                          title: "New year week",
+                          title: "New Year Week",
                           image: "assets/images/trip/Trip - Kithulgala.png",
                         ),
                       ],
@@ -74,7 +121,7 @@ class BlogScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: JournalCard2(
                     trip_title: "My trip around Sri Lanka",
-                    created_on: "created on 12th June 2024",
+                    created_on: "Created on 12th June 2024",
                     trip_image: "assets/images/trip/Trip - Arugam Bay.png",
                   ),
                 ),
@@ -87,7 +134,7 @@ class BlogScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 5),
                 child: AddButton(
                   onTap: () {
-                    // Add functionality for the AddButton here
+                    _showTripsPopup(context); // Show the trip selection popup
                   },
                 ),
               ),
