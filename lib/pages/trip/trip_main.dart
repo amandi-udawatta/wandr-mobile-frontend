@@ -18,6 +18,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'dart:convert';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class TripScreen extends StatefulWidget {
   @override
@@ -68,11 +69,18 @@ class _TripScreenState extends State<TripScreen> {
                 'title': trip['name'],
                 'created_on': createdOn,
                 'routeType': trip['routeType'],
+                'start_lat': trip['start_lat'],
+                'start_lng': trip['start_lng'],
+                'end_lat': trip['end_lat'],
+                'end_lng': trip['end_lng'],
                 'tripPlaces': trip['tripPlaces']?.map((place) {
                   return {
                     'tripPlaceId': place['tripPlaceId'], // Place ID
-                    'placeOrder': place['placeOrder'], // Order of the place
+                    'placeOrder': place['placeOrder'],
+                    // 'optimizedOrder': place['optimizedOrder'],
                     'title': place['title'],
+                    'latitude': place['latitude'],
+                    'longitude': place['longitude'],
                   };
                 }).toList() ?? [],
               };
@@ -240,6 +248,8 @@ class _TripScreenState extends State<TripScreen> {
                                             tripPlaces: trip['tripPlaces'] as List<dynamic>,
                                             tripId: trip['tripId'] as int,
                                             routeType: trip['routeType'] as int,
+                                            startLocation: LatLng(trip['start_lat'], trip['start_lng']),
+                                            endLocation: LatLng(trip['end_lat'], trip['end_lng']),
                                           ),
                                         ),
                                       );
