@@ -29,6 +29,8 @@ class PendingTripPage extends StatefulWidget {
   final List<dynamic> tripPlaces;
   final int tripId;
   final int? routeType;
+  final LatLng? startLocation; // Start location latitude and longitude
+  final LatLng? endLocation; // End location latitude and longitude
 
   const PendingTripPage({
     Key? key,
@@ -37,6 +39,8 @@ class PendingTripPage extends StatefulWidget {
     required this.tripPlaces,
     required this.tripId,
     this.routeType,
+    this.startLocation, // New Parameter
+    this.endLocation,
   }) : super(key: key);
 
   @override
@@ -56,38 +60,6 @@ class _PendingTripPageState extends State<PendingTripPage> {
   int? _estimatedTime; // Selected estimated time
   int? _distance; // Selected distance based on routeType
 
-  final List<Map<String, dynamic>> _sampleLocations = [
-    {
-      'id': 1,
-      'name': 'Sigiriya Lion Rock',
-      'latitude': 7.957113000000000,
-      'longitude': 80.760257000000000,
-    },
-    {
-      'id': 2,
-      'name': 'Temple of the Sacred Tooth Relic',
-      'latitude': 7.293609000000000,
-      'longitude': 80.641325000000000,
-    },
-    {
-      'id': 3,
-      'name': 'Pasikuda Beach',
-      'latitude': 8.569559000000000,
-      'longitude': 81.213307000000000,
-    },
-  ];
-
-  // Variables to store estimated time and distance
-  String _totalDistance = "N/A";
-
-  // Example function to simulate updating estimates
-  // void _updateEstimates() {
-  //   // Simulate fetching estimates (replace this with real calculations/API response)
-  //   setState(() {
-  //     _estimatedTime = "2 hrs 30 mins"; // Replace with real estimate
-  //     _totalDistance = "120 km"; // Replace with real distance
-  //   });
-  // }
 
   // Dropdown selection state
   int? _selectedOption; // 1 = Custom Route, 2 = Optimized Route
@@ -105,6 +77,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
   LatLng? _startLocation;
   LatLng? _endLocation;
 
+  Set<Polyline> _polylines = {};
 
   @override
   void initState() {
@@ -112,40 +85,189 @@ class _PendingTripPageState extends State<PendingTripPage> {
     // print("HELLOOOOOOO");
     // print('Trip Places Received: ${widget.tripPlaces}');
     _selectedOption = widget.routeType ?? 2;
+    _startLocation = widget.startLocation;
+    _endLocation = widget.endLocation;
+
+    print('Trip Places received in PendingTripPage: ${widget.tripPlaces}');
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fitMarkersToMap();
+      _fetchDetailedRoute();
     });
   }
   Future<void> _fitMarkersToMap() async {
-    if (_sampleLocations.isEmpty) return;
+    if (widget.tripPlaces.isEmpty && _startLocation == null && _endLocation == null) return;
 
     LatLngBounds bounds;
-    if (_sampleLocations.length == 1) {
-      // Only one marker
-      final LatLng singleMarker = LatLng(
-        _sampleLocations.first['latitude'],
-        _sampleLocations.first['longitude'],
-      );
+
+    // Create a list of all locations (start, end, and destinations)
+    List<LatLng> allLocations = [
+      if (_startLocation != null) _startLocation!,
+      if (_endLocation != null) _endLocation!,
+      ...widget.tripPlaces
+          .where((place) => place['latitude'] != null && place['longitude'] != null)
+          .map((place) => LatLng(place['latitude'], place['longitude'])),
+    ];
+
+    if (allLocations.isEmpty) return;
+
+    if (allLocations.length == 1) {
       bounds = LatLngBounds(
-        southwest: singleMarker,
-        northeast: singleMarker,
+        southwest: allLocations.first,
+        northeast: allLocations.first,
       );
     } else {
-      // Multiple markers: calculate bounds
       bounds = LatLngBounds(
         southwest: LatLng(
-          _sampleLocations.map((place) => place['latitude']).reduce((a, b) => a < b ? a : b),
-          _sampleLocations.map((place) => place['longitude']).reduce((a, b) => a < b ? a : b),
+          allLocations.map((loc) => loc.latitude).reduce((a, b) => a < b ? a : b),
+          allLocations.map((loc) => loc.longitude).reduce((a, b) => a < b ? a : b),
         ),
         northeast: LatLng(
-          _sampleLocations.map((place) => place['latitude']).reduce((a, b) => a > b ? a : b),
-          _sampleLocations.map((place) => place['longitude']).reduce((a, b) => a > b ? a : b),
+          allLocations.map((loc) => loc.latitude).reduce((a, b) => a > b ? a : b),
+          allLocations.map((loc) => loc.longitude).reduce((a, b) => a > b ? a : b),
         ),
       );
     }
 
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+  }
+
+  Set<Marker> _buildMarkers() {
+    Set<Marker> markers = {};
+
+    // Add Start Location Marker
+    if (_startLocation != null) {
+      markers.add(Marker(
+        markerId: MarkerId('start'),
+        position: _startLocation!,
+        infoWindow: InfoWindow(title: "Start Location"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+      ));
+    } else {
+      print("Warning: Start location is null.");
+    }
+
+    // Add End Location Marker
+    if (_endLocation != null) {
+      markers.add(Marker(
+        markerId: MarkerId('end'),
+        position: _endLocation!,
+        infoWindow: InfoWindow(title: "End Location"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ));
+    } else {
+      print("Warning: End location is null.");
+    }
+
+    // Add Destination Markers
+    for (var place in widget.tripPlaces) {
+      final double? lat = place['latitude'] as double?;
+      final double? lng = place['longitude'] as double?;
+
+      if (lat != null && lng != null) {
+        final LatLng position = LatLng(lat, lng);
+        markers.add(Marker(
+          markerId: MarkerId('destination-${place['tripPlaceId']}'),
+          position: position,
+          infoWindow: InfoWindow(title: place['title']),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        ));
+      } else {
+        print("Warning: Skipping marker for place with missing latitude/longitude. Place: $place");
+      }
+    }
+
+    return markers;
+  }
+
+  void _generateRoute() {
+    // Ensure locations are valid and in order
+    List<LatLng> routePoints = [
+      if (_startLocation != null) _startLocation!,
+      ...widget.tripPlaces
+          .where((place) => place['latitude'] != null && place['longitude'] != null)
+          .map((place) => LatLng(place['latitude'], place['longitude'])),
+      if (_endLocation != null) _endLocation!,
+    ];
+
+    // Create a polyline with the route points
+    setState(() {
+      _polylines = {
+        Polyline(
+          polylineId: const PolylineId('route'),
+          points: routePoints,
+          color: Colors.blue, // Polyline color
+          width: 5, // Polyline width
+        ),
+      };
+    });
+  }
+
+  Future<void> _fetchDetailedRoute() async {
+    if (_startLocation == null || _endLocation == null || widget.tripPlaces.isEmpty) return;
+
+    String waypoints = widget.tripPlaces
+        .where((place) => place['latitude'] != null && place['longitude'] != null)
+        .map((place) => '${place['latitude']},${place['longitude']}')
+        .join('|');
+
+    String url = 'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${_startLocation!.latitude},${_startLocation!.longitude}'
+        '&destination=${_endLocation!.latitude},${_endLocation!.longitude}'
+        '&waypoints=$waypoints'
+        '&key=AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY';
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['routes'] != null && data['routes'].isNotEmpty) {
+        String encodedPolyline = data['routes'][0]['overview_polyline']['points'];
+        List<LatLng> points = _decodePolyline(encodedPolyline);
+
+        setState(() {
+          _polylines = {
+            Polyline(
+              polylineId: const PolylineId('detailed_route'),
+              points: points,
+              color: Colors.blueAccent,
+              width: 3,
+            ),
+          };
+        });
+      }
+    }
+  }
+
+  List<LatLng> _decodePolyline(String encoded) {
+    List<LatLng> points = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1F) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1F) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+      lng += dlng;
+
+      points.add(LatLng(lat / 1E5, lng / 1E5));
+    }
+
+    return points;
   }
 
   Future<void> _onConfirmDestinations() async {
@@ -401,6 +523,8 @@ class _PendingTripPageState extends State<PendingTripPage> {
                     for (int i = 0; i < widget.tripPlaces.length; i++) {
                       widget.tripPlaces[i]['placeOrder'] = i + 1;
                     }
+
+                    _fetchDetailedRoute();
                   });
                 },
                 children: widget.tripPlaces.map((destination) {
@@ -807,33 +931,30 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: GoogleMap(
-                      onMapCreated: (GoogleMapController controller) {
-                        _controller.complete(controller);
-                      },
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(
-                          _sampleLocations.first['latitude'],
-                          _sampleLocations.first['longitude'],
-                        ),
-                        zoom: 10, // Default zoom level
-                      ),
-                      markers: _sampleLocations.map((place) {
-                        return Marker(
-                          markerId: MarkerId(place['id'].toString()),
-                          position: LatLng(place['latitude'], place['longitude']),
-                          infoWindow: InfoWindow(
-                            title: place['name'],
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      child: AbsorbPointer(
+                        absorbing: false,
+                        child: GoogleMap(
+                          onMapCreated: (GoogleMapController controller) {
+                            _controller.complete(controller);
+                          },
+                          initialCameraPosition: CameraPosition(
+                            target: _startLocation ?? LatLng(0, 0),
+                            zoom: 10, // Default zoom level
                           ),
-                        );
-                      }).toSet(),
-                      mapType: MapType.normal,
-                      scrollGesturesEnabled: true,
-                      zoomGesturesEnabled: true,
-                      tiltGesturesEnabled: true,
-                      rotateGesturesEnabled: true,
+                          markers: _buildMarkers(),
+                          polylines: _polylines,
+                          mapType: MapType.normal,
+                          scrollGesturesEnabled: true,
+                          zoomGesturesEnabled: true,
+                          tiltGesturesEnabled: true,
+                          rotateGesturesEnabled: true,
+                        ),
+                      ),
                     ),
-                  ),
+                  )
+
                 ),
               ),
 
