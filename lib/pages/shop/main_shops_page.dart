@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wandr/pages/dashboard_page.dart';
+
 import 'package:wandr/theme/app_colors.dart';
 import '../../components/bottom_nav_bar.dart';
 import '../../components/custom_carousel.dart';
@@ -16,17 +17,33 @@ class MainShopsPage extends StatelessWidget {
     // Mock data for shop categories - replace this with your actual data fetching logic
     final shopCategoryNames = [
       'Handicrafts',
+      'Gems and Jewelry',
       'Souvenirs',
-      'Local Cuisine',
-      'Travel Essentials',
-      'Clothing',
-    ];
-    final shopImagePaths = [
-      'assets/images/shop-categories/category-handicrafts.png',
-      'assets/images/shop-categories/category-souvenirs.png',
-      'assets/images/shop-categories/category-localcuisine.png',
-      'assets/images/shop-categories/category-travelessentials.png',
-      'assets/images/shop-categories/category-clothing.png',
+      'Tea and Spices',
+      'Clothing and Textiles',
+      'Antiques',
+      'Art and Paintings',
+      'Books and Stationery',
+      'Local Food and Snacks',
+      'Health and Wellness Products',
+      'Sports and Outdoor Equipment',
+      'Electronics and Gadgets',
+      'Leather Goods',
+      'Footwear',
+      'Fashion Accessories',
+      'Musical Instruments',
+      'Perfumes and Cosmetics',
+      'Organic Products',
+      'Ayurvedic Products',
+      'Gift Shops',
+      'Local Markets',
+      'Bakeries and Confectioneries',
+      'Farmers’ Markets',
+      'Furniture and Carpets',
+      'Camping and Hiking Gear',
+      'Pet Shops',
+      'Wine and Spirits',
+      'Toy Shops',
     ];
 
     // Mock data for service categories
@@ -36,13 +53,6 @@ class MainShopsPage extends StatelessWidget {
       'Camping',
       'Accommodation',
       'Sightseeing',
-    ];
-    final serviceImagePaths = [
-      'assets/images/service-categories/category-surfing.png',
-      'assets/images/service-categories/category-mountainclimbing.png',
-      'assets/images/service-categories/category-camping.png',
-      'assets/images/service-categories/category-accommodation.png',
-      'assets/images/service-categories/category-sightseeing.png',
     ];
 
     // Mock data for recommended items - replace this with your actual data fetching logic
@@ -227,15 +237,28 @@ class MainShopsPage extends StatelessWidget {
                         ),
 
                         const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0), // Add space to the left
+                          child: Text(
+                            'Categories',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Kcolours.brownShade4,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
 
                         // Service Slider for Shops
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: ServiceSlider(
                             categoryNames: shopCategoryNames,
-                            imagePaths: shopImagePaths,
                           ),
                         ),
+
 
                         const SizedBox(height: 20),
 
@@ -279,17 +302,6 @@ class MainShopsPage extends StatelessWidget {
                             'assets/advertisements/shops-ad-1.png',
                             'assets/advertisements/shops-ad-1.png',
                           ],
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Service Slider for Services
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: ServiceSlider(
-                            categoryNames: serviceCategoryNames,
-                            imagePaths: serviceImagePaths,
-                          ),
                         ),
 
                         const SizedBox(height: 20),

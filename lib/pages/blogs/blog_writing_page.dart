@@ -75,7 +75,7 @@ class _BlogWritingPageState extends State<BlogWritingPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 5),
-                  
+
                   // Loop through each destination and add an editor for it
                   for (int i = 0; i < destinations.length; i++) ...[
                     ExpansionTile(
@@ -94,8 +94,8 @@ class _BlogWritingPageState extends State<BlogWritingPage> {
                             children: [
                               quill.QuillSimpleToolbar(
                                 controller: _controller,
-                                configurations:
-                                    const quill.QuillSimpleToolbarConfigurations(),
+                                configurations: const quill
+                                    .QuillSimpleToolbarConfigurations(),
                               ),
                               const SizedBox(height: 10),
                               Container(
