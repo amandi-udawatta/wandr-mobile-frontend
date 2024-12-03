@@ -57,7 +57,7 @@ class MainShopsPage extends StatelessWidget {
 
     // Mock data for recommended items - replace this with your actual data fetching logic
     final recommendedItemNames = [
-      'Handcrafted Wooden Elephant',
+      'Perera Wooden Store',
       'Handwoven Rattan Basket',
       'Gemstone Necklace',
       'Batik Print Scarf',
@@ -72,22 +72,7 @@ class MainShopsPage extends StatelessWidget {
       'assets/images/shops/item-spices.png',
       'assets/images/shops/item-wallart.png',
     ];
-    final recommendedItemPrices = [
-      'Rs.1,500.00',
-      'Rs.2,300.00',
-      'Rs.15,700.00',
-      'Rs.3,450.00',
-      'Rs.1,200.00',
-      'Rs.16,450.00',
-    ];
-    final recommendedItemStores = [
-      'by Elephant Craft Store',
-      'by Rattan Wonders',
-      'by Jewel Paradise',
-      'by Batik Boutique',
-      'by Spice Emporium',
-      'by Artistic Expressions',
-    ];
+   
 
     // Mock data for recommended services - replace this with your actual data fetching logic
     final recommendedServiceNames = [
@@ -175,16 +160,16 @@ class MainShopsPage extends StatelessWidget {
               SizedBox(height: 10),
 
               Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text(
-                "What local treasures do you want to explore today?",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 22,
-                  color: Kcolours.primary,
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text(
+                  "What local treasures do you want to explore today?",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22,
+                    color: Kcolours.primary,
+                  ),
                 ),
               ),
-            ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30.0),
                 child: TabBar(
@@ -238,7 +223,8 @@ class MainShopsPage extends StatelessWidget {
 
                         const SizedBox(height: 20),
                         Padding(
-                          padding: const EdgeInsets.only(left: 10.0), // Add space to the left
+                          padding: const EdgeInsets.only(
+                              left: 10.0), // Add space to the left
                           child: Text(
                             'Categories',
                             style: TextStyle(
@@ -259,18 +245,15 @@ class MainShopsPage extends StatelessWidget {
                           ),
                         ),
 
-
                         const SizedBox(height: 20),
 
                         // Recommended Items
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: RecommendedServicesVerticalList(
-                            title: "Recommended Items",
+                            title: "Explore Local Shops",
                             itemNames: recommendedItemNames,
                             itemImages: recommendedItemImages,
-                            itemPrices: recommendedItemPrices,
-                            itemStores: recommendedItemStores,
                             isShop: true, // shop items or not?
                           ),
                         ),
@@ -313,8 +296,6 @@ class MainShopsPage extends StatelessWidget {
                             title: "Recommended Services",
                             itemNames: recommendedServiceNames,
                             itemImages: recommendedServiceImages,
-                            itemPrices: recommendedServicePrices,
-                            itemStores: recommendedServiceStores,
                             isShop:
                                 false, // Indicate that these are service items
                           ),

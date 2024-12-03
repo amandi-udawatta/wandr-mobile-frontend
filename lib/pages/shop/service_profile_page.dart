@@ -23,7 +23,6 @@ class _ServiceProfilePageState extends State<ServiceProfilePage> {
     String firstPart = words.take(20).join(' ') + "... ";
     String secondPart = words.skip(20).join(' ');
 
-    // Mock data for services (replace with actual data fetching logic)
     List<Map<String, String>> services = [
       {"title": "Beginner Surf Lessons", "description": "Learn the basics of surfing in a safe and controlled environment."},
       {"title": "Intermediate Surf Lessons", "description": "Improve your technique and tackle bigger waves."},
@@ -31,16 +30,9 @@ class _ServiceProfilePageState extends State<ServiceProfilePage> {
       {"title": "Surfboard & Equipment Rentals", "description": "John offers a range of high-quality surfboards and equipment to suit all skill levels."},
     ];
 
-    // Mock data for location (replace with actual data fetching logic)
     String location = "No.17, Beach Road, Arugam Bay";
-
-    //location
     String langauges = "English, Sinhala";
-
-    //website
     String website = "www.johnsurfshack.com";
-
-    //contact us
     String contactus = "0778985678 / 0786543876";
 
     return Scaffold(
@@ -81,6 +73,7 @@ class _ServiceProfilePageState extends State<ServiceProfilePage> {
                     bottom: 16.0,
                     right: 16.0,
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -91,7 +84,7 @@ class _ServiceProfilePageState extends State<ServiceProfilePage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 8.0),
+                        SizedBox(height: 4.0),
                         Row(
                           children: [
                             Icon(Icons.location_on, color: Colors.white, size: 16.0),
@@ -123,13 +116,13 @@ class _ServiceProfilePageState extends State<ServiceProfilePage> {
           ),
           SliverToBoxAdapter(
             child: Container(
-              color: Color(0xFF337102).withOpacity(0.1), // Set the background color with reduced opacity here
+              color: Color(0xFF337102).withOpacity(0.1),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     Text(
                       isExpanded ? fullText : firstPart,
                       style: TextStyle(fontSize: 16, color: Colors.black),
@@ -150,7 +143,7 @@ class _ServiceProfilePageState extends State<ServiceProfilePage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                   ],
                 ),
               ),
@@ -158,97 +151,108 @@ class _ServiceProfilePageState extends State<ServiceProfilePage> {
           ),
           SliverToBoxAdapter(
             child: Container(
-              color: Colors.white, // Set background color to white
-              padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Services",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    "Services:",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 6),
                   for (var service in services) ...[
-                    Text(
-                      "• ${service['title']}: ${service['description']}",
-                      style: TextStyle(fontSize: 16, color: Colors.black),
-                      textAlign: TextAlign.justify,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Transform.rotate(
+                          angle: -0.5,
+                          child: Icon(Icons.circle, size: 10, color: Kcolours.primary),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            "${service['title']}: ${service['description']}",
+                            style: TextStyle(fontSize: 16, color: Colors.black),
+                            textAlign: TextAlign.justify,
+                            softWrap: true,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 10), // Increased space between bullet points
                   ],
-                  SizedBox(height: 10),
+                  SizedBox(height: 12),
+                  // Location Section
                   Row(
                     children: [
                       Text(
-                        "Location:      ",
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        "Location: ",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 10),
-                      Text(
-                        location,
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                        textAlign: TextAlign.justify,
+                      Expanded(
+                        child: Text(
+                          location,
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          textAlign: TextAlign.justify,
+                        ),
                       ),
                     ],
                   ),
-
-                  SizedBox(height: 10),
-
+                  SizedBox(height: 12),
+                  // Languages Section
                   Row(
                     children: [
                       Text(
-                        "Languages:  ",
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        "Languages: ",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 10),
-                      Text(
-                        langauges,
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                        textAlign: TextAlign.justify,
+                      Expanded(
+                        child: Text(
+                          langauges,
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          textAlign: TextAlign.justify,
+                        ),
                       ),
                     ],
                   ),
-
-                  SizedBox(height: 10),
-
+                  SizedBox(height: 12),
+                  // Website Section
                   Row(
                     children: [
                       Text(
-                        "Website:       ",
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        "Website: ",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 10),
-                      Text(
-                        website,
-                        style: TextStyle(fontSize: 16, color: Kcolours.primary),
-                        textAlign: TextAlign.justify,
+                      Expanded(
+                        child: Text(
+                          website,
+                          style: TextStyle(fontSize: 16, color: Kcolours.primary),
+                          textAlign: TextAlign.justify,
+                        ),
                       ),
                     ],
                   ),
-
-                  SizedBox(height: 10),
-
+                  SizedBox(height: 12),
+                  // Contact Us Section
                   Row(
                     children: [
                       Text(
-                        "Contact Us:  ",
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        "Contact Us: ",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 10),
-                      Text(
-                        contactus,
-                        style: TextStyle(fontSize: 16, color: Kcolours.black),
-                        textAlign: TextAlign.justify,
+                      Expanded(
+                        child: Text(
+                          contactus,
+                          style: TextStyle(fontSize: 16, color: Kcolours.black),
+                          textAlign: TextAlign.justify,
+                        ),
                       ),
                     ],
                   ),
-
-                  SizedBox(height: 20),
-
+                  SizedBox(height: 15),
                   PrimaryButton(
-                    onTap: () {
-
-                    },
+                    onTap: () {},
                     text: "Chat",
                   ),
                 ],

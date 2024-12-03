@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wandr/pages/home/home_dashboard_screen.dart';
 import 'package:wandr/pages/splash_screen.dart';
 import 'package:wandr/pages/shop/main_shops_page.dart';
-import 'package:wandr/pages/shop/shop_profile_page.dart';
+import 'package:wandr/pages/shop/shop_profile_page2.dart';
 import 'package:wandr/pages/shop/service_profile_page.dart';
 import 'package:wandr/theme/app_colors.dart';
 
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           final args = settings.arguments as String;
           return MaterialPageRoute(
             builder: (context) {
-              return ShopProfilePage(itemName: args);
+              return ShopProfilePage2(itemName: args);
             },
           );
         } else if (settings.name == '/service_profile_page') {
