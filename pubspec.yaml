@@ -45,6 +45,8 @@ dependencies:
   carousel_slider: ^5.0.0
   flutter_svg: ^2.0.10+1
   google_maps_flutter: ^2.5.3
+  flutter_quill: ^10.8.5
+  image_picker: ^0.8.8+5
   google_places_flutter: ^2.0.4
 
 dev_dependencies:
@@ -95,7 +97,8 @@ flutter:
     - assets/images/trip/
     - assets/images/profile/
     - assets/places/
-
+    - assets/images/blogs/default.jpg
+    
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

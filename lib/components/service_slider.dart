@@ -1,76 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:wandr/theme/app_colors.dart';
+import 'package:wandr/pages/shop/categories_filter.dart'; // Import the CategoryFilterPage
+import 'categories_button.dart';
 
-class ServiceSlider extends StatelessWidget {
+class ServiceSlider extends StatefulWidget {
   final List<String> categoryNames;
-  final List<String> imagePaths;
 
-  const ServiceSlider({super.key, required this.categoryNames, required this.imagePaths});
+  const ServiceSlider({
+    Key? key,
+    required this.categoryNames,
+  }) : super(key: key);
+
+  @override
+  _ServiceSliderState createState() => _ServiceSliderState();
+}
+
+class _ServiceSliderState extends State<ServiceSlider> {
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Categories',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Kcolours.brownShade4
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, '/all_shops'); // Put the correct link
-              },
-              child: const Text(
-                'See All',
-                style: TextStyle(
-                  color: Kcolours.blueShade2,
-                  fontSize: 16,
+    return SizedBox(
+      height: 50,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: widget.categoryNames.length,
+        itemBuilder: (context, index) {
+          final isSelected = _selectedIndex == index;
+          return CategoriesButton(
+            title: widget.categoryNames[index],
+            onPressed: () {
+              setState(() {
+                _selectedIndex = index;
+              });
+              // Navigate to the CategoryFilterPage and pass the selected category
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CategoryFilterPage(
+                    selectedCategory: widget.categoryNames[index], // Pass selected category
+                  ),
                 ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Container(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: categoryNames.length > 5 ? 5 : categoryNames.length,
-            itemBuilder: (context, index) {
-              return Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 10.0),
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: AssetImage(imagePaths[index]),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    categoryNames[index],
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
               );
             },
-          ),
-        ),
-      ],
+            isSelected: isSelected,
+            image: null, // No image needed
+          );
+        },
+        separatorBuilder: (context, index) => const SizedBox(width: 8),
+      ),
     );
   }
 }

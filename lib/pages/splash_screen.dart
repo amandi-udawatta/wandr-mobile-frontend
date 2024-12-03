@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wandr/pages/login_page.dart';
-import 'package:wandr/pages/profile/profile_main.dart';
 import 'package:wandr/pages/signup/pref_activities_page.dart';
 
 import 'package:wandr/pages/home/home_dashboard_screen.dart';
+import 'package:wandr/pages/blogs/blogs_main.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => LoginPage()), //LoginPage()  DashboardScreen()
+        MaterialPageRoute(builder: (context) => BlogScreen()), //LoginPage()  BlogScreen()
       );
     });
     super.initState();
