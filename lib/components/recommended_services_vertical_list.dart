@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wandr/pages/shop/shop_profile_page.dart';
+import 'package:wandr/pages/shop/shop_profile_page2.dart';
 import 'package:wandr/pages/shop/service_profile_page.dart';
 import 'package:wandr/theme/app_colors.dart';
 
@@ -7,8 +7,6 @@ class RecommendedServicesVerticalList extends StatefulWidget {
   final String title;
   final List<String> itemNames;
   final List<String> itemImages;
-  final List<String> itemPrices;
-  final List<String> itemStores;
   final bool isShop; // Added to determine the type of items
 
   const RecommendedServicesVerticalList({
@@ -16,8 +14,6 @@ class RecommendedServicesVerticalList extends StatefulWidget {
     required this.title,
     required this.itemNames,
     required this.itemImages,
-    required this.itemPrices,
-    required this.itemStores,
     required this.isShop, // Initialize the new parameter
   }) : super(key: key);
 
@@ -88,7 +84,7 @@ class _RecommendedServicesVerticalListState extends State<RecommendedServicesVer
                   context,
                   MaterialPageRoute(
                     builder: (context) => widget.isShop
-                        ? ShopProfilePage(itemName: widget.itemNames[index])
+                        ? ShopProfilePage2(itemName: widget.itemNames[index])
                         : ServiceProfilePage(serviceName: widget.itemNames[index]),
                   ),
                 );
@@ -152,22 +148,7 @@ class _RecommendedServicesVerticalListState extends State<RecommendedServicesVer
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
-                          ),
-                          Text(
-                            widget.itemStores[index],
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
-                          Text(
-                            widget.itemPrices[index],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                          ),                        ],
                       ),
                     ),
                   ),
