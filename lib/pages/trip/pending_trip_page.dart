@@ -31,6 +31,12 @@ class PendingTripPage extends StatefulWidget {
   final int? routeType;
   final LatLng? startLocation; // Start location latitude and longitude
   final LatLng? endLocation; // End location latitude and longitude
+  final int? orderedTime;
+  final int? optimizedTime;
+  final int? orderedDistance;
+  final int? optimizedDistance;
+  final int? estimatedOrderedTime;
+  final int? estimatedOptimizedTime;
 
   const PendingTripPage({
     Key? key,
@@ -39,8 +45,14 @@ class PendingTripPage extends StatefulWidget {
     required this.tripPlaces,
     required this.tripId,
     this.routeType,
-    this.startLocation, // New Parameter
+    this.startLocation,
     this.endLocation,
+    this.orderedTime,
+    this.optimizedTime,
+    this.orderedDistance,
+    this.optimizedDistance,
+    this.estimatedOrderedTime,
+    this.estimatedOptimizedTime,
   }) : super(key: key);
 
   @override
@@ -79,6 +91,8 @@ class _PendingTripPageState extends State<PendingTripPage> {
 
   Set<Polyline> _polylines = {};
 
+
+
   @override
   void initState() {
     super.initState();
@@ -89,6 +103,43 @@ class _PendingTripPageState extends State<PendingTripPage> {
     _endLocation = widget.endLocation;
 
     print('Trip Places received in PendingTripPage: ${widget.tripPlaces}');
+    print('Estimated Time: $_time');
+    print('Estimated Distance: $_distance');
+    print('Estimated Total Time: $_estimatedTime');
+
+    // Set values based on route type
+    if (widget.routeType == 1) {
+      // Optimized Route
+      _time = widget.optimizedTime ?? 0;
+      _distance = widget.optimizedDistance ?? 0;
+      _estimatedTime = widget.estimatedOptimizedTime ?? 0;
+    } else if (widget.routeType == 2) {
+      // Custom Route
+      _time = widget.orderedTime ?? 0;
+      _distance = widget.orderedDistance ?? 0;
+      _estimatedTime = widget.estimatedOrderedTime ?? 0;
+    }
+
+    // Pre-fill text controllers
+    if (_startLocation != null) {
+      _getPlaceDescription(_startLocation!).then((description) {
+        if (description != null) {
+          setState(() {
+            _startLocationController.text = description;
+          });
+        }
+      });
+    }
+
+    if (_endLocation != null) {
+      _getPlaceDescription(_endLocation!).then((description) {
+        if (description != null) {
+          setState(() {
+            _endLocationController.text = description;
+          });
+        }
+      });
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fitMarkersToMap();
@@ -181,61 +232,86 @@ class _PendingTripPageState extends State<PendingTripPage> {
     return markers;
   }
 
-  void _generateRoute() {
-    // Ensure locations are valid and in order
-    List<LatLng> routePoints = [
-      if (_startLocation != null) _startLocation!,
-      ...widget.tripPlaces
-          .where((place) => place['latitude'] != null && place['longitude'] != null)
-          .map((place) => LatLng(place['latitude'], place['longitude'])),
-      if (_endLocation != null) _endLocation!,
-    ];
-
-    // Create a polyline with the route points
-    setState(() {
-      _polylines = {
-        Polyline(
-          polylineId: const PolylineId('route'),
-          points: routePoints,
-          color: Colors.blue, // Polyline color
-          width: 5, // Polyline width
-        ),
-      };
-    });
-  }
+  // void _generateRoute() {
+  //   // Ensure locations are valid and in order
+  //   final orderKey = widget.routeType == 1 ? 'optimizedOrder' : 'placeOrder';
+  //   List<LatLng> routePoints = [
+  //     if (_startLocation != null) _startLocation!,
+  //     ...widget.tripPlaces
+  //         .where((place) => place['latitude'] != null && place['longitude'] != null)
+  //         .toList()
+  //       ..sort((a, b) => (a[orderKey] ?? 0).compareTo(b[orderKey] ?? 0))
+  //           .map((place) => LatLng(place['latitude'], place['longitude'])),
+  //     if (_endLocation != null) _endLocation!,
+  //   ];
+  //
+  //   // Create a polyline with the route points
+  //   setState(() {
+  //     _polylines = {
+  //       Polyline(
+  //         polylineId: const PolylineId('route'),
+  //         points: routePoints,
+  //         color: Colors.blue, // Polyline color
+  //         width: 5, // Polyline width
+  //       ),
+  //     };
+  //   });
+  // }
 
   Future<void> _fetchDetailedRoute() async {
     if (_startLocation == null || _endLocation == null || widget.tripPlaces.isEmpty) return;
 
-    String waypoints = widget.tripPlaces
+    // Use routeType to determine the sorting key
+    final orderKey = _selectedOption == 1 ? 'optimizedOrder' : 'placeOrder';
+
+    // Sort the tripPlaces based on the selected orderKey
+    List<Map<String, dynamic>> sortedPlaces = widget.tripPlaces
+        .cast<Map<String, dynamic>>()
+        .toList()
+      ..sort((a, b) => (a[orderKey] ?? 0).compareTo(b[orderKey] ?? 0));
+
+    // Build the waypoints string
+    String waypoints = sortedPlaces
         .where((place) => place['latitude'] != null && place['longitude'] != null)
         .map((place) => '${place['latitude']},${place['longitude']}')
         .join('|');
 
+    // Construct the Google Directions API URL
     String url = 'https://maps.googleapis.com/maps/api/directions/json?'
         'origin=${_startLocation!.latitude},${_startLocation!.longitude}'
         '&destination=${_endLocation!.latitude},${_endLocation!.longitude}'
         '&waypoints=$waypoints'
         '&key=AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY';
 
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data['routes'] != null && data['routes'].isNotEmpty) {
-        String encodedPolyline = data['routes'][0]['overview_polyline']['points'];
-        List<LatLng> points = _decodePolyline(encodedPolyline);
+    try {
+      final response = await http.get(Uri.parse(url));
 
-        setState(() {
-          _polylines = {
-            Polyline(
-              polylineId: const PolylineId('detailed_route'),
-              points: points,
-              color: Colors.blueAccent,
-              width: 3,
-            ),
-          };
-        });
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['routes'] != null && data['routes'].isNotEmpty) {
+          String encodedPolyline = data['routes'][0]['overview_polyline']['points'];
+          List<LatLng> points = _decodePolyline(encodedPolyline);
+
+          // Update the polylines on the map
+          setState(() {
+            _polylines = {
+              Polyline(
+                polylineId: const PolylineId('detailed_route'),
+                points: points,
+                color: Colors.blueAccent,
+                width: 3,
+              ),
+            };
+          });
+        } else {
+          print("No routes found in the API response.");
+        }
+      } else {
+        print("Failed to fetch route: ${response.body}");
       }
+    } catch (e) {
+      print("Error fetching route: $e");
     }
   }
 
@@ -251,6 +327,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
         result |= (b & 0x1F) << shift;
         shift += 5;
       } while (b >= 0x20);
+
       int dlat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
       lat += dlat;
 
@@ -261,13 +338,47 @@ class _PendingTripPageState extends State<PendingTripPage> {
         result |= (b & 0x1F) << shift;
         shift += 5;
       } while (b >= 0x20);
+
       int dlng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
       lng += dlng;
 
       points.add(LatLng(lat / 1E5, lng / 1E5));
     }
 
+    print("Decoded ${points.length} points from polyline."); // Debugging log
     return points;
+  }
+
+
+  Future<String?> _getPlaceDescription(LatLng location) async {
+    final url = 'https://maps.googleapis.com/maps/api/geocode/json?'
+        'latlng=${location.latitude},${location.longitude}&key=AIzaSyCkHD2HerXhpZkLcYALU2Cm6BuP2sxOAWY';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['results'] != null && data['results'].isNotEmpty) {
+          return data['results'][0]['formatted_address'];
+        }
+      }
+    } catch (e) {
+      print('Error fetching place description: $e');
+    }
+    return null;
+  }
+
+  List<Map<String, dynamic>> _getSortedTripPlaces() {
+    if (widget.tripPlaces.isEmpty) {
+      return [];
+    }
+
+    final orderKey = _selectedOption == 1 ? 'optimizedOrder' : 'placeOrder';
+
+    return widget.tripPlaces
+        .cast<Map<String, dynamic>>()
+        .toList()
+      ..sort((a, b) => (a[orderKey] ?? 0).compareTo(b[orderKey] ?? 0));
   }
 
   Future<void> _onConfirmDestinations() async {
@@ -281,13 +392,11 @@ class _PendingTripPageState extends State<PendingTripPage> {
     try {
       String? token = await _storage.read(key: 'accessToken');
       if (token != null) {
-        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-        final userId = decodedToken['id'];
         final url = _selectedOption == 2
             ? Uri.parse('$baseUrl/forward/trip/reorder-route') // Custom Route
             : Uri.parse('$baseUrl/forward/trip/shortest-route'); // Optimized Route
 
-
+        // Prepare the payload for the API request
         final payload = _selectedOption == 2
             ? {
           "tripId": widget.tripId,
@@ -297,7 +406,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
           "endLng": _endLocation!.longitude,
           "placeList": widget.tripPlaces.map((place) {
             return {
-              "tripPlaceId": place['tripPlaceId'], // Ensure this is populated
+              "tripPlaceId": place['tripPlaceId'],
               "order": place['placeOrder'],
             };
           }).toList(),
@@ -310,41 +419,38 @@ class _PendingTripPageState extends State<PendingTripPage> {
           "endLng": _endLocation!.longitude,
         };
 
-        // print("The payload is: $payload");
-
         final response = await http.post(
           url,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': token,},
+            'Authorization': token,
+          },
           body: jsonEncode(payload),
         );
-
-        // print("the POST request is: $url");
-        // print("Payload sent to server: ${jsonEncode(payload)}");
-        // print("Response status code: ${response.statusCode}");
-        print("Raw response body: ${response.body}");
 
         if (response.statusCode == 200) {
           final responseData = jsonDecode(response.body);
 
-          // Check if the response indicates success
           if (responseData['success'] == true) {
             final data = responseData['data'];
 
+            // Update trip metrics (time and distance)
             setState(() {
-              if (_selectedOption == 1) {
-                // Optimized Route
-                _time = int.tryParse(data['optimizedTime'].toString());
-                _estimatedTime = int.tryParse(data['estimatedOptimizedTime'].toString());
-                _distance = int.tryParse(data['optimizedDistance'].toString());
-              } else if (_selectedOption == 2) {
-                // Custom Route
-                _time = int.tryParse(data['orderedTime'].toString());
-                _estimatedTime = int.tryParse(data['estimatedOrderedTime'].toString());
-                _distance = int.tryParse(data['orderedDistance'].toString());
-              }
+              _time = _selectedOption == 1 ? data['optimizedTime'] : data['orderedTime'];
+              _distance = _selectedOption == 1 ? data['optimizedDistance'] : data['orderedDistance'];
+              _estimatedTime = _selectedOption == 1
+                  ? data['estimatedOptimizedTime']
+                  : data['estimatedOrderedTime'];
             });
+
+            // Optionally reorder trip places locally
+            setState(() {
+              final orderKey = _selectedOption == 1 ? 'optimizedOrder' : 'placeOrder';
+              widget.tripPlaces.sort((a, b) => (a[orderKey] ?? 0).compareTo(b[orderKey] ?? 0));
+            });
+
+            // Update map route
+            await _fetchDetailedRoute();
 
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Route confirmed successfully!")),
@@ -363,11 +469,22 @@ class _PendingTripPageState extends State<PendingTripPage> {
     }
   }
 
+
+
   /// Helper function to format time in seconds to "hours and minutes"
+  /// Helper function to format time in seconds to "days, hours, and minutes" or just "hours and minutes"
   String formatTime(int seconds) {
-    final hours = seconds ~/ 3600;
-    final minutes = (seconds % 3600) ~/ 60;
-    return '${hours}h ${minutes}m';
+    final int days = seconds ~/ 86400; // Calculate days
+    final int hours = (seconds % 86400) ~/ 3600; // Remaining hours after removing days
+    final int minutes = (seconds % 3600) ~/ 60; // Remaining minutes after removing hours
+
+    if (days > 0) {
+      // Display in "X days Y hours Z minutes"
+      return '${days}d ${hours}h ${minutes}m';
+    } else {
+      // Display in "X hours Y minutes"
+      return '${hours}h ${minutes}m';
+    }
   }
 
   /// Helper function to format distance in meters to "kilometers"
@@ -453,7 +570,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<int>(
                       isExpanded: true,
-                      value: _selectedOption, // Dynamically set the value
+                      value: _selectedOption,
                       hint: Text("Select an option"),
                       items: _dropdownOptions.map((option) {
                         return DropdownMenuItem<int>(
@@ -467,6 +584,9 @@ class _PendingTripPageState extends State<PendingTripPage> {
                         setState(() {
                           _selectedOption = value;
                         });
+
+                        // Refresh the map based on the new routeType
+                        await _fetchDetailedRoute();
 
                         if (value == 1) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -508,11 +628,12 @@ class _PendingTripPageState extends State<PendingTripPage> {
               ),
               SizedBox(height: 10),
               // Destinations list
+              // Inside ReorderableListView
               ReorderableListView(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 onReorder: (oldIndex, newIndex) {
-                  if (!_isReorderEnabled) return; // Do nothing if reordering is disabled
+                  if (!_isReorderEnabled) return;
 
                   setState(() {
                     if (newIndex > oldIndex) newIndex -= 1;
@@ -524,27 +645,33 @@ class _PendingTripPageState extends State<PendingTripPage> {
                       widget.tripPlaces[i]['placeOrder'] = i + 1;
                     }
 
-                    _fetchDetailedRoute();
+                    _fetchDetailedRoute(); // Update the map after reordering
                   });
                 },
-                children: widget.tripPlaces.map((destination) {
+                children: _getSortedTripPlaces().map((destination) {
+                  final orderKey = _selectedOption == 1 ? 'optimizedOrder' : 'placeOrder'; // Use the selected route type
                   return Card(
-                    key: ValueKey(destination['placeOrder']),
+                    key: ValueKey(destination[orderKey]),
                     color: Colors.grey[200],
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ListTile(
-                      leading: Icon(Icons.menu, color: Kcolours.black),
+                      leading: Icon(
+                        Icons.menu,
+                        color: _isReorderEnabled ? Kcolours.black : Colors.grey,
+                      ),
                       title: Text(destination['title'] ?? 'No Title'),
-                      trailing: IconButton(
+                      trailing: _isReorderEnabled
+                          ? IconButton(
                         icon: Icon(Icons.delete_outline, color: Colors.red),
                         onPressed: () {
                           setState(() {
                             widget.tripPlaces.remove(destination);
                           });
                         },
-                      ),
+                      )
+                          : null, // Hide delete button for Optimized Route
                     ),
                   );
                 }).toList(),
@@ -554,6 +681,37 @@ class _PendingTripPageState extends State<PendingTripPage> {
               SizedBox(height: 16),
 
               Padding(
+                padding: commonPadding,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RewardsPage(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Kcolours.white, // Background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.add, size: 18),
+                          ],
+                      ),
+                    ),
+                    )],
+                ),
+              ),
+
+          Padding(
                 padding: commonPadding,
                 child: Row(
                   children: [
@@ -852,7 +1010,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                             ),
                           ),
                           Text(
-                            _time != null ? formatTime(_time!) : "N/A",
+                            _time != null && _time! > 0 ? formatTime(_time!) : "N/A",
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
@@ -874,7 +1032,9 @@ class _PendingTripPageState extends State<PendingTripPage> {
                             ),
                           ),
                           Text(
-                            _estimatedTime != null ? formatTime(_estimatedTime!) : "N/A",
+                            _estimatedTime != null && _estimatedTime! > 0
+                                ? formatTime(_estimatedTime!)
+                                : "N/A",
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
@@ -883,34 +1043,35 @@ class _PendingTripPageState extends State<PendingTripPage> {
                           ),
                         ],
                       ),
-
-                  SizedBox(height: 8),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Distance:",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                          color: Kcolours.brownShade4,
-                        ),
-                      ),
-                      Text(
-                        _distance != null ? formatDistance(_distance!) : "N/A",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                          color: Kcolours.black,
-                        ),
+                      SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Distance:",
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Kcolours.brownShade4,
+                            ),
+                          ),
+                          Text(
+                            _distance != null && _distance! > 0
+                                ? formatDistance(_distance!)
+                                : "N/A",
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Kcolours.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-              ),
+
 
 
 
@@ -941,16 +1102,17 @@ class _PendingTripPageState extends State<PendingTripPage> {
                           },
                           initialCameraPosition: CameraPosition(
                             target: _startLocation ?? LatLng(0, 0),
-                            zoom: 10, // Default zoom level
+                            zoom: 10,
                           ),
                           markers: _buildMarkers(),
-                          polylines: _polylines,
+                          polylines: _polylines, // Dynamically updated polylines
                           mapType: MapType.normal,
                           scrollGesturesEnabled: true,
                           zoomGesturesEnabled: true,
                           tiltGesturesEnabled: true,
                           rotateGesturesEnabled: true,
                         ),
+
                       ),
                     ),
                   )

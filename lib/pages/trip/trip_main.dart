@@ -73,11 +73,17 @@ class _TripScreenState extends State<TripScreen> {
                 'start_lng': trip['start_lng'],
                 'end_lat': trip['end_lat'],
                 'end_lng': trip['end_lng'],
+                'orderedTime': trip['orderedTime'],
+                'optimizedTime': trip['optimizedTime'],
+                'orderedDistance': trip['orderedDistance'],
+                'optimizedDistance': trip['optimizedDistance'],
+                'estimatedOrderedTime': trip['estimatedOrderedTime'],
+                'estimatedOptimizedTime': trip['estimatedOptimizedTime'],
                 'tripPlaces': trip['tripPlaces']?.map((place) {
                   return {
                     'tripPlaceId': place['tripPlaceId'], // Place ID
                     'placeOrder': place['placeOrder'],
-                    // 'optimizedOrder': place['optimizedOrder'],
+                    'optimizedOrder': place['optimizedOrder'],
                     'title': place['title'],
                     'latitude': place['latitude'],
                     'longitude': place['longitude'],
@@ -247,9 +253,19 @@ class _TripScreenState extends State<TripScreen> {
                                             createdOn: trip['created_on'] as String,
                                             tripPlaces: trip['tripPlaces'] as List<dynamic>,
                                             tripId: trip['tripId'] as int,
-                                            routeType: trip['routeType'] as int,
-                                            startLocation: LatLng(trip['start_lat'], trip['start_lng']),
-                                            endLocation: LatLng(trip['end_lat'], trip['end_lng']),
+                                            routeType: trip['routeType'] as int?,
+                                            startLocation: trip['start_lat'] != null && trip['start_lng'] != null
+                                                ? LatLng(trip['start_lat'] as double, trip['start_lng'] as double)
+                                                : null,
+                                            endLocation: trip['end_lat'] != null && trip['end_lng'] != null
+                                                ? LatLng(trip['end_lat'] as double, trip['end_lng'] as double)
+                                                : null,
+                                            orderedTime: (trip['orderedTime'] ?? 0) as int,
+                                            optimizedTime: (trip['optimizedTime'] ?? 0) as int,
+                                            orderedDistance: (trip['orderedDistance'] ?? 0) as int,
+                                            optimizedDistance: (trip['optimizedDistance'] ?? 0) as int,
+                                            estimatedOrderedTime: (trip['estimatedOrderedTime'] ?? 0) as int,
+                                            estimatedOptimizedTime: (trip['estimatedOptimizedTime'] ?? 0) as int,
                                           ),
                                         ),
                                       );
