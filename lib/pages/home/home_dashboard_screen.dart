@@ -15,6 +15,8 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:wandr/data.dart'; // Importing destinations from data.dart
 import 'package:wandr/pages/home/home_destination_profile_screen.dart';
 
+const String imageBaseUrl = "http://68.183.94.54:5080/places/";
+
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
 
@@ -38,7 +40,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     fetchPopularDestinations();
     fetchFavoritePlaces();
     fetchAllPlaces(); // Add this line to fetch all places data
-    fetchRecommendedPlaces(); // Add this line to fetch recommended places data
+    fetchRecommendedPlaces();
   }
 
   Future<void> fetchPopularDestinations() async {
@@ -64,7 +66,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          popularDestinations = data['data'].take(10).toList(); // Limit to 10 items
+          popularDestinations = data['data'].take(10).map((place) {
+            return {
+              ...place,
+              'image': place['image'] != null ? "$imageBaseUrl${place['image']}" : null,
+            };
+          }).toList(); // Limit to 10 items and append the full image URL
         });
       } else {
         print('Failed to load popular destinations with status: ${response.statusCode}');
@@ -74,6 +81,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _showError(context, 'Error fetching popular destinations. Please try again later.');
     }
   }
+
 
   Future<void> fetchFavoritePlaces() async {
     final token = await storage.read(key: 'accessToken');
@@ -98,7 +106,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          favoritePlaces = data['data'].take(10).toList(); // Limit to 10 items
+          favoritePlaces = data['data'].take(10).map((place) {
+            return {
+              ...place,
+              'image': place['image'] != null ? "$imageBaseUrl${place['image']}" : null,
+            };
+          }).toList(); // Limit to 10 items and append the full image URL
         });
       } else {
         print('Failed to load favorite places with status: ${response.statusCode}');
@@ -132,7 +145,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          allPlaces = data['data'];
+          allPlaces = data['data'].map((place) {
+            return {
+              ...place,
+              'image': place['image'] != null ? "$imageBaseUrl${place['image']}" : null,
+            };
+          }).toList(); // Append the full image URL
         });
       } else {
         print('Failed to load all places with status: ${response.statusCode}');
@@ -144,6 +162,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> fetchRecommendedPlaces() async {
+    // print("Fetching recommended places...");
+
     final token = await storage.read(key: 'accessToken');
     if (token == null) {
       _showError(context, 'Token not found. Please login again.');
@@ -165,26 +185,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+
         setState(() {
-          recommendedPlaces = (data['data'] as List)
-              .where((place) => place['similarity'] != null)
-              .toList()
-            ..sort((a, b) => b['similarity'].compareTo(a['similarity'])) // Sort by similarity
-            ..take(10)
-                .toList();
-          print(recommendedPlaces);
+          recommendedPlaces = data['data'].map((place) {
+            return {
+              ...place,
+              'image': place['image'] != null ? "$imageBaseUrl${place['image']}" : null,
+            };
+          }).toList(); // Append the full image URL
         });
       } else {
         print('Failed to load recommended places with status: ${response.statusCode}');
+        _showError(context, 'Failed to fetch recommended places. Try again later.');
       }
     } catch (e) {
       print('Error fetching recommended places: $e');
       _showError(context, 'Error fetching recommended places. Please try again later.');
     }
   }
-
-
-
 
 
   void _onItemTapped(int index) {
@@ -228,6 +246,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: Column(
           children: [
             SizedBox(height: 25),
+            //TODO add the name of the user. Check if name is taken from the signup
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: HomeProfile(
@@ -248,11 +267,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             SizedBox(height: 20),
-            custom.SearchBar(
-              controller: _searchController,
-              onChanged: _onSearchChanged,
-            ),
-            SizedBox(height: 20),
+
+            //TODO the search bar doesnt workkkk. remove if not needed
+            // custom.SearchBar(
+            //   controller: _searchController,
+            //   onChanged: _onSearchChanged,
+            // ),
+            // SizedBox(height: 20),
             Expanded(
               child: buildTabContent(),
             ),
@@ -265,6 +286,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget buildTabContent() {
+    // print("Rendering recommendedPlaces: $recommendedPlaces"); // Debug current state
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
@@ -318,17 +341,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: Kcolours.brownShade4,
                   ),
                 ),
-                Text(
-                  "See all",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: Kcolours.blueShade2,
-                  ),
-                ),
               ],
             ),
             SizedBox(height: 12),
+            // Recommended Places Section
+
             recommendedPlaces.isNotEmpty
                 ? SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -339,14 +356,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: PlacesCard1(
                       title: place['name'],
                       location: place['address'],
-                      image: place['image'] != null ? 'assets/places/${place['image']}' : null,
+                      image: place['image'], // Use the full image URL
                       isLiked: place['liked'],
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => DestinationProfileScreen(
-                              place: place,
+                              place: {
+                                'id': place['id'],
+                                'name': place['name'],
+                                'description': place['description'],
+                                'image': place['image'], // Pass the image URL here
+                                'address': place['address'],
+                                'latitude': place['latitude'],
+                                'longitude': place['longitude'],
+                                'categories': place['categories'],
+                                'activities': place['activities'],
+                                'liked': place['liked'],
+                                'rating': place['rating'],
+                                // Add any other fields as needed
+                              },
                             ),
                           ),
                         );
@@ -356,7 +386,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 }).toList(),
               ),
             )
-                : Text("No recommended places available"),
+                : Center(
+              child: Text(
+                "No recommended places available",
+                style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey),
+              ),
+            ),
 
             SizedBox(height: 20),
 
@@ -393,15 +428,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: PlacesCard1(
                       title: destination['name'],
                       location: destination['address'],
-                      image: 'assets/places/${destination['image']}',
-                      isLiked: destination['liked'],
+                      image: destination['image'], // Correct server image URL
+                      isLiked: destination['liked'], // Boolean for like status
                       onTap: () {
-                        // Navigate to DestinationProfileScreen with place details
+                        // Navigate to DestinationProfileScreen with destination details
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => DestinationProfileScreen(
-                              place: destination,
+                              place: {
+                                'id': destination['id'],
+                                'name': destination['name'],
+                                'description': destination['description'],
+                                'image': destination['image'], // Pass the image URL here
+                                'address': destination['address'],
+                                'latitude': destination['latitude'],
+                                'longitude': destination['longitude'],
+                                'categories': destination['categories'],
+                                'activities': destination['activities'],
+                                'liked': destination['liked'],
+                                'rating': destination['rating'],
+                                // Add any other fields as needed
+                              },
                             ),
                           ),
                         );
@@ -411,8 +459,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 }).toList(),
               ),
             )
-                : Text("No popular places available"),
-            SizedBox(height: 20),
+                : Center(
+              child: Text(
+                "No popular destinations available",
+                style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey),
+              ),
+            ),
 
             // Favorites
             Row(
@@ -447,15 +499,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: PlacesCard1(
                       title: place['name'],
                       location: place['address'],
-                      image: 'assets/places/${place['image']}',
-                      isLiked: place['liked'],
+                      image: place['image'], // Correct server image URL
+                      isLiked: place['liked'], // Boolean for like status
                       onTap: () {
                         // Navigate to DestinationProfileScreen with place details
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => DestinationProfileScreen(
-                              place: place,
+                              place: {
+                                'id': place['id'],
+                                'name': place['name'],
+                                'description': place['description'],
+                                'image': place['image'], // Pass the image URL here
+                                'address': place['address'],
+                                'latitude': place['latitude'],
+                                'longitude': place['longitude'],
+                                'categories': place['categories'],
+                                'activities': place['activities'],
+                                'liked': place['liked'],
+                                'rating': place['rating'],
+                                // Add any other fields as needed
+                              },
                             ),
                           ),
                         );
@@ -469,7 +534,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 
 
-            
+
           ],
         ),
       ),

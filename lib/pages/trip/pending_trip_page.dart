@@ -5,7 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:wandr/config.dart';
 import 'package:wandr/pages/rewards/rewards_page.dart';
+import 'package:wandr/pages/trip/finalized_trip_page.dart';
 import 'package:wandr/pages/trip/generate_trip_recs.dart';
+import 'package:wandr/pages/trip/get_recommendations_page.dart';
 import 'package:wandr/pages/trip/trip_main.dart';
 import 'package:wandr/theme/app_colors.dart';
 import '../../components/bottom_nav_bar.dart';
@@ -718,12 +720,14 @@ class _PendingTripPageState extends State<PendingTripPage> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RewardsPage(),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => GetRecommendationsPage(
+                          //       tripId: widget.tripId,
+                          //     ),
+                          //   ),
+                          // );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Kcolours.primary, // Background color
@@ -1184,6 +1188,12 @@ class _PendingTripPageState extends State<PendingTripPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           // Handle Finalize Trip action here
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => RewardsPage(),
+                          //   ),
+                          // );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Kcolours.primary, // Background color
@@ -1193,7 +1203,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                           padding: EdgeInsets.symmetric(vertical: 16),
                         ),
                         child: Text(
-                          'Finalize Trip',
+                          'Start Trip',
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ),
