@@ -16,9 +16,10 @@ import 'package:wandr/components/primary_button.dart';
 import '../../config.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+const String imageBaseUrl = "http://68.183.94.54:5080/places/";
+
 class DestinationProfileScreen extends StatefulWidget {
   final Map<String, dynamic> place;
-
   const DestinationProfileScreen({
     Key? key,
     required this.place,
@@ -26,8 +27,7 @@ class DestinationProfileScreen extends StatefulWidget {
 
   @override
   _DestinationProfileScreenState createState() =>
-      _DestinationProfileScreenState();
-}
+      _DestinationProfileScreenState();}
 
 class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
 
@@ -37,9 +37,13 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
 
   Map<String, dynamic>? _selectedTrip;
 
+
   @override
   void initState() {
     super.initState();
+
+    print("Received place data: ${widget.place}");
+
     fetchPendingTrips();
 
     // Add a listener to clear selected trip when typing in the input field
@@ -348,6 +352,17 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
     final double latitude = widget.place['latitude'] ?? 0.0; // Default to 0.0 if missing
     final double longitude = widget.place['longitude'] ?? 0.0;
     final String placeName = widget.place['name'] ?? 'Unknown Place';
+    final String? imageUrl = widget.place['image'];
+
+
+    final Map<String, dynamic> place = Map<String, dynamic>.from(widget.place);
+
+    // // Construct the final image URL
+    final String? finalImageUrl = widget.place['image'] != null && widget.place['image']!.isNotEmpty
+        ? "$imageBaseUrl${widget.place['image']}"
+        : null;
+
+    // print("Final Image URL in DestinationProfileScreen: $finalImageUrl");
 
     return SafeArea(
       child: Scaffold(
@@ -359,7 +374,7 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
               DescriptionCard(
                 title: widget.place['name'],
                 location: widget.place['address'],
-                image: 'assets/places/${widget.place['image']}',
+                image: widget.place['image'] // Pass null for placeholder handling
               ),
               SizedBox(height: 20),
               Padding(

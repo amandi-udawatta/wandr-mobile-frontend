@@ -25,6 +25,7 @@ class LoginPage extends StatelessWidget {
     print('Base URL being used: $baseUrl');
     final url = Uri.parse('$baseUrl/login');
     final hashedPassword = hashPassword(password);
+    print("THE HASHED PASSWORD: $hashedPassword");
 
     final response = await http.post(
       url,
@@ -35,6 +36,7 @@ class LoginPage extends StatelessWidget {
         'password': hashedPassword,
       }),
     );
+    print('THE RESPONSE IS: ${response.body}');
 
     if (response.statusCode == 200) {
       final responseBody = json.decode(response.body);
@@ -56,6 +58,7 @@ class LoginPage extends StatelessWidget {
     if (responseBody['success']) {
       final accessToken = responseBody['data']['accessToken'];
       final refreshToken = responseBody['data']['refreshToken'];
+      print("REFRESH TOKEN: $refreshToken");
       loginUser(accessToken, refreshToken, context);
     } else {
       print('Login failed: ${responseBody['message']}');
@@ -215,6 +218,9 @@ class LoginPage extends StatelessWidget {
                   final role = 'TRAVELLER';
 
                   login(role, email, password, context);
+                  print("THE EMAIL IS: $email");
+                  print("THE PASSWORD IS: $password");
+                  print("THE ROLE IS: $role");
                 },
                 text: "Login",
               ),
