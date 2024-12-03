@@ -13,6 +13,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:wandr/data.dart'; // Importing destinations from data.dart
 
+const String imageBaseUrl = "http://68.183.94.54:5080/places/";
+
 class FilterScreen extends StatefulWidget {
   final String category;
   final int initialIndex;
@@ -38,6 +40,8 @@ class _FilterScreenState extends State<FilterScreen> {
   }
 
   Future<void> _fetchAndUpdatePlaces() async {
+    print("Fetching and updating places...");
+
     final token = await storage.read(key: 'accessToken');
     if (token == null) {
       _showError(context, 'Token not found. Please login again.');
@@ -45,14 +49,21 @@ class _FilterScreenState extends State<FilterScreen> {
     }
 
     try {
+      // Decode the JWT to get the traveller ID
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       final userId = decodedToken['id'];
-      String category = _selectedCategoryIndex == -1 ? "All" : destinations.firstWhere((d) => d['id'] == _selectedCategoryIndex)['name'];
-      String filter = _selectedIndex == 0 ? "All Destinations" :
-                      _selectedIndex == 1 ? "Most Popular" :
-                      "Recommended";
-      final url = Uri.parse('$baseUrl/forward/traveller/all-places/$userId');
-      
+
+      // Determine the correct API endpoint based on the selected filter
+      Uri url;
+      if (_selectedIndex == 0) {
+        url = Uri.parse('$baseUrl/forward/traveller/all-places/$userId');
+      } else if (_selectedIndex == 1) {
+        url = Uri.parse('$baseUrl/forward/traveller/popular-places/$userId');
+      } else {
+        url = Uri.parse('$baseUrl/forward/traveller/recommended-places/$userId');
+      }
+
+      // Fetch data from the API
       final response = await http.get(
         url,
         headers: {
@@ -63,28 +74,41 @@ class _FilterScreenState extends State<FilterScreen> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+
         if (data['success']) {
           List<dynamic> placesData = data['data'];
+
+          // Apply category filtering
+          String selectedCategory = _selectedCategoryIndex == -1
+              ? "All"
+              : destinations.firstWhere((d) => d['id'] == _selectedCategoryIndex)['name'];
+
           setState(() {
             _places = placesData.where((place) {
-              bool matchesCategory = category == "All" || place['categories'].contains(category);
-              bool matchesFilter = filter == "All Destinations" ||
-                                   (filter == "Most Popular" && place['activities'].contains('Popular Activity')) ||
-                                   (filter == "Recommended" && place['liked']);
-              return matchesCategory && matchesFilter;
+              bool matchesCategory = selectedCategory == "All" ||
+                  (place['categories'] != null &&
+                      place['categories'].contains(selectedCategory));
+              return matchesCategory;
             }).map((place) {
+              // Construct the full image URL
+              final imageUrl = place['image'] != null && place['image'].isNotEmpty
+                  ? "$imageBaseUrl${place['image']}" // Ensure full URL
+                  : null;
+
+              print("Constructed Image URL: $imageUrl"); // Debug
+
               return {
                 'title': place['name'],
                 'location': place['address'],
-                'image': place['image']
+                'image': imageUrl,
               };
-            }).take(10).toList(); // Take only the first 10 items
+            }).toList();
           });
         } else {
-          throw Exception('Failed to load places');
+          throw Exception('Failed to load places: ${data['message']}');
         }
       } else {
-        throw Exception('Failed to load places');
+        throw Exception('Failed to load places: HTTP ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching places: $e');
@@ -96,14 +120,14 @@ class _FilterScreenState extends State<FilterScreen> {
     setState(() {
       _selectedCategoryIndex = index;
     });
-    _fetchAndUpdatePlaces();
+    _fetchAndUpdatePlaces(); // Fetch data with updated category
   }
 
   void _onFilterSelected(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    _fetchAndUpdatePlaces();
+    _fetchAndUpdatePlaces(); // Fetch data with updated filter
   }
 
   @override
@@ -158,11 +182,11 @@ class _FilterScreenState extends State<FilterScreen> {
               child: Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(right: 10.0), // Adjust the right padding as needed
+                    padding: const EdgeInsets.only(right: 10.0),
                     child: CategoriesButton(
                       title: "All",
                       onPressed: () {
-                        _onCategorySelected(-1); // Update the logic as needed
+                        _onCategorySelected(-1); // Set to "All"
                       },
                       isSelected: _selectedCategoryIndex == -1,
                     ),
@@ -174,7 +198,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         title: destination['name'],
                         image: destination['image'],
                         onPressed: () {
-                          _onCategorySelected(destination['id']);
+                          _onCategorySelected(destination['id']); // Pass category ID
                         },
                         isSelected: _selectedCategoryIndex == destination['id'],
                       ),
@@ -184,7 +208,7 @@ class _FilterScreenState extends State<FilterScreen> {
               ),
             ),
 
-            // Filter By
+            // Filter By Section
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -207,7 +231,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   FilterButton(
                     text: "All Destinations",
                     onPressed: () {
-                      _onFilterSelected(0); // Handle filter logic for "All Destinations"
+                      _onFilterSelected(0); // Fetch all destinations
                     },
                     isSelected: _selectedIndex == 0,
                   ),
@@ -215,7 +239,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   FilterButton(
                     text: "Most Popular",
                     onPressed: () {
-                      _onFilterSelected(1); // Handle filter logic for "Most Popular"
+                      _onFilterSelected(1); // Fetch most popular destinations
                     },
                     isSelected: _selectedIndex == 1,
                   ),
@@ -223,7 +247,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   FilterButton(
                     text: "Recommended",
                     onPressed: () {
-                      _onFilterSelected(2); // Handle filter logic for "Recommended"
+                      _onFilterSelected(2); // Fetch recommended destinations
                     },
                     isSelected: _selectedIndex == 2,
                   ),
@@ -231,7 +255,7 @@ class _FilterScreenState extends State<FilterScreen> {
               ),
             ),
 
-            // Suggested places
+            // Suggested Places
             SizedBox(height: 20),
             GridView.builder(
               physics: NeverScrollableScrollPhysics(),
@@ -248,7 +272,7 @@ class _FilterScreenState extends State<FilterScreen> {
                 return PlacesCard1(
                   title: place["title"]!,
                   location: place["location"]!,
-                  image: 'assets/places/${place['image']}',
+                  image: place['image'],
                 );
               },
             ),

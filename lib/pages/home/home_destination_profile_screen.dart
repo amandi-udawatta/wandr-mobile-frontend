@@ -16,9 +16,10 @@ import 'package:wandr/components/primary_button.dart';
 import '../../config.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+const String imageBaseUrl = "http://68.183.94.54:5080/places/";
+
 class DestinationProfileScreen extends StatefulWidget {
   final Map<String, dynamic> place;
-
   const DestinationProfileScreen({
     Key? key,
     required this.place,
@@ -26,21 +27,39 @@ class DestinationProfileScreen extends StatefulWidget {
 
   @override
   _DestinationProfileScreenState createState() =>
-      _DestinationProfileScreenState();
-}
+      _DestinationProfileScreenState();}
 
 class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
-  // late GoogleMapController mapController;
 
-  List<String> pendingTrips = []; // Stores the user's pending trips
+  List<Map<String, dynamic>> pendingTrips = [];
   final storage = FlutterSecureStorage();
   final TextEditingController _tripNameController = TextEditingController(); // Controller for trip name input
+
+  Map<String, dynamic>? _selectedTrip;
 
 
   @override
   void initState() {
     super.initState();
-    fetchPendingTrips(); // Fetch pending trips on initialization
+
+    print("Received place data: ${widget.place}");
+
+    fetchPendingTrips();
+
+    // Add a listener to clear selected trip when typing in the input field
+    _tripNameController.addListener(() {
+      if (_tripNameController.text.isNotEmpty && _selectedTrip != null) {
+        setState(() {
+          _selectedTrip = null; // Clear selected trip when typing
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tripNameController.dispose(); // Dispose of the controller to avoid memory leaks
+    super.dispose();
   }
 
   /// Fetches the user's pending trips from the backend
@@ -61,13 +80,18 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
           'Authorization': token,
         },
       );
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success']) {
           setState(() {
-            pendingTrips = (data['data'] as List)
-                .map<String>((trip) => trip['name'] as String)
-                .toList();
+            // Extract relevant fields: tripId and name
+            pendingTrips = (data['data'] as List).map<Map<String, dynamic>>((trip) {
+              return {
+                'id': trip['tripId'], // Extract tripId as ID
+                'name': trip['name'], // Extract name of the trip
+              };
+            }).toList();
           });
         } else {
           _showError(context, data['message']);
@@ -80,6 +104,49 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
     }
   }
 
+  // /// Saves a new trip to the backend
+  // Future<void> saveNewTrip(String tripName) async {
+  //   final token = await storage.read(key: 'accessToken');
+  //   if (token == null) {
+  //     _showError(context, 'Token not found. Please login again.');
+  //     return;
+  //   }
+  //
+  //   try {
+  //     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+  //     final travellerId = decodedToken['id'];
+  //
+  //     final response = await http.post(
+  //       Uri.parse('$baseUrl/forward/trip/create'),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': token,
+  //       },
+  //       body: json.encode({
+  //         'travellerId': travellerId,
+  //         'name': tripName,
+  //         'placeId': widget.place['id'], // Assuming the place object has an ID field
+  //       }),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       if (data['success']) {
+  //         Navigator.of(context).pop(); // Close the popup
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text('Trip saved successfully!')),
+  //         );
+  //       } else {
+  //         _showError(context, data['message']);
+  //       }
+  //     } else {
+  //       _showError(context, 'Failed to save the trip. Please try again.');
+  //     }
+  //   } catch (e) {
+  //     _showError(context, 'An error occurred while saving the trip');
+  //   }
+  // }
+
   /// Saves a new trip to the backend
   Future<void> saveNewTrip(String tripName) async {
     final token = await storage.read(key: 'accessToken');
@@ -89,6 +156,9 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
     }
 
     try {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      final travellerId = decodedToken['id'];
+
       final response = await http.post(
         Uri.parse('$baseUrl/forward/trip/create'),
         headers: {
@@ -96,8 +166,9 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
           'Authorization': token,
         },
         body: json.encode({
+          'travellerId': travellerId,
           'name': tripName,
-          'placeId': widget.place['id'], // Assuming the place object has an ID field
+          'placeId': widget.place['id'], // Location to associate
         }),
       );
 
@@ -106,7 +177,7 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
         if (data['success']) {
           Navigator.of(context).pop(); // Close the popup
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Trip saved successfully!')),
+            SnackBar(content: Text('Trip created and place added successfully!')),
           );
         } else {
           _showError(context, data['message']);
@@ -119,6 +190,46 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
     }
   }
 
+  /// Adds a place to an existing trip
+  Future<void> addPlaceToExistingTrip() async {
+    final token = await storage.read(key: 'accessToken');
+    if (token == null) {
+      _showError(context, 'Token not found. Please login again.');
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/forward/trip/add-place'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+        body: json.encode({
+          'tripId': _selectedTrip!['id'], // Use selected trip's ID
+          'placeId': widget.place['id'], // Location to associate
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success']) {
+          Navigator.of(context).pop(); // Close the popup
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Place added to selected trip successfully!')),
+          );
+        } else {
+          _showError(context, data['message']);
+        }
+      } else {
+        _showError(context, 'Failed to add place to the trip. Please try again.');
+      }
+    } catch (e) {
+      _showError(context, 'An error occurred while adding the place to the trip');
+    }
+  }
+
+
   /// Displays an error message
   void _showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -128,77 +239,130 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
 
   /// Shows the "Add to Trip" pop-up dialog
   void _showTripPopup() {
+    setState(() {
+      _selectedTrip = null; // Reset the selection when the dialog opens
+      _tripNameController.clear(); // Clear the input field
+    });
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          title: Text(
-            "Save trip to",
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (pendingTrips.isNotEmpty) ...[
-                for (var trip in pendingTrips)
-                  ListTile(
-                    title: Text(trip),
-                    trailing: Icon(Icons.check_box_outline_blank),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              title: Text(
+                "Save trip to",
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Dropdown for selecting an existing trip
+                  if (pendingTrips.isNotEmpty) ...[
+                    DropdownButtonFormField<Map<String, dynamic>>(
+                      value: _selectedTrip,
+                      hint: Text("Select an existing trip"),
+                      items: pendingTrips.map((trip) {
+                        return DropdownMenuItem<Map<String, dynamic>>(
+                          value: trip, // Entire trip object
+                          child: Text(trip['name']), // Display trip name
+                        );
+                      }).toList(),
+                      onChanged: (Map<String, dynamic>? newValue) {
+                        setState(() {
+                          _selectedTrip = newValue; // Update the selected trip
+                          _tripNameController.clear(); // Clear input field
+                        });
+                      },
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 10.0,
+                          horizontal: 12.0,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                  ],
+                  // Input field for adding a new trip
+                  TextField(
+                    controller: _tripNameController,
+                    onChanged: (value) {
+                      if (value.isNotEmpty) {
+                        setState(() {
+                          _selectedTrip = null; // Deselect dropdown when typing
+                        });
+                      }
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Enter new trip name",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10), // Rounded border
+                      ),
+                    ),
                   ),
-                Divider(),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.green, // Green font color
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final tripName = _tripNameController.text.trim();
+                    if (tripName.isNotEmpty) {
+                      saveNewTrip(tripName); // Create a new trip
+                    } else if (_selectedTrip != null) {
+                      addPlaceToExistingTrip(); // Add place to existing trip
+                    } else {
+                      _showError(context, "Please select or enter a trip name.");
+                    }
+                  },
+                  child: Text(
+                    "Save",
+                    style: TextStyle(
+                      color: Colors.green, // Green font color
+                    ),
+                  ),
+                ),
               ],
-              TextField(
-                controller: _tripNameController,
-                decoration: InputDecoration(
-                  hintText: "Enter new trip name",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10), // Rounded border
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                "Cancel",
-                style: TextStyle(
-                  color: Colors.green, // Green font color
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                final tripName = _tripNameController.text.trim();
-                if (tripName.isNotEmpty) {
-                  saveNewTrip(tripName); // Call saveNewTrip
-                } else {
-                  _showError(context, "Please enter a trip name.");
-                }
-              },
-              child: Text(
-                "Save",
-                style: TextStyle(
-                  color: Colors.green, // Green font color
-                ),
-              ),
-            ),
-          ],
+            );
+          },
         );
       },
     );
   }
 
 
+
+
   @override
   Widget build(BuildContext context) {
-    final double latitude = widget.place['latitude']; // Latitude from backend
-    final double longitude = widget.place['longitude']; // Longitude from backend
-    final String placeName = widget.place['name']; // Place name from backend
+    final double latitude = widget.place['latitude'] ?? 0.0; // Default to 0.0 if missing
+    final double longitude = widget.place['longitude'] ?? 0.0;
+    final String placeName = widget.place['name'] ?? 'Unknown Place';
+    final String? imageUrl = widget.place['image'];
+
+
+    final Map<String, dynamic> place = Map<String, dynamic>.from(widget.place);
+
+    // // Construct the final image URL
+    final String? finalImageUrl = widget.place['image'] != null && widget.place['image']!.isNotEmpty
+        ? "$imageBaseUrl${widget.place['image']}"
+        : null;
+
+    // print("Final Image URL in DestinationProfileScreen: $finalImageUrl");
 
     return SafeArea(
       child: Scaffold(
@@ -210,7 +374,7 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
               DescriptionCard(
                 title: widget.place['name'],
                 location: widget.place['address'],
-                image: 'assets/places/${widget.place['image']}',
+                image: widget.place['image'] // Pass null for placeholder handling
               ),
               SizedBox(height: 20),
               Padding(
@@ -446,3 +610,4 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
     );
   }
 }
+

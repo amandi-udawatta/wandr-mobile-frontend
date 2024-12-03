@@ -7,17 +7,17 @@ import 'package:wandr/pages/home/home_destination_profile_screen.dart';
 class PlacesCard1 extends StatefulWidget {
   final String title;
   final String location;
-  final String? image; // Make image nullable
-  final bool isLiked; // New field to indicate if the place is liked
-  final VoidCallback? onTap; // Add onTap callback
+  final String? image;
+  final bool isLiked;
+  final VoidCallback? onTap;
 
   const PlacesCard1({
     Key? key,
     required this.title,
     required this.location,
-    this.image, // Allow image to be nullable
-    this.isLiked = false, // Default value for isLiked
-    this.onTap, // Initialize onTap
+    this.image, // Nullable image
+    this.isLiked = false,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -30,7 +30,7 @@ class _PlacesCard1State extends State<PlacesCard1> {
   @override
   void initState() {
     super.initState();
-    isFavorite = widget.isLiked; // Initialize isFavorite based on isLiked
+    isFavorite = widget.isLiked;
   }
 
   @override
@@ -43,30 +43,61 @@ class _PlacesCard1State extends State<PlacesCard1> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: Colors.black,
-          image: widget.image != null && widget.image!.isNotEmpty
-              ? DecorationImage(
-            fit: BoxFit.cover,
-            opacity: 0.9,
-            image: AssetImage(widget.image!),
-          )
-              : null, // No image decoration if image is null or empty
         ),
         child: Stack(
           children: [
-            if (widget.image == null || widget.image!.isEmpty)
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.grey.shade800, // Placeholder background color
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.image,
-                    size: 40,
-                    color: Colors.grey.shade500, // Placeholder icon color
-                  ),
+            // Use NetworkImage for remote images
+            widget.image != null && widget.image!.isNotEmpty
+                ? ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                widget.image!,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                          (loadingProgress.expectedTotalBytes ?? 1)
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade800,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.broken_image,
+                        size: 40,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+                : Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade800,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.image,
+                  size: 40,
+                  color: Colors.grey.shade500,
                 ),
               ),
+            ),
+
+            // Favorite icon overlay
             Positioned(
               top: 10,
               right: 10,
@@ -83,6 +114,8 @@ class _PlacesCard1State extends State<PlacesCard1> {
                 ),
               ),
             ),
+
+            // Title and location overlay
             Positioned(
               bottom: 10,
               left: 10,
@@ -100,8 +133,7 @@ class _PlacesCard1State extends State<PlacesCard1> {
                     maxLines: 1, // Ensure title stays on one line
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(
-                      height: 2), // Reduced space between title and location
+                  SizedBox(height: 2), // Spacing between title and location
                   Row(
                     children: [
                       Icon(
@@ -133,3 +165,4 @@ class _PlacesCard1State extends State<PlacesCard1> {
     );
   }
 }
+

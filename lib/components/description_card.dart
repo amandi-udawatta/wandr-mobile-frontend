@@ -5,13 +5,13 @@ import 'package:wandr/theme/app_colors.dart';
 class DescriptionCard extends StatefulWidget {
   final String title;
   final String location;
-  final String image;
+  final String? image;
 
   const DescriptionCard({
     Key? key,
     required this.title,
     required this.location,
-    required this.image,
+    this.image,
   }) : super(key: key);
 
   @override
@@ -28,13 +28,14 @@ class _DescriptionCardState extends State<DescriptionCard> {
       height: MediaQuery.of(context).size.height / 3,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(widget.image),
+          image: NetworkImage(widget.image!), // Fallback image
           fit: BoxFit.cover,
           opacity: 0.9,
         ),
       ),
       child: Stack(
         children: [
+          // Favorite Button
           Positioned(
             top: 10,
             right: 10,
@@ -58,9 +59,11 @@ class _DescriptionCardState extends State<DescriptionCard> {
               ),
             ),
           ),
+
+          // Title and Location
           Positioned(
             bottom: 10,
-            left: 20,  // Added left padding
+            left: 20,
             right: 10,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,6 +104,8 @@ class _DescriptionCardState extends State<DescriptionCard> {
               ],
             ),
           ),
+
+          // Back Button
           Positioned(
             top: 10,
             left: 10,

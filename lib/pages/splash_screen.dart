@@ -21,7 +21,6 @@ class _SplashScreenState extends State<SplashScreen> {
         MaterialPageRoute(builder: (context) => BlogScreen()), //LoginPage()  BlogScreen()
       );
     });
-    // TODO: implement initState
     super.initState();
   }
 

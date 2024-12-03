@@ -1,5 +1,7 @@
 // lib/pages/trip/trip_main.dart
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wandr/theme/app_colors.dart';
@@ -16,6 +18,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'dart:convert';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class TripScreen extends StatefulWidget {
   @override
@@ -31,6 +34,7 @@ class _TripScreenState extends State<TripScreen> {
   @override
   void initState() {
     super.initState();
+
     _fetchPendingTrips();
     _fetchFinalizedTrips();
   }
@@ -54,6 +58,7 @@ class _TripScreenState extends State<TripScreen> {
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
           final trips = data['data'] as List<dynamic>;
+          // print('Pending Trips Data: ${data['data']}');
 
           setState(() {
             pendingTrips = trips.map((trip) {
@@ -63,10 +68,31 @@ class _TripScreenState extends State<TripScreen> {
                 'tripId': trip['tripId'],
                 'title': trip['name'],
                 'created_on': createdOn,
-                'tripPlaces': trip['tripPlaces'] ?? [],
+                'routeType': trip['routeType'],
+                'start_lat': trip['start_lat'],
+                'start_lng': trip['start_lng'],
+                'end_lat': trip['end_lat'],
+                'end_lng': trip['end_lng'],
+                'orderedTime': trip['orderedTime'],
+                'optimizedTime': trip['optimizedTime'],
+                'orderedDistance': trip['orderedDistance'],
+                'optimizedDistance': trip['optimizedDistance'],
+                'estimatedOrderedTime': trip['estimatedOrderedTime'],
+                'estimatedOptimizedTime': trip['estimatedOptimizedTime'],
+                'tripPlaces': trip['tripPlaces']?.map((place) {
+                  return {
+                    'tripPlaceId': place['tripPlaceId'], // Place ID
+                    'placeOrder': place['placeOrder'],
+                    'optimizedOrder': place['optimizedOrder'],
+                    'title': place['title'],
+                    'latitude': place['latitude'],
+                    'longitude': place['longitude'],
+                  };
+                }).toList() ?? [],
               };
             }).toList();
           });
+          print("$pendingTrips");
         } else {
           print('Failed to load trips with status: ${response.statusCode}');
         }
@@ -207,6 +233,7 @@ class _TripScreenState extends State<TripScreen> {
                             ],
                           ),
                           SizedBox(height: 12),
+
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -217,6 +244,7 @@ class _TripScreenState extends State<TripScreen> {
                                     title: trip['title'] as String,
                                     created_on: trip['created_on'] as String,
                                     onTap: () {
+                                      // print('Navigating to PendingTripPage with tripPlaces: ${trip['tripPlaces']}');
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -224,6 +252,20 @@ class _TripScreenState extends State<TripScreen> {
                                             title: trip['title'] as String,
                                             createdOn: trip['created_on'] as String,
                                             tripPlaces: trip['tripPlaces'] as List<dynamic>,
+                                            tripId: trip['tripId'] as int,
+                                            routeType: trip['routeType'] as int?,
+                                            startLocation: trip['start_lat'] != null && trip['start_lng'] != null
+                                                ? LatLng(trip['start_lat'] as double, trip['start_lng'] as double)
+                                                : null,
+                                            endLocation: trip['end_lat'] != null && trip['end_lng'] != null
+                                                ? LatLng(trip['end_lat'] as double, trip['end_lng'] as double)
+                                                : null,
+                                            orderedTime: (trip['orderedTime'] ?? 0) as int,
+                                            optimizedTime: (trip['optimizedTime'] ?? 0) as int,
+                                            orderedDistance: (trip['orderedDistance'] ?? 0) as int,
+                                            optimizedDistance: (trip['optimizedDistance'] ?? 0) as int,
+                                            estimatedOrderedTime: (trip['estimatedOrderedTime'] ?? 0) as int,
+                                            estimatedOptimizedTime: (trip['estimatedOptimizedTime'] ?? 0) as int,
                                           ),
                                         ),
                                       );
@@ -233,6 +275,37 @@ class _TripScreenState extends State<TripScreen> {
                               }).toList(),
                             ),
                           ),
+
+                          // Expanded(
+                          //   child: ListView.builder(
+                          //     scrollDirection: Axis.horizontal,
+                          //     itemCount: pendingTrips.length,
+                          //     itemBuilder: (context, index) {
+                          //       final trip = pendingTrips[index];
+                          //       return Padding(
+                          //         padding: const EdgeInsets.only(right: 16.0),
+                          //         child: TripCard(
+                          //           title: trip['title'],
+                          //           created_on: trip['created_on'],
+                          //           onTap: () {
+                          //             Navigator.push(
+                          //               context,
+                          //               MaterialPageRoute(
+                          //                 builder: (context) => PendingTripPage(
+                          //                   title: trip['title'],
+                          //                   createdOn: trip['created_on'],
+                          //                   tripPlaces: trip['tripPlaces'], // Pass complete tripPlaces list
+                          //                   tripId: trip['tripId'], // Pass tripId
+                          //                 ),
+                          //               ),
+                          //             );
+                          //           },
+                          //         ),
+                          //       );
+                          //     },
+                          //   ),
+                          // ),
+
                         ],
                       ),
                     ),
