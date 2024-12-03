@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wandr/theme/app_colors.dart'; // Ensure this has your grey color definitions
 import 'package:wandr/pages/profile/profile_main.dart'; // Adjust the import path if necessary
+import 'package:wandr/pages/chat/chat_list.dart'; // Import the chat list page
 
 class HomeProfile extends StatelessWidget {
   final String image;
@@ -47,10 +48,19 @@ class HomeProfile extends StatelessWidget {
             ),
           ),
         ),
-        Icon(
-          Icons.notifications,
-          color: Kcolours.greyShade1, // Ensure Kcolours has the correct grey color
-          size: 24, // Adjust size as needed
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const ChatListPage(),
+              ),
+            );
+          },
+          child: Icon(
+            Icons.chat_bubble_outline, // Chat icon
+            color: Kcolours.greyShade1, // Ensure Kcolours has the correct grey color
+            size: 24, // Adjust size as needed
+          ),
         ),
       ],
     );
