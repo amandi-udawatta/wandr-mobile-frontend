@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wandr/pages/dashboard_page.dart';
+import 'package:wandr/pages/home/home_dashboard_screen.dart';
 
 import 'package:wandr/theme/app_colors.dart';
 import '../../components/bottom_nav_bar.dart';
@@ -58,11 +58,11 @@ class MainShopsPage extends StatelessWidget {
     // Mock data for recommended items - replace this with your actual data fetching logic
     final recommendedItemNames = [
       'Perera Wooden Store',
-      'Handwoven Rattan Basket',
-      'Gemstone Necklace',
-      'Batik Print Scarf',
-      'Sri Lankan Spices Set',
-      'Hand-painted Wall Art',
+      'Elegant Store',
+      'Gemstones',
+      'Batik Print Kade',
+      'Sri Lankan Spices',
+      'Hand-painted Wall Arts',
     ];
     final recommendedItemImages = [
       'assets/images/shops/item-elephant.png',

@@ -504,14 +504,7 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
                             color: Kcolours.brownShade4,
                           ),
                         ),
-                        Text(
-                          "See all",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                            color: Kcolours.blueShade2,
-                          ),
-                        ),
+
                       ],
                     ),
                     SizedBox(height: 12),
@@ -538,61 +531,54 @@ class _DestinationProfileScreenState extends State<DestinationProfileScreen> {
                 ),
               ),
               SizedBox(height: 20),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Related Destinations",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 18,
-                            color: Kcolours.brownShade4,
-                          ),
-                        ),
-                        Text(
-                          "See all",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                            color: Kcolours.blueShade2,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 12),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          PlacesCard1(
-                            title: "Mihintale Rock",
-                            location: "Mihintale, SL",
-                            image: "assets/images/home/Related - 1.png",
-                          ),
-                          SizedBox(width: 16),
-                          PlacesCard1(
-                            title: "Jetawanaramaya",
-                            location: "Anuradhapura, SL",
-                            image: "assets/images/home/Related - 2.png",
-                          ),
-                          SizedBox(width: 16),
-                          PlacesCard1(
-                            title: "Ruwanweli Stupa",
-                            location: "Anuradhapura, SL",
-                            image: "assets/images/home/Related - 3.png",
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 16.0),
+              //   child: Column(
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       Row(
+              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //         children: [
+              //           Text(
+              //             "Related Destinations",
+              //             style: GoogleFonts.poppins(
+              //               fontWeight: FontWeight.w500,
+              //               fontSize: 18,
+              //               color: Kcolours.brownShade4,
+              //             ),
+              //           ),
+              //
+              //         ],
+              //       ),
+              //       SizedBox(height: 12),
+              //       SingleChildScrollView(
+              //         scrollDirection: Axis.horizontal,
+              //         child: Row(
+              //           children: [
+              //             PlacesCard1(
+              //               title: "Mihintale Rock",
+              //               location: "Mihintale, SL",
+              //               image: "assets/images/home/Related - 1.png",
+              //             ),
+              //             SizedBox(width: 16),
+              //             PlacesCard1(
+              //               title: "Jetawanaramaya",
+              //               location: "Anuradhapura, SL",
+              //               image: "assets/images/home/Related - 2.png",
+              //             ),
+              //             SizedBox(width: 16),
+              //             PlacesCard1(
+              //               title: "Ruwanweli Stupa",
+              //               location: "Anuradhapura, SL",
+              //               image: "assets/images/home/Related - 3.png",
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              SizedBox(height: 10),
               // Add to Trip Button
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),

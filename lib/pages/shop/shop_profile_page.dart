@@ -22,9 +22,9 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
   Widget build(BuildContext context) {
     // Mock data for item (replace with actual data fetching logic)
     Map<String, String> itemData = {
-      "imagePath": "assets/images/shops/item-basket.png",
-      "price": "Rs.2,300.00",
-      "name": "Handwoven Rattan Basket",
+      "imagePath": "assets/images/shops/item-cane-laundry-basket.png",
+      "price": "Rs.3,300.00",
+      "name": "Cane Laundry Basket",
       "storeName": "Rattan Wonders",
       "description":
       "This beautifully handwoven rattan basket is the perfect blend of functionality and style. Crafted by skilled artisans, it offers a durable and eco-friendly solution for your storage needs. Whether used for organizing household items, displaying fruits, or as a decorative piece, this basket adds a touch of natural elegance to any space. Read More...",
@@ -309,67 +309,67 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  // const SizedBox(height: 20),
 
-                  // Delivery Section
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Kcolours.primary.withOpacity(0.4)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.card_giftcard_outlined,
-                              size: 30,
-                              color: Kcolours.brownShade4,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Delivery",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Kcolours.brownShade4,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              deliveryData["dateDuration"]!,
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Kcolours.brownShade4,
-                              ),
-                            ),
-                            Text(
-                              deliveryData["price"]!,
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Kcolours.brownShade3,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "Address : ${deliveryData["address"]!}",
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Kcolours.brownShade3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // // Delivery Section
+                  // Container(
+                  //   padding: EdgeInsets.all(16),
+                  //   decoration: BoxDecoration(
+                  //     borderRadius: BorderRadius.circular(15),
+                  //     border: Border.all(color: Kcolours.primary.withOpacity(0.4)),
+                  //   ),
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       Row(
+                  //         children: [
+                  //           Icon(
+                  //             Icons.card_giftcard_outlined,
+                  //             size: 30,
+                  //             color: Kcolours.brownShade4,
+                  //           ),
+                  //           const SizedBox(width: 8),
+                  //           Text(
+                  //             "Delivery",
+                  //             style: TextStyle(
+                  //               fontSize: 20,
+                  //               color: Kcolours.brownShade4,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       const SizedBox(height: 8),
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         children: [
+                  //           Text(
+                  //             deliveryData["dateDuration"]!,
+                  //             style: TextStyle(
+                  //               fontSize: 20,
+                  //               color: Kcolours.brownShade4,
+                  //             ),
+                  //           ),
+                  //           Text(
+                  //             deliveryData["price"]!,
+                  //             style: TextStyle(
+                  //               fontSize: 20,
+                  //               fontWeight: FontWeight.bold,
+                  //               color: Kcolours.brownShade3,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       const SizedBox(height: 8),
+                  //       Text(
+                  //         "Address : ${deliveryData["address"]!}",
+                  //         style: TextStyle(
+                  //           fontSize: 15,
+                  //           color: Kcolours.brownShade3,
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
 
                   const SizedBox(height: 20),
 

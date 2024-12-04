@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:wandr/pages/home/home_dashboard_screen.dart';
 import 'package:wandr/theme/app_colors.dart';
 import '../../components/bottom_nav_bar.dart';
-import '../dashboard_page.dart';
 import 'completed_challenges_page.dart';
 import 'new_challenges_page.dart';
 import 'package:google_fonts/google_fonts.dart';

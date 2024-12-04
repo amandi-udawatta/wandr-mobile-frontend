@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:wandr/config.dart';
+import 'package:wandr/pages/home/home_dashboard_screen.dart';
 import 'package:wandr/pages/rewards/rewards_page.dart';
 import 'package:wandr/pages/trip/finalized_trip_page.dart';
 import 'package:wandr/pages/trip/generate_trip_recs.dart';
@@ -692,7 +693,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => RewardsPage(),
+                              builder: (context) => DashboardScreen(),
                             ),
                           );
                         },
@@ -706,6 +707,7 @@ class _PendingTripPageState extends State<PendingTripPage> {
                         child: Row(
                           children: [
                             Icon(Icons.add, size: 18),
+
                           ],
                       ),
                     ),
@@ -713,38 +715,38 @@ class _PendingTripPageState extends State<PendingTripPage> {
                 ),
               ),
 
-          Padding(
-                padding: commonPadding,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => GetRecommendationsPage(
-                          //       tripId: widget.tripId,
-                          //     ),
-                          //   ),
-                          // );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Kcolours.primary, // Background color
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: Text(
-                          'Generate My Recommendations',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          // Padding(
+          //       padding: commonPadding,
+          //       child: Row(
+          //         children: [
+          //           Expanded(
+          //             child: ElevatedButton(
+          //               onPressed: () {
+          //                 // Navigator.push(
+          //                 //   context,
+          //                 //   MaterialPageRoute(
+          //                 //     builder: (context) => GetRecommendationsPage(
+          //                 //       tripId: widget.tripId,
+          //                 //     ),
+          //                 //   ),
+          //                 // );
+          //               },
+          //               style: ElevatedButton.styleFrom(
+          //                 backgroundColor: Kcolours.primary, // Background color
+          //                 shape: RoundedRectangleBorder(
+          //                   borderRadius: BorderRadius.circular(12),
+          //                 ),
+          //                 padding: EdgeInsets.symmetric(vertical: 16),
+          //               ),
+          //               child: Text(
+          //                 'Generate My Recommendations',
+          //                 style: TextStyle(color: Colors.white, fontSize: 18),
+          //               ),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
 
               SizedBox(height: 16),
 

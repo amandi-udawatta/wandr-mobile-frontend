@@ -246,7 +246,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: Column(
           children: [
             SizedBox(height: 25),
-            //TODO add the name of the user. Check if name is taken from the signup
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: HomeProfile(
@@ -268,7 +267,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             SizedBox(height: 20),
 
-            //TODO the search bar doesnt workkkk. remove if not needed
             // custom.SearchBar(
             //   controller: _searchController,
             //   onChanged: _onSearchChanged,
